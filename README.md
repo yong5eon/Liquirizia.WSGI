@@ -1,0 +1,2 @@
+# Liquirizia.WSGI
+WSGI
