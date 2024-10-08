@@ -46,9 +46,6 @@ class ServerHandler(BaseHandler):
 		result = self.stdout.write(data)
 		if result is None or result == len(data):
 			return
-		from warnings import warn
-		warn("SimpleHandler.stdout.write() should not do partial writes",
-			DeprecationWarning)
 		while True:
 			data = data[result:]
 			if not data:
@@ -59,15 +56,6 @@ class ServerHandler(BaseHandler):
 	def _flush(self):
 		self.stdout.flush()
 		self._flush = self.stdout.flush
-		return
-
-	def close(self):
-		try:
-			self.request_handler.log_request(
-				self.status.split(' ',1)[0], self.bytes_sent
-			)
-		finally:
-			SimpleHandler.close(self)
 		return
 
 	def send_headers(self):
