@@ -1,0 +1,229 @@
+# -*- coding: utf-8 -*-
+
+# from collections.abc import Mapping
+
+from enum import  Enum
+
+from typing import Any, Iterator, KeysView, ItemsView, ValuesView, Mapping
+
+__all__ = (
+	'OAuth2Password',
+	'OAuth2Implict',
+	'OAuth2Credentials',
+	'OAuth2Code',
+	'HTTP',
+	'KeyHeader',
+	'KeyQuery',
+	'KeyCookie',
+	'TLS',
+	'OpenIdConnect',
+)
+
+class Auth(Mapping):
+	def __init__(self, **kwargs):
+		self.__properties__ = kwargs
+		return
+
+	def __getitem__(self, key: Any) -> Any:
+		return self.__properties__.__getitem__(key)
+	
+	def __setitem__(self, key: Any, value: Any) -> None:
+		return self.__properties__.__setitem__(key, value)
+	
+	def __delitem__(self, key: Any) -> None:
+		return self.__properties__.__delitem__(key)
+	
+	def __iter__(self) -> Iterator:
+		return self.__properties__.__iter__()
+	
+	def __len__(self) -> int:
+		return self.__properties__.__len__()
+	
+	def __contains__(self, key: object) -> bool:
+		return self.__properties__.__contains__(key)
+	
+	def keys(self) -> KeysView:
+		return self.__properties__.keys()
+	
+	def items(self) -> ItemsView:
+		return self.__properties__.items()
+	
+	def values(self) -> ValuesView:
+		return self.__properties__.values()
+	
+	def __eq__(self, other: object) -> bool:
+		return self.__properties__.__eq__(other)
+	
+	def __ne__(self, value: object) -> bool:
+		return self.__properties__.__ne__(value)
+	
+	def get(self, key: object) -> Any:
+		return self.__properties__.get(key)
+
+class OAuth2Password(Auth):
+	def __init__(
+		self,
+		url: str,
+		refreshUrl: str = None,
+		description: str = None,
+		scopes: Mapping[str, str] = {},
+	):
+		super().__init__(
+			type='oauth2',
+			flows={
+				'password': {
+					'tokenUrl': url,
+					'refreshUrl': refreshUrl,
+					'scopes': scopes
+				}
+			},
+			description=description,
+		)
+		return
+	
+class OAuth2Implict(Auth):
+	def __init__(
+		self,
+		url: str,
+		refreshUrl: str = None,
+		description: str = None,
+		scopes: Mapping[str, str] = {},
+	):
+		super().__init__(
+			type='oauth2',
+			flows={
+				'implicit': {
+					'authorizationUrl': url,
+					'refreshUrl': refreshUrl,
+					'scopes': scopes
+				}
+			},
+			description=description,
+		)
+		return
+
+class OAuth2Credentials(Auth):
+	def __init__(
+		self,
+		url: str,
+		refreshUrl: str = None,
+		description: str = None,
+		scopes: Mapping[str, str] = {},
+	):
+		super().__init__(
+			type='oauth2',
+			flows={
+				'clientCredentials': {
+					'tokenUrl': url,
+					'refreshUrl': refreshUrl,
+					'scopes': scopes
+				}
+			},
+			description=description,
+		)
+		return
+
+class OAuth2Code(Auth):
+	def __init__(
+		self,
+		url: str,
+		authUrl: str,
+		refreshUrl: str = None,
+		description: str = None,
+		scopes: Mapping[str, str] = {},
+	):
+		super().__init__(
+			type='oauth2',
+			flows={
+				'clientCredentials': {
+					'tokenUrl': url,
+					'authrizationUrl': authUrl,
+					'refreshUrl': refreshUrl,
+					'scopes': scopes
+				}
+			},
+			description=description,
+		)
+		return
+	
+class HTTP(Auth):
+	def __init__(
+		self,
+		format: str,
+		bearerFormat: str = 'bearer',
+		description: str = None,
+	):
+		super().__init__(
+			type='http',
+			scheme=format,
+			bearerFormat=bearerFormat,
+			description=description,
+		)
+		return
+
+class KeyHeader(Auth):
+	def __init__(
+		self,
+		name: str,
+		description: str = None,
+	):
+		super().__init__(
+			type='apiKey',
+			name=name,
+			description=description,
+		)
+		self['in'] = 'header'
+		return
+
+class KeyQuery(Auth):
+	def __init__(
+		self,
+		name: str,
+		description: str = None,
+	):
+		super().__init__(
+			type='apiKey',
+			name=name,
+			description=description,
+		)
+		self['in'] = 'query'
+		return
+
+class KeyCookie(Auth):
+	def __init__(
+		self,
+		name: str,
+		description: str = None,
+	):
+		super().__init__(
+			type='apiKey',
+			name=name,
+			description=description,
+		)
+		self['in'] = 'cookie'
+		return
+
+class TLS(Auth):
+	def __init__(
+		self,
+		description: str = None,
+	):
+		super().__init__(
+			type='mutualTLS',
+			description=description,
+		)
+		return
+	
+class OpenIdConnect(Auth):
+	def __init__(
+		self,
+		url: str,
+		description: str = None,
+	):
+		super().__init__(
+			type='openIdConnect',
+			openIdConnectUrl=url,
+			description=description,
+		)
+		return
+	

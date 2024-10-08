@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8" />
+	<title>Sample Web Application Server</title>
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+	<link rel="stylesheet" href="/css/sample.css" />
+	<link rel="shortcut icon" href="/favicon.ico">
+</head>
+<body>
+	<article>
+		<div class="container">
+			<h2>요청 테스트</h2>
+			<h3>URL 패턴: <span>/api/run/:a/:b</span>, 요청 URL: <span>/api/run/${INTEGER}/${INTEGER}</span></h3>
+			<form id="frm-test">
+				<div class="form-group row">
+					<label class="col-form-label col-3 text-right">요청 방식</label>
+					<div class="col-9">
+						<select class="form-control" name="method">
+							<option selected></option>
+							<option value="GET">GET</option>
+							<option value="POST">POST</option>
+							<option value="PUT">PUT</option>
+							<option value="DELETE">DELETE</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label class="col-form-label col-3 text-right">질의</label>
+					<div class="col-9">
+						<input type="text" class="form-control" name="querystring"/>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label class="col-form-label col-3 text-right">본문 유형</label>
+					<div class="col-9">
+						<select class="form-control" name="type">
+							<option selected></option>
+							<option value="text/plain; charset=utf-8">Text</option>
+							<option value="application/x-www-form-urlencoded; charset=utf-8">Form-UrlEncoded</option>
+							<option value="application/json; charset=utf-8">JavaScriptObjectNotation</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label class="col-form-label col-3 text-right">본문</label>
+					<div class="col-9">
+						<input class="form-control" type="text" name="body"/>
+					</div>
+				</div>
+				<div class="form-group row">
+					<div class="col-12">
+						<button class="btn btn-primary btn-sm btn-block" type="button">테스트</button>
+					</div>
+				</div>
+			</form>
+			<h3>결과</h3>
+			<blockquote class="blockquote" id="frm-test-result">
+				<p class="mb-0"></p>
+				<pre class="mb-0"></pre>
+			</blockquote>
+		</div>
+		<div class="container">
+			<h2>스트림 출력 테스트</h2>
+			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestStreamOut">테스트</button>
+			<blockquote class="blockquote" id="frmTestStreamOutResult">
+				<p class="mb-0"></p>
+				<pre class="mb-0"></pre>
+			</blockquote>
+		</div>
+		<div class="container">
+			<h2>청크 스트림 출력 테스트</h2>
+			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestChunkedStreamOut">테스트</button>
+			<blockquote class="blockquote" id="frmTestChunkedStreamOutResult">
+				<p class="mb-0"></p>
+				<pre class="mb-0"></pre>
+			</blockquote>
+		</div>
+		<div class="container">
+			<h2>서버 센트 이벤트(Server Sent Event) 테스트</h2>
+			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestServerSentEventStart">테스트</button>
+			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestServerSentEventStop" style="display: none;">테스트 종료</button>
+			<blockquote class="blockquote" id="frmTestServerSentEvent">
+				<p class="mb-0"></p>
+				<pre class="mb-0"></pre>
+			</blockquote>
+		</div>
+		<div class="container">
+			<h2>웹 소켓 테스트</h2>
+			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestWebSocketStart">시작</button>
+			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestWebSocketSend" style="display: none;">테스트</button>
+			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestWebSocketStop" style="display: none;">종료</button>
+			<blockquote class="blockquote" id="frm-test-websocket-result">
+				<pre class="mb-0"></pre>
+			</blockquote>
+		</div>
+		<div class="container">
+			<h2>필터 테스트</h2>
+			<img src="/thumbs/sample" class="img-fluid">
+		</div>
+	</article>
+	<script src="//code.jquery.com/jquery-3.6.1.js" integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI=" crossorigin="anonymous"></script>
+	<script src="//cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+	<script type="application/javascript">
+		$(document).ready(function(e) {
+			$('form[id=frm-test] button').click(function(e) {
+				method = $('form[id=frm-test] select[name=method]').val()
+				if(!method)
+					return;
+				qs = $('form[id=frm-test] input[name=querystring]').val()
+				type = $('form[id=frm-test] select[name=type]').val()
+				body = $('form[id=frm-test] input[name=body]').val()
+				const options = {
+					method: method,
+					headers: {}
+				};
+				options['headers']['X-Token'] = crypto.randomUUID();
+				if(method !=='GET' && body !== '') {
+					options['headers']['Content-Type'] = type;
+					options['body'] = body;
+				}
+				let url = '/api/run/' + Math.floor(Math.random() * 1000).toString() + '/' + Math.floor(Math.random() * 1000).toString();
+				if(qs)
+					url += '?' + qs;
+				console.log(options);
+				fetch(url, options).then(function(response) {
+					$('#frm-test-result p').text(response.status + ' ' + response.statusText)
+					response.text().then(function(data) {
+						$('#frm-test-result pre').text(data);
+					});
+				}).catch(function(error) {
+					console.log(error);
+				});
+			});
+			$('#btnTestStreamOut').click(function(e) {
+				const options = {method: 'GET'};
+				fetch('/api/run/stream/out', options).then(function(response) {
+					$('#frmTestStreamOutResult p').text(response.status + ' ' + response.statusText);
+					$('#frmTestStreamOutResult pre').text('');
+					const reader = response.body.getReader();
+					const decoder = new TextDecoder();
+					const read = function() {
+						reader.read().then(append);
+					};
+					const append = function(response) {
+						if(response.done)
+							return;
+						$('#frmTestStreamOutResult pre').append(decoder.decode(response.value));
+						read();
+					};
+					read();
+				}).catch(function(error) {
+					console.log(error);
+				});
+			});
+			$('#btnTestChunkedStreamOut').click(function(e) {
+				const options = {method: 'GET'};
+				fetch('/api/run/stream/chunked/out', options).then(function(response) {
+					$('#frmTestChunkedStreamOutResult p').text(response.status + ' ' + response.statusText);
+					$('#frmTestChunkedStreamOutResult pre').text('');
+					const reader = response.body.getReader();
+					const decoder = new TextDecoder();
+					const read = function() {
+						reader.read().then(append);
+					};
+					const append = function(response) {
+						if(response.done)
+							return;
+						$('#frmTestChunkedStreamOutResult pre').append(decoder.decode(response.value));
+						read();
+					};
+					read();
+				}).catch(function(error) {
+					console.log(error);
+				});
+			});
+			$('#btnTestServerSentEventStart').click(function(e) {
+				$('#btnTestServerSentEventStart').hide();
+				$('#btnTestServerSentEventStop').show();
+				const es = new EventSource('/api/run/stream/sse');
+				es.onopen = function(event) {
+					$('#frmTestServerSentEvent p').text('open');
+					$('#frmTestServerSentEvent pre').text('');
+					console.log(event.type);
+				};
+				es.onmessage = function(event) {
+					$('#frmTestServerSentEvent p').text('message');
+					console.log(event.type);
+					$('#frmTestServerSentEvent pre').append(event.data);
+				};
+				es.addEventListener('start', function(event) {
+					$('#frmTestServerSentEvent p').text('started');
+					console.log(event.type);
+				});
+				es.addEventListener('end', function(event) {
+					$('#frmTestServerSentEvent p').text('end');
+					console.log(event.type);
+				});
+				es.onerror = function(event) {
+					console.log(event.type);
+					$('#frmTestServerSentEvent p').text('error');
+					$('#frmTestServerSentEvent pre').append(event);
+				}
+				$('#btnTestServerSentEventStop').click(function(e) {
+					$('#btnTestServerSentEventStop').hide();
+					$('#btnTestServerSentEventStart').show();
+					$('#frmTestServerSentEvent p').text('stopped');
+					es.close();
+				});
+			});
+			$('#btnTestWebSocketStart').click(function(e) {
+				let socket = new WebSocket('/api/run/socket');
+				$('#btnTestWebSocketSend').click(function(e) {
+					if(socket)
+						socket.send(Math.floor(Math.random() * 1000));
+				});
+				$('#btnTestWebSocketStop').click(function(e) {
+					$('#btnTestWebSocketStart').show();
+					$('#btnTestWebSocketSend').hide();
+					$('#btnTestWebSocketStop').hide();
+					if(socket)
+						socket.close();
+				});
+				socket.onmessage = function(event) {
+					$('#frm-test-websocket-result pre').append(event.data + '\n');
+				};
+				socket.onopen = function (event) {
+					$('#btnTestWebSocketStart').hide();
+					$('#btnTestWebSocketSend').show();
+					$('#btnTestWebSocketStop').show();
+					$('#frm-test-websocket-result pre').text('');
+				};
+			});
+		});
+	</script>
+</body>
+</html>
