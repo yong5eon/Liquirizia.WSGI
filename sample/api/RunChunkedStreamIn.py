@@ -6,6 +6,7 @@ from Liquirizia.WSGI.Responses import (
 	ResponseBadRequest,
 	ResponseBuffer,
 )
+from Liquirizia.WSGI.Description import *
 
 __all__ = (
 	'RunChunkedStreamIn'
@@ -13,7 +14,21 @@ __all__ = (
 
 @RequestProperties(
 	method='PUT',
-	url='/api/run/stream/chunked/in'
+	url='/api/run/stream/chunked/in',
+	description=Description(
+		description='클라이언트에서 스트림으로 입력한 값을 그대로 반환',
+		summary='청크드 입력 스트림 샘플',
+		tags='RequestStreamRunner',
+		responses=(
+			DescriptionResponse(
+				status=200,
+				description='완료',
+				body=DescriptionResponseBody(
+					format='*/*',
+				),
+			),
+		),
+	),
 )
 class RunChunkedStreamIn(RequestStreamRunner):
 	def __init__(self, request: Request):

@@ -3,6 +3,7 @@
 from Liquirizia.WSGI import RequestProperties, Request, RequestReader
 from Liquirizia.WSGI.Extends import ServerSentEvents
 from Liquirizia.WSGI.Properties import RequestServerSentEventsRunner
+from Liquirizia.WSGI.Description import *
 
 from time import sleep
 from random import randrange
@@ -15,7 +16,22 @@ __all__ = (
 
 @RequestProperties(
 	method='GET',
-	url='/api/run/stream/sse'
+	url='/api/run/stream/sse',
+	description=Description(
+		description='1초 간격으로 0에서 1000사이의 랜덤한 숫자를 송출',
+		summary='서버 전송 이벤트 샘플',
+		tags='RequestServerSentEventsRunner',
+		responses=(
+			DescriptionResponse(
+				status=200,
+				description='완료',
+				body=DescriptionResponseBody(
+					format='text/event-stream',
+					example='data:1\ndata:2\ndata:3\n',
+				),
+			),
+		),
+	),
 )
 class RunServerSentEvent(RequestServerSentEventsRunner):
 	def __init__(self, request: Request):
