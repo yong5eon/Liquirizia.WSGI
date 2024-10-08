@@ -7,7 +7,7 @@ from .Route import Route
 from .Description import Description
 from .Documentation import Document, Information, Path
 
-from re import sub, compile
+from re import compile
 
 __all__ = (
 	'Router'
@@ -67,4 +67,17 @@ class Router(Singleton):
 		return
 	
 	def toDocument(self, info: Information, version: str = '3.1.0'):
+		ORDER = {
+			'OPTIONS': '00',
+			'POST': '10',
+			'HEAD': '11',
+			'GET': '12',
+			'PUT': '13',
+			'DELETE': '14',
+			'TRACE': '20',
+			'PATCH': '30',
+		}
+		for k, v in self.maps.items():
+			self.maps[k] = dict(sorted(self.maps[k].items(), key=lambda _: ORDER.get(_[0].upper(), '99')))
+		self.maps = dict(sorted(self.maps.items(), key=lambda _: _[0]))
 		return Document(info=info, version=version, routes=self.maps, authenticates=self.authes)
