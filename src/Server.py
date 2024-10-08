@@ -3,14 +3,19 @@ from wsgiref.simple_server import (
 	make_server,
 	WSGIServer,
 	WSGIRequestHandler,
-	
 )
 from wsgiref.handlers import SimpleHandler, BaseHandler
+from socketserver import ThreadingMixIn
+
 __all__ = (
 	'serve'
 )
-class Server(WSGIServer): pass
+
+class Server(ThreadingMixIn, WSGIServer):
+	daemon_threads = True
+
 class ServerHandler(BaseHandler):
+
 	def __init__(
 		self,
 		stdin,
@@ -26,12 +31,17 @@ class ServerHandler(BaseHandler):
 		self.base_env = environ
 		self.wsgi_multithread = multithread
 		self.wsgi_multiprocess = multiprocess
+		return
+
 	def get_stdin(self):
 		return self.stdin
+
 	def get_stderr(self):
 		return self.stderr
+
 	def add_cgi_vars(self):
 		self.environ.update(self.base_env)
+
 	def _write(self,data):
 		result = self.stdout.write(data)
 		if result is None or result == len(data):
@@ -44,9 +54,13 @@ class ServerHandler(BaseHandler):
 			if not data:
 				break
 			result = self.stdout.write(data)
+		return
+
 	def _flush(self):
 		self.stdout.flush()
 		self._flush = self.stdout.flush
+		return
+
 	def close(self):
 		try:
 			self.request_handler.log_request(
@@ -54,6 +68,8 @@ class ServerHandler(BaseHandler):
 			)
 		finally:
 			SimpleHandler.close(self)
+		return
+
 	def send_headers(self):
 		self.cleanup_headers()
 		self.headers_sent = True
@@ -62,6 +78,7 @@ class ServerHandler(BaseHandler):
 			self._write(bytes(self.headers))
 			self._flush()
 		return
+
 	def start_response(self, status, headers, exc_info=None):
 		if exc_info:
 			try:
@@ -79,6 +96,7 @@ class ServerHandler(BaseHandler):
 		assert status[3]==" ", "Status message must have a space after code"
 		self.send_headers()
 		return self.write
+
 class ServerRequestHandler(WSGIRequestHandler):
 	def handle(self):
 		self.raw_requestline = self.rfile.readline(65537)
@@ -91,8 +109,10 @@ class ServerRequestHandler(WSGIRequestHandler):
 		if not self.parse_request(): # An error code has been sent, just exit
 			return
 		handler = ServerHandler(
-			self.rfile, self.wfile, self.get_stderr(), self.get_environ(),
-			multithread=False,
+			self.rfile, 
+			self.wfile, 
+			self.get_stderr(), 
+			self.get_environ(),
 		)
 		handler.request_handler = self	  # backpointer for logging
 		handler.run(self.server.get_app())
