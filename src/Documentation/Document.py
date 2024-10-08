@@ -69,7 +69,8 @@ class Response(Documentation):
 class Path(Documentation):
 	def __init__(
 		self, 
-		description: Description
+		description: Description,
+		id: str = None,
 	):
 		parameters = []
 		for parameter in description.parameter if description.parameter else []:
@@ -128,7 +129,7 @@ class Path(Documentation):
 		super().__init__(
 			summary=description.summary,
 			description=description.description,
-			operationId=uuid4().hex,
+			operationId=id if id else uuid4().hex,
 			tags=description.tags,
 			responses={
 				str(response.status): Response(response) for response in description.responses
