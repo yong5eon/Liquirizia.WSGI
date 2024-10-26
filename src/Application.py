@@ -37,7 +37,6 @@ from .Error import Error
 from .Responses import (
 	ResponseError,
 	ResponseOK,
-	ResponseNotFound,
 )
 from .Errors import (
 	InternalServerError,
@@ -49,12 +48,12 @@ from .Util import ToHeaderName
 from .RequestHandler import RequestHandler
 
 from platform import system
-from os import getcwd, walk
+from os import walk
 from os.path import splitext, split
 from pathlib import Path
 from importlib.machinery import SourceFileLoader
-
-from io import BufferedReader, BufferedWriter, BytesIO
+from importlib import import_module
+from pkgutil import walk_packages
 
 from typing import Type
 
@@ -317,13 +316,17 @@ class Application(object):
 			cors=cors
 		))
 
-	def load(self, path, ext: str = 'py'):
-		ps = Path(path).rglob('*.{}'.format(ext))
-		for p in ps if ps else []:
-			p = self.loadRunner(str(p))
+
+	def load(self, mod: str = None, path: str = None, ext: str = 'py'):
+		if mod:
+			self.loadModule(mod)
+		if path:
+			ps = Path(path).rglob('*.{}'.format(ext))
+			for p in ps if ps else []:
+				p = self.loadPath(str(p))
 		return
 	
-	def loadRunner(self, path):
+	def loadPath(self, path):
 		head, tail = split(path)
 		file, ext = splitext(tail)
 		head = head.replace('\\', '.').replace('/', '.')
@@ -333,3 +336,13 @@ class Application(object):
 		if not mo:
 			return None
 		return mo
+	
+	def loadModule(self, mod):
+		pkg = import_module(mod)
+		for _, name, isPackage in walk_packages(pkg.__path__):
+			fullname = pkg.__name__ + '.' + name
+			if isPackage:
+				self.loadModule(fullname)
+				continue
+			import_module(fullname)
+		return
