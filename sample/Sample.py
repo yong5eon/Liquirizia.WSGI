@@ -82,7 +82,7 @@ aps = Application(
 		)
 )
 
-aps.load('sample/api')
+aps.load(path='sample/api')
 
 # apply swagger-ui
 import sys
