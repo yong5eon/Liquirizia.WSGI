@@ -19,6 +19,13 @@ from .RequestHandler import RequestHandler
 
 from .Server import serve
 
+from Liquirizia.Serializer import SerializerHelper
+from .Serializers.FormUrlEncoded import (
+	Encoder as FormUrlEncoder,
+	Decoder as FormUrlDecoder,
+	FORMATS as FORM_URL_ENCODED,
+)
+
 __all__ = (
 	'Application',
 	'Configuration',
@@ -34,3 +41,6 @@ __all__ = (
 	'RequestHandler',
 	'serve',
 )
+
+for FORMAT in FORM_URL_ENCODED:
+	SerializerHelper.Set(FORMAT, FormUrlEncoder, FormUrlDecoder)
