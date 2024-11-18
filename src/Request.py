@@ -132,10 +132,6 @@ class Request(object):
 		return headers
 	
 	@property
-	def remote(self):
-		return '{}:{}'.format(self.address, self.port)
-	
-	@property
 	def remoteAddress(self):
 		return self.address
 	
@@ -183,12 +179,15 @@ class Request(object):
 
 	@property
 	def remote(self):
-		if 'X-Forwarded-For' in self.props.keys():
-			return self.props['X-Forwarded-For']['expr']
-		if 'X-Real-IP' in self.props.keys():
-			return self.props['X-Real-IP']['expr']
-		return self.props['Remote-Address']['expr']
-
+		try:
+			if 'X-Forwarded-For' in self.props.keys():
+				return self.props['X-Forwarded-For']['expr']
+			if 'X-Real-IP' in self.props.keys():
+				return self.props['X-Real-IP']['expr']
+			return self.props['Remote-Address']['expr']
+		except:
+			return '{}:{}'.format(self.address, self.port)
+	
 	@property
 	def scheme(self):
 		if 'X-Forwarded-Proto' in self.props.keys():
