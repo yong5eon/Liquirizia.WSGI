@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from ..Request import Request
-from ..Response import Response
 from .ResponseFilter import ResponseFilter
 
-from typing import Tuple
+from ..Request import Request
+from ..Response import Response
+
+from typing import Tuple, Optional
 
 __all__ = (
 	'RequestFilters',
@@ -17,9 +18,9 @@ class RequestFilters(ResponseFilter):
 		self.filters = args
 		return
 
-	def run(self, request: Request) -> Tuple[Request, Response]:
+	def __call__(self, request: Request) -> Tuple[Request, Optional[Response]]:
 		for f in self.filters:
-			request, response = f.run(request)
+			request, response = f(request)
 			if response:
 				return request, response
 		return request, None

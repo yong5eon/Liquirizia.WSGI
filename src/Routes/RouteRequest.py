@@ -85,7 +85,7 @@ class RouteRequest(Route, RouteRun):
 
 
 		if self.onRequest:
-			request, response = self.onRequest.run(request)
+			request, response = self.onRequest(request)
 			if response:
 				writer.response(response)
 				return
@@ -94,7 +94,7 @@ class RouteRequest(Route, RouteRun):
 		response = obj.run()
 
 		if self.onResponse:
-			response = self.onResponse.run(response)
+			response = self.onResponse(response)
 
 		writer.response(response)
 		return
