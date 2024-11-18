@@ -12,13 +12,14 @@ __all__ = (
 class ResponseBadRequest(Response):
 	"""Response 400 Bad Request Class"""
 	def __init__(self, body=None, format=None, charset=None):
+		if body: body = SerializerHelper.Encode(body, format, charset)
 		super(ResponseBadRequest, self).__init__(
 			status=400,
 			message='Bad Request',
 			headers={
 				'Content-Length': len(body) if body else 0,
 			},
-			body=SerializerHelper.Encode(body, format, charset) if body else None,
+			body=body,
 			format=format,
 			charset=charset,
 		)

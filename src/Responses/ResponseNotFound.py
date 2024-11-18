@@ -13,13 +13,14 @@ class ResponseNotFound(Response):
 	"""Response 404 Not Found Class"""
 
 	def __init__(self, body=None, format=None, charset=None):
+		if body: body = SerializerHelper.Encode(body, format, charset)
 		super(ResponseNotFound, self).__init__(
 			status=404,
 			message='Not Found',
 			headers={
 				'Content-Length': len(body) if body else 0,
 			},
-			body=SerializerHelper.Encode(body, format, charset) if body else None,
+			body=body,
 			format=format,
 			charset=charset,
 		)
