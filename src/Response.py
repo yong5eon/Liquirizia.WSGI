@@ -113,15 +113,15 @@ class Response(object):
 	def format(self):
 		if 'Content-Type' not in self.props.keys():
 			return None
-		return self.props['Content-Type']['args'][0][0]
+		return self.props['Content-Type']['args'][0]
 
 	@property
 	def charset(self):
 		if 'Content-Type' not in self.props.keys():
 			return None
-		if 'charset' not in self.props['Content-Type']['args'][0][1].keys():
+		if 'charset' not in self.props['Content-Type']['kwargs'].keys():
 			return None
-		return self.props['Content-Type']['args'][0][1]['charset'][0]
+		return self.props['Content-Type']['kwargs']['charset']
 
 	@property
 	def body(self):
