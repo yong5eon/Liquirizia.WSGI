@@ -3,12 +3,14 @@
 from Liquirizia.WSGI.Filters import RequestFilter
 from Liquirizia.WSGI import Request, Response
 
+from typing import Tuple, Optional
+
 __all__ = (
     'ToJPEG'
 )
 
 
 class ToJPEG(RequestFilter):
-    def run(self, request: Request) -> Request:
+    def __call__(self, request: Request) -> Tuple[Request, Optional[Response]]:
         request.path = '{}.jpg'.format(request.path)
         return request, None
