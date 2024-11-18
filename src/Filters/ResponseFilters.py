@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from ..Response import Response
 from .ResponseFilter import ResponseFilter
+
+from ..Request import Request
+from ..Response import Response
 
 __all__ = (
 	'ResponseFilter',
@@ -15,8 +17,7 @@ class ResponseFilters(ResponseFilter):
 		self.filters = args
 		return
 
-	def run(self, response: Response) -> Response:
+	def __call__(self, request: Request, response: Response) -> Response:
 		for f in self.filters:
-			response = f.run(response)
+			response = f(request, response)
 		return response
-

@@ -105,7 +105,7 @@ api_doc(
 		config=Router().toDocument(
 				info=Information(
 						title='Liquirizia.WSGI Sample API',
-						version=open('VERSION').read(),
+						version='0.1.0',
 						summary='Sample API Document',
 						description='Sample API',
 						contact=Contact(

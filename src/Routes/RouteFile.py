@@ -81,7 +81,7 @@ class RouteFile(Route, RouteRun):
 		writer: ResponseWriter,
 	):
 		if self.onRequest:
-			request, response = self.onRequest.run(request)
+			request, response = self.onRequest(request)
 			if response:
 				writer.response(response)
 				return

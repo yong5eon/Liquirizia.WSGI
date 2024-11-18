@@ -4,7 +4,8 @@ from ..Request import Request
 from ..Response import Response
 
 from abc import ABCMeta, abstractmethod
-from typing import Tuple 
+
+from typing import Tuple, Optional
 
 __all__ = (
 	'RequestFilter',
@@ -14,5 +15,5 @@ __all__ = (
 class RequestFilter(metaclass=ABCMeta):
 	"""Request Filter Interface"""
 	@abstractmethod
-	def run(self, request: Request) -> Tuple[Request, Response]:
+	def __call__(self, request: Request) -> Tuple[Request, Optional[Response]]:
 		raise NotImplementedError('{} must be implemented run'.format(self.__class__.__name__))
