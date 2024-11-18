@@ -12,6 +12,7 @@ __all__ = (
 class ResponseRedirect(Response):
 	"""Response 302 Found with Redirect Class"""
 	def __init__(self, url, body=None, format=None, charset=None):
+		if body: body = SerializerHelper.Encode(body, format, charset)
 		super(ResponseRedirect, self).__init__(
 			status=302,
 			message='Found',
@@ -19,7 +20,7 @@ class ResponseRedirect(Response):
 				'Content-Length': len(body) if body else 0,
 				'Location': url,
 			},
-			body=SerializerHelper.Encode(body, format, charset) if body else None,
+			body=body,
 			format=format,
 			charset=charset,
 		)

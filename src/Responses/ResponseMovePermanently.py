@@ -12,6 +12,7 @@ __all__ = (
 class ResponseMovePermanently(Response):
 	"""Response 301 Move Permanently Class"""
 	def __init__(self, url, body=None, format=None, charset=None):
+		if body: body = SerializerHelper.Encode(body, format, charset)
 		super(ResponseMovePermanently, self).__init__(
 			status=301,
 			message='Move Permanently',
@@ -19,7 +20,7 @@ class ResponseMovePermanently(Response):
 				'Content-Length': len(body) if body else 0,
 				'Location': url,
 			},
-			body=SerializerHelper.Encode(body, format, charset) if body else None,
+			body=body,
 			format=format,
 			charset=charset,
 		)

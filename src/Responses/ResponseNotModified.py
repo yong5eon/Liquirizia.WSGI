@@ -12,13 +12,14 @@ __all__ = (
 class ResponseNotModified(Response):
 	"""Reponse 304 Not Modified Class"""
 	def __init__(self, body=None, format=None, charset=None):
+		if body: body = SerializerHelper.Encode(body, format, charset)
 		super(ResponseNotModified, self).__init__(
 			status=304,
 			message='Not Modified',
 			headers={
 				'Content-Length': len(body) if body else 0,
 			},
-			body=SerializerHelper.Encode(body, format, charset) if body else None,
+			body=body,
 			format=format,
 			charset=charset,
 		)
