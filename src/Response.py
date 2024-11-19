@@ -31,7 +31,8 @@ class Response(object):
 					'; charset={}'.format(charset) if charset else ''
 				)
 			)
-		# self.header('Date', formatdate(time(), usegmt=True))
+			self.header('Content-Length', len(body) if body else 0)
+		self.header('Date', formatdate(time(), usegmt=True))
 		self.obj = body
 		return
 
@@ -43,10 +44,14 @@ class Response(object):
 		)
 	
 	def __str__(self):
-		return '{} {}'.format(self.status, self.message)
+		return '{} {}{}'.format(
+			self.status,
+			self.message,
+			' - {}'.format(self.header('Content-Length')) if self.header('Content-Length') else ''
+		)
 
 	def header(self, key: str, value=None):
-		if value:
+		if value is not None:
 			# TODO : according to value, use other parse methods
 			args, kwargs = parse_header(str(value))
 			self.props[ToHeaderName(key)] = {

@@ -37,4 +37,5 @@ class ServerSentEvents(object):
 		return
 
 	def end(self):
-		pass
+		self.writer.write(b'')
+		return

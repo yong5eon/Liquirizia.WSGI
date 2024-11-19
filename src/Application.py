@@ -30,13 +30,13 @@ from Liquirizia.FileSystemObject import Connection
 
 from .Request import Request
 from .RequestReader import RequestReader
-from .Response import Response
 from .ResponseWriter import ResponseWriter
 from .Error import Error
 
 from .Responses import (
 	ResponseError,
 	ResponseOK,
+	ResponseNoContent,
 )
 from .Errors import (
 	InternalServerError,
@@ -86,34 +86,64 @@ class Application(object):
 					k=ToHeaderName(k[5:])
 					k=self.config.toHeaderName(k)
 					headers[k] = v
-				if k in ['CONTENT_TYPE', 'CONTENT_LENGTH']:
+				if k in ['CONTENT_TYPE', 'CONTENT_LENGTH'] and v:
 					headers[ToHeaderName(k)] = v
 
-			patterns = self.router.matches(env['PATH_INFO'])
-			if not patterns:
-				raise NotFoundError('{} is not found in router'.format(env['PATH_INFO']))
-	
 			if env['REQUEST_METHOD'] == 'OPTIONS':
-				if 'Access-Control-Request-Method' in headers:
+				# 서버 전체 지원 요청 확인
+				if env['PATH_INFO'] == '*': 
+					METHODS = [
+						'OPTIONS',
+						'GET',
+						# 'HEAD',
+						'POST',
+						'PUT',
+						'DELETE',
+						# 'CONNECT',
+						# 'TRACE',
+					]
 					response = ResponseOK(
 						body=', '.join(patterns.keys()),
 						format='text/plain',
 						charset='utf-8',
 					)
-					# response.header('Access-Control-Allow-Methods', ', '.join(patterns.keys()))
-					response.header('Allow', ', '.join(patterns.keys()))
-					send(str(response), headers=response.headers())
-					yield response.body if response.body else b''
+					response.header('Allow', ', '.join(METHODS))
+					write = send(str(response), headers=response.headers())
+					write(response.body if response.body else b'')
+					return
 
-				route = patterns[headers['Access-Control-Request-Method']].route
-				cors = route.headers()
-		
+				patterns = self.router.matches(env['PATH_INFO'])
+				if not patterns:
+					raise NotFoundError('{} is not found in router'.format(env['PATH_INFO']))
+
+				# CORS 요청
+				if 'Access-Control-Request-Method' in headers:
+					response = ResponseNoContent()
+					# TODO : check origin
+					# TODO : build cors in each env['PATH_INFO']
+					# for pattern in patterns:
+					#	 route = patterns[pattern].route
+					#	 cors = route.headers()
+					#	 # TODO : append cors
+					# TODO : set Access-Control-Allow-Origin header
+					response.header('Access-Control-Allow-Methods', ', '.join(patterns.keys()))
+					# TODO : set Access-Control-Allow-Headers header
+					# TODO : set Access-Control-Max-Age header
+					write = send(str(response), headers=response.headers())
+					write(response.body if response.body else b'')
+					return
+
 				response = ResponseOK()
-				for key, value in cors.items():
-					response.header(key, value)
-				send(str(response), response.headers())
-				yield response.body if response.body else b''
-	
+				response.header('Allow', ', '.join(patterns.keys()))
+				write = send(str(response), response.headers())
+				write(response.body if response.body else b'')
+				return
+			
+			# OPTIONS 를 제외한 각 메소드에 따른 라우팅에 따른 처리
+			patterns = self.router.matches(env['PATH_INFO'])
+			if not patterns:
+				raise NotFoundError('{} is not found in router'.format(env['PATH_INFO']))
+
 			if env['REQUEST_METHOD'] not in patterns.keys():
 				raise MethodNotAllowedError('{} is not allowed for {}'.format(
 					env['REQUEST_METHOD'],
@@ -124,10 +154,9 @@ class Application(object):
 			parameters = patterns[env['REQUEST_METHOD']].params
 
 			reader = RequestReader(env['wsgi.input'])
-			writer = ResponseWriter(send, self.requestHandler.onResponse)
 			request = Request(
 				address=env['REMOTE_ADDR'],
-				port=env['REMOTE_PORT'] if 'REMOTE_PORT' in env else 0,
+				port=env['REMOTE_PORT'] if 'REMOTE_PORT' in env.keys() else 0,
 				method=env['REQUEST_METHOD'],
 				uri='{}{}'.format(
 					env['PATH_INFO'],
@@ -136,16 +165,19 @@ class Application(object):
 				parameters=parameters,
 				headers=headers,
 			)
+			writer = ResponseWriter(request, send, self.requestHandler.onResponse)
 			if self.requestHandler: 
 				request, response = self.requestHandler.onRequest(request)
 				if response:
-					send(str(response), response.headers())
-					yield response.body if response.body else b''
+					write = send(str(response), response.headers())
+					write(response.body if response.body else b'')
+					return
 			if self.onRequest:
 				request, response = self.onRequest(request)
 				if response:
-					send(str(response), response.headers())
-					yield response.body if response.body else b''
+					write = send(str(response), response.headers())
+					write(response.body if response.body else b'')
+					return
 			runner.run(request, reader, writer)
 			if self.requestHandler:
 				self.requestHandler.onRequestComplete(request)
@@ -166,15 +198,16 @@ class Application(object):
 				response = self.requestHandler.onError(request, e)
 			else:
 				response = ResponseError(e)
-			send(str(response), response.headers())
-			yield response.body if response.body else b''
+			write = send(str(response), response.headers())
+			write(response.body if response.body else b'')
 		except BaseException as e:
 			if self.requestHandler: 
 				response = self.requestHandler.onException(request, e)
 			else:
 				response = ResponseError(InternalServerError(e))
-			send(str(response), response.headers())
-			yield response.body if response.body else b''
+			write = send(str(response), response.headers())
+			write(response.body if response.body else b'')
+		return
 	
 	def addFile(
 		self,
@@ -287,17 +320,21 @@ class Application(object):
 		self,
 		object: Type[RequestWebSocketRunner],
 		url: str,
+		parameter: Validator = None,
+		header: Validator = None,
 		qs: Validator = None,
 		cors: CORS = None,
 	):
 		self.router.add(RouteRequestWebSocket(
 			obj=object,
 			url=url,
+			parameter=parameter,
+			header=header,
 			qs=qs,
 			cors=cors
 		))
 		return
-	
+
 	def addServerSentEvents(
 		self,
 		object: Type[RequestServerSentEventsRunner],
@@ -315,7 +352,7 @@ class Application(object):
 			qs=qs,
 			cors=cors
 		))
-
+		return
 
 	def load(self, mod: str = None, path: str = None, ext: str = 'py'):
 		if mod:

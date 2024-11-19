@@ -1,38 +1,58 @@
 # -*- coding: utf-8 -*-
 
-from .ResponseOK import ResponseOK
+# COMMON
 from .ResponseError import ResponseError
-
 from .ResponseHTML import ResponseHTML
 from .ResponseJSON import ResponseJSON
 from .ResponseFile import ResponseFile
 from .ResponseBuffer import ResponseBuffer
-
-from .ResponseCreated import ResponseCreated  # 201
-
-from .ResponseMovePermanently import ResponseMovePermanently  # 301
-from .ResponseRedirect import ResponseRedirect  # 302
-from .ResponseNotModified import ResponseNotModified  # 304
-
-from .ResponseBadRequest import ResponseBadRequest  # 400
-from .ResponseNotFound import ResponseNotFound  # 404
-
+# 1XX Informational
+# 2XX Succesful
+from .ResponseSuccesful import (
+	ResponseOK, # 200
+	ResponseCreated, # 201
+	ResponseAccepted, # 202
+	ResponseNoContent, # 204
+)
+# 3XX Redirection
+from .ResponseRedirection import (
+	ResponseMovePermanently, # 301
+	ResponseFound, # 302
+	ResponseNotModified  # 304
+)
+# 4XX Client Error
+from .ResponseClientError import (
+	ResponseBadRequest, # 400
+	ResponseNotFound,  # 404
+)
+# 5XX Server Error
+from .ResponseServerError import (
+	ResponseInternalServerError,
+	ResponseNotImplemented,
+	ResponseServiceUnavailable,
+)
 
 __all__ = (
-	'ResponseOK',  # Response OK
 	'ResponseError',  # Response Error
-
 	'ResponseHTML',  # Response HTML
 	'ResponseJSON',  # Response JSON
 	'ResponseFile',  # Response File
 	'ResponseBuffer',  # Response Buffer(Bytes)
-
-	'ResponseCreated',  # Response Created with 201
-
-	'ResponseMovePermanently',  # Response 301 Move Permanently
-	'ResponseRedirect',  # Response 302 Found to Redirect
-	'ResponseNotModified',  # Response 304 Not Modified
-	
-	'ResponseBadRequest',		# Response 400 Bad Request
-	'ResponseNotFound',  # Response 404 Not Found
+	# 1XX Informational
+	# 2XX Succesful
+	'ResponseOK', # 200
+	'ResponseCreated', # 201
+	'ResponseAccepted',  # 202
+	'ResponseNoContent',  # 204
+	# 3XX Redirection
+	'ResponseMovePermanently', # 301
+	'ResponseFound',  # 302
+	'ResponseNotModified', # 304
+	# 4XX Client Error
+	'ResponseBadRequest', # 400
+	'ResponseNotFound',  # 404
+	# 5XX Server Error
+	'ResponseInternalServerError',
+	'ResponseNotImplemented',
+	'ResponseServiceUnavailable',
 )
