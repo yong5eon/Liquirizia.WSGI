@@ -37,7 +37,7 @@ class SampleHandler(RequestHandler):
 		def onRequest(self, request: Request):
 				print('REQUEST	: {}'.format(str(request)))
 				return request, None
-		def onResponse(self, response: Response):
+		def onResponse(self, request: Request, response: Response):
 				print('RESPONSE : {}'.format(str(response)))
 				return response
 		def onRequestComplete(self, request: Request):
