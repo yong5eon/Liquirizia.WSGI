@@ -17,7 +17,7 @@ class RequestHandler(metaclass=ABCMeta):
 	def onRequest(self, request: Request) -> Request:
 		raise NotImplementedError('{} must be implemented onRequest'.format(self.__class__.__name__))
 	@abstractmethod
-	def onResponse(self, response: Response) -> Response:
+	def onResponse(self, request: Request, response: Response) -> Response:
 		raise NotImplementedError('{} must be implemented onResponse'.format(self.__class__.__name__))
 	@abstractmethod
 	def onRequestComplete(self, request: Request) -> None:

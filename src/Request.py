@@ -6,6 +6,7 @@ from .Util import ToHeaderName, ParseHeader
 from http.cookies import SimpleCookie
 from urllib.parse import parse_qs, unquote, urlencode
 
+from uuid import uuid4
 
 __all__ = (
 	'Request'
@@ -25,8 +26,10 @@ class Request(object):
 		headers: dict = None, 
 		body: bytes = None, 
 		format: str = None, 
-		charset: str = None
+		charset: str = None,
+		id: str = None,
 	):
+		self.id = id if id else uuid4().hex
 		self.address = address
 		self.port = port
 		self.method = method
@@ -76,7 +79,7 @@ class Request(object):
 		return '{} {}'.format(self.method, self.path)
 
 	def header(self, key: str, value=None):
-		if value:
+		if value is not None:
 			if key == 'Cookie':
 				c = SimpleCookie()
 				c.load(value)
@@ -133,6 +136,10 @@ class Request(object):
 	
 	@property
 	def remoteAddress(self):
+		if 'X-Forwarded-For' in self.props.keys():
+			return self.props['X-Forwarded-For']['args'][0][0]
+		if 'X-Real-IP' in self.props.keys():
+			return self.props['X-Real-IP']['args'][0][0]
 		return self.address
 	
 	@property
@@ -179,15 +186,20 @@ class Request(object):
 
 	@property
 	def remote(self):
-		try:
-			if 'X-Forwarded-For' in self.props.keys():
-				return self.props['X-Forwarded-For']['expr']
-			if 'X-Real-IP' in self.props.keys():
-				return self.props['X-Real-IP']['expr']
-			return self.props['Remote-Address']['expr']
-		except:
-			return '{}:{}'.format(self.address, self.port)
-	
+		if 'X-Forwarded-For' in self.props.keys():
+			return '{}({}):{}'.format(
+				self.props['X-Forwarded-For']['args'][0][0],
+				self.address,
+				self.port,
+			)
+		if 'X-Real-IP' in self.props.keys():
+			return '{}({}):{}'.format(
+				self.props['X-Real-IP']['args'][0][0],
+				self.address,
+				self.port,
+			)
+		return '{}:{}'.format(self.address, self.port)
+
 	@property
 	def scheme(self):
 		if 'X-Forwarded-Proto' in self.props.keys():

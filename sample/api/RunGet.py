@@ -47,7 +47,7 @@ __all__ = (
 	),
 	qs=Validator(
 		IsDictionary(
-			IsRequiredIn('a', 'b', error=BadRequestError('질의에 a 와 a 는 필수 입니다.')),
+			IsRequiredIn('a', 'b', error=BadRequestError('질의에 a 와 b 는 필수 입니다.')),
 			IsMappingOf({
 				'a': Validator(
 					IsNotToNone(error=BadRequestError('a 는 값이 있어야 합니다.')),

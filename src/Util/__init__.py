@@ -16,6 +16,7 @@ from time import timezone, mktime
 __all__ = (
 	'ToHeaderName',
 	'ToQueryString',
+	'ParseHeader',
 	'ParseRange',
 	'ParseURL',
 	'VersionToString',

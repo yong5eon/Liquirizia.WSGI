@@ -48,4 +48,5 @@ class ChunkedStreamWriter(object):
 		size = '{:x}'.format(0)
 		self.writer.write(size.encode())
 		self.writer.write(CRLF.encode())
+		self.writer.write(b'')
 		return

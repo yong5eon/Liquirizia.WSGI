@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
+
 from wsgiref.simple_server import (
 	make_server,
 	WSGIServer,
 	WSGIRequestHandler,
+	
 )
 from wsgiref.handlers import SimpleHandler, BaseHandler
-from socketserver import ThreadingMixIn
 
 __all__ = (
 	'serve'
 )
 
-class Server(ThreadingMixIn, WSGIServer):
-	daemon_threads = True
+class Server(WSGIServer): pass
 
 class ServerHandler(BaseHandler):
-
+	server_software = 'HuGraph-WSGIServer/0.1.0'
 	def __init__(
 		self,
 		stdin,
@@ -31,7 +31,6 @@ class ServerHandler(BaseHandler):
 		self.base_env = environ
 		self.wsgi_multithread = multithread
 		self.wsgi_multiprocess = multiprocess
-		return
 
 	def get_stdin(self):
 		return self.stdin
@@ -46,16 +45,21 @@ class ServerHandler(BaseHandler):
 		result = self.stdout.write(data)
 		if result is None or result == len(data):
 			return
+		from warnings import warn
+		warn("SimpleHandler.stdout.write() should not do partial writes",
+			DeprecationWarning)
 		while True:
 			data = data[result:]
 			if not data:
 				break
 			result = self.stdout.write(data)
-		return
 
 	def _flush(self):
 		self.stdout.flush()
 		self._flush = self.stdout.flush
+
+	def close(self):
+		SimpleHandler.close(self)
 		return
 
 	def send_headers(self):
@@ -76,6 +80,7 @@ class ServerHandler(BaseHandler):
 				exc_info = None		# avoid dangling circular ref
 		elif self.headers is not None:
 			raise AssertionError("Headers already set!")
+
 		self.status = status
 		self.headers = self.headers_class(headers)
 		status = self._convert_string_type(status, "Status")
@@ -84,6 +89,26 @@ class ServerHandler(BaseHandler):
 		assert status[3]==" ", "Status message must have a space after code"
 		self.send_headers()
 		return self.write
+	
+	def finish_response(self):
+		try:
+			if not self.result_is_file() or not self.sendfile():
+				for data in self.result if self.result else []:
+					self.write(data)
+				self.finish_content()
+		except:
+			# Call close() on the iterable returned by the WSGI application
+			# in case of an exception.
+			if hasattr(self.result, 'close'):
+				self.result.close()
+			raise
+		else:
+			# We only call close() when no exception is raised, because it
+			# will set status, result, headers, and environ fields to None.
+			# See bpo-29183 for more details.
+			self.close()
+		return
+
 
 class ServerRequestHandler(WSGIRequestHandler):
 	def handle(self):
@@ -94,18 +119,19 @@ class ServerRequestHandler(WSGIRequestHandler):
 			self.command = ''
 			self.send_error(414)
 			return
+
 		if not self.parse_request(): # An error code has been sent, just exit
 			return
+
 		handler = ServerHandler(
-			self.rfile, 
-			self.wfile, 
-			self.get_stderr(), 
-			self.get_environ(),
+			self.rfile, self.wfile, self.get_stderr(), self.get_environ(),
+			multithread=False,
 		)
 		handler.request_handler = self	  # backpointer for logging
 		handler.run(self.server.get_app())
 		return
 	
+
 def serve(host, port, app):
 	"""Create a new WSGI server listening on `host` and `port` for `app`"""
 	server = Server((host, port), ServerRequestHandler)

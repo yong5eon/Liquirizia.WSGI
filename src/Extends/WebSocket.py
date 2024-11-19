@@ -150,6 +150,7 @@ class WebSocket(object):
 		header.append(payload_length)
 
 		self.writer.write(bytes(header + payload))
+		self.writer.write(b'')
 		return
 
 	def ping(self, message):
