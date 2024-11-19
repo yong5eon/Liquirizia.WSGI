@@ -55,7 +55,7 @@ from importlib.machinery import SourceFileLoader
 from importlib import import_module
 from pkgutil import walk_packages
 
-from typing import Type
+from typing import Type, Dict, Callable
 
 __all__ = (
 	'Application'
@@ -77,7 +77,7 @@ class Application(object):
 		self.onRequest = onRequest
 		return
 
-	def __call__(self, env: dict, send):
+	def __call__(self, env: Dict, send: Callable):
 		try:
 			request = None
 			headers = {}
@@ -165,7 +165,11 @@ class Application(object):
 				parameters=parameters,
 				headers=headers,
 			)
-			writer = ResponseWriter(request, send, self.requestHandler.onResponse)
+			writer = ResponseWriter(
+				request,
+				send,
+				self.requestHandler,
+			)
 			if self.requestHandler: 
 				request, response = self.requestHandler.onRequest(request)
 				if response:
