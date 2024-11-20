@@ -63,13 +63,12 @@ class ResponseAccepted(Response):
 
 class ResponseNoContent(Response):
 	"""Response 204 No Content Class"""
-	def __init__(self, url, body=None, format=None, charset=None):
+	def __init__(self, body=None, format=None, charset=None):
 		super().__init__(
 			status=204,
 			message='No Content',
 			headers={
 				'Content-Length': len(body) if body else 0,
-				'Location': url,
 			},
 			body=SerializerHelper.Encode(body, format, charset) if body else None,
 			format=format,
