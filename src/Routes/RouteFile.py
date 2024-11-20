@@ -39,7 +39,7 @@ class RouteFile(Route, RouteRun):
 		path,
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
-		cors: CORS = None,
+		cors: CORS = CORS(),
 	):
 		super(RouteFile, self).__init__('GET', url, cors=cors)
 		self.onRequest = onRequest

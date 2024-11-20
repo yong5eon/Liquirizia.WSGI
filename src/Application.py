@@ -156,18 +156,18 @@ class Application(object):
 				headers=headers,
 			)
 			cors = CORS(
-				origin=copy(self.config.cors.origin),
-				headers=copy(self.config.cors.headers),
-				exposeHeaders=copy(self.config.cors.exposeHeaders),
+				origin=self.config.cors.origin,
+				headers=self.config.cors.headers,
+				exposeHeaders=self.config.cors.exposeHeaders,
 				credentials=self.config.cors.credentials,
 				age=self.config.cors.age,
 			)
 			if runner.cors:
-				cors.origin.extend(runner.cors.origin)
-				cors.headers.extend(runner.cors.headers)
-				cors.exposeHeaders.extend(runner.cors.exposeHeaders)
-				cors.credentials=runner.cors.credentials
-				cors.age=runner.cors.age
+				if runner.cors.origin: cors.origin = runner.cors.origin
+				if runner.cors.headers: cors.headers = runner.cors.headers
+				if runner.cors.exposeHeaders: cors.exposeHeaders = runner.cors.exposeHeaders
+				if runner.cors.credentials: cors.credentials=runner.cors.credentials
+				if runner.cors.age: cors.age=runner.cors.age
 			writer = ResponseWriter(
 				request,
 				send,
@@ -205,6 +205,14 @@ class Application(object):
 				response = self.requestHandler.onError(e)
 			else:
 				response = ResponseError(e)
+			cors = CORS(
+				origin=self.config.cors.origin,
+				headers=self.config.cors.headers,
+				exposeHeaders=self.config.cors.exposeHeaders,
+				credentials=self.config.cors.credentials,
+				age=self.config.cors.age,
+			)
+			for k, v in cors.toHeaders().items(): response.header(k, v)
 			write = send(str(response), response.headers())
 			write(response.body if response.body else b'')
 		except Exception as e:
@@ -212,6 +220,14 @@ class Application(object):
 				response = self.requestHandler.onException(e)
 			else:
 				response = ResponseError(ServiceUnavailableError(e))
+			cors = CORS(
+				origin=self.config.cors.origin,
+				headers=self.config.cors.headers,
+				exposeHeaders=self.config.cors.exposeHeaders,
+				credentials=self.config.cors.credentials,
+				age=self.config.cors.age,
+			)
+			for k, v in cors.toHeaders().items(): response.header(k, v)
 			write = send(str(response), response.headers())
 			write(response.body if response.body else b'')
 		return
@@ -222,12 +238,14 @@ class Application(object):
 		url,
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
+		cors: CORS = CORS(),
 	):
 		self.router.add(RouteFile(
 			url,
 			path,
 			onRequest=onRequest,
-			onResponse=onResponse
+			onResponse=onResponse,
+			cors=cors,
 		))
 		return
 
@@ -237,6 +255,7 @@ class Application(object):
 		prefix,
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
+		cors: CORS = CORS(),
 	):
 		if system().upper() == 'WINDOWS':
 			path = path.replace('/', '\\')
@@ -256,7 +275,8 @@ class Application(object):
 					url=url,
 					path=file,
 					onRequest=onRequest,
-					onResponse=onResponse
+					onResponse=onResponse,
+					cors=cors,
 				))
 		return
 
@@ -266,12 +286,14 @@ class Application(object):
 		prefix,
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
+		cors: CORS = CORS(),
 	):
 		self.router.add(RouteFileSystemObject(
 			fso=fso,
 			prefix=prefix,
 			onRequest=onRequest,
-			onResponse=onResponse
+			onResponse=onResponse,
+			cors=cors,
 		))
 		return
 
@@ -286,7 +308,7 @@ class Application(object):
 		body: Validator = None,
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
-		cors: CORS = None,
+		cors: CORS = CORS(),
 	):
 		self.router.add(RouteRequest(
 			obj=object,
@@ -298,7 +320,7 @@ class Application(object):
 			body=body,
 			onRequest=onRequest,
 			onResponse=onResponse,
-			cors=cors
+			cors=cors,
 		))
 		return
 
@@ -310,7 +332,7 @@ class Application(object):
 		parameter: Validator = None,
 		header: Validator = None,
 		qs: Validator = None,
-		cors: CORS = None,
+		cors: CORS = CORS(),
 	):
 		self.router.add(RouteRequestStream(
 			obj=object,
@@ -319,7 +341,7 @@ class Application(object):
 			parameter=parameter,
 			header=header,
 			qs=qs,
-			cors=cors
+			cors=cors,
 		))
 		return
 
@@ -330,7 +352,7 @@ class Application(object):
 		parameter: Validator = None,
 		header: Validator = None,
 		qs: Validator = None,
-		cors: CORS = None,
+		cors: CORS = CORS(),
 	):
 		self.router.add(RouteRequestWebSocket(
 			obj=object,
@@ -338,7 +360,7 @@ class Application(object):
 			parameter=parameter,
 			header=header,
 			qs=qs,
-			cors=cors
+			cors=cors,
 		))
 		return
 
@@ -349,7 +371,7 @@ class Application(object):
 		parameter: Validator = None,
 		header: Validator = None,
 		qs: Validator = None,
-		cors: CORS = None,
+		cors: CORS = CORS(),
 	):
 		self.router.add(RouteRequestServerSentEvents(
 			obj=object,
@@ -357,7 +379,7 @@ class Application(object):
 			parameter=parameter,
 			header=header,
 			qs=qs,
-			cors=cors
+			cors=cors,
 		))
 		return
 

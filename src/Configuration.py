@@ -26,10 +26,10 @@ class Configuration(object):
 	HEADERS = [
 		'Accept',
 		'Accept-Language',
-		'Content-Type',
+		'Authorization',
 		'Content-Language',
 		'Content-Length',
-		'Authorization',
+		'Content-Type',
 	]
 	EXPOSE_HEADERS = [
 		'*'
