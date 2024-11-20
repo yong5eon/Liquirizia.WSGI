@@ -20,7 +20,7 @@ class ResponseError(Response):
 				'Content-Length': len(body) if body else 0
 			},
 			body=SerializerHelper.Encode(body, format, charset) if body else None,
-			format='text/plain',
-			charset='utf-8'
+			format=format,
+			charset=charset,
 		)
 		return

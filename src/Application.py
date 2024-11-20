@@ -40,12 +40,13 @@ from .Responses import (
 )
 from .Errors import (
 	InternalServerError,
+	ServiceUnavailableError,
 	MethodNotAllowedError,
 	NotFoundError,
 )
 from .Util import ToHeaderName
 
-from .RequestHandler import RequestHandler
+from .Handler import Handler
 
 from platform import system
 from os import walk
@@ -54,6 +55,7 @@ from pathlib import Path
 from importlib.machinery import SourceFileLoader
 from importlib import import_module
 from pkgutil import walk_packages
+from copy import copy
 
 from typing import Type, Dict, Callable
 
@@ -68,13 +70,11 @@ class Application(object):
 	def __init__(
 		self, 
 		conf: Configuration = Configuration(),
-		handler: RequestHandler = None,
-		onRequest: RequestFilter = None,
+		handler: Handler = None,
 	):
 		self.router = Router()
 		self.config = conf
 		self.requestHandler = handler
-		self.onRequest = onRequest
 		return
 
 	def __call__(self, env: Dict, send: Callable):
@@ -89,60 +89,50 @@ class Application(object):
 				if k in ['CONTENT_TYPE', 'CONTENT_LENGTH'] and v:
 					headers[ToHeaderName(k)] = v
 
-			if env['REQUEST_METHOD'] == 'OPTIONS':
-				# 서버 전체 지원 요청 확인
-				if env['PATH_INFO'] == '*': 
-					METHODS = [
-						'OPTIONS',
-						'GET',
-						# 'HEAD',
-						'POST',
-						'PUT',
-						'DELETE',
-						# 'CONNECT',
-						# 'TRACE',
-					]
-					response = ResponseOK(
-						body=', '.join(patterns.keys()),
-						format='text/plain',
-						charset='utf-8',
-					)
-					response.header('Allow', ', '.join(METHODS))
-					write = send(str(response), headers=response.headers())
-					write(response.body if response.body else b'')
-					return
-
-				patterns = self.router.matches(env['PATH_INFO'])
-				if not patterns:
-					raise NotFoundError('{} is not found in router'.format(env['PATH_INFO']))
-
-				# CORS 요청
-				if 'Access-Control-Request-Method' in headers:
-					response = ResponseNoContent()
-					# TODO : check origin
-					# TODO : build cors in each env['PATH_INFO']
-					# for pattern in patterns:
-					#	 route = patterns[pattern].route
-					#	 cors = route.headers()
-					#	 # TODO : append cors
-					# TODO : set Access-Control-Allow-Origin header
-					response.header('Access-Control-Allow-Methods', ', '.join(patterns.keys()))
-					# TODO : set Access-Control-Allow-Headers header
-					# TODO : set Access-Control-Max-Age header
-					write = send(str(response), headers=response.headers())
-					write(response.body if response.body else b'')
-					return
-
-				response = ResponseOK()
-				response.header('Allow', ', '.join(patterns.keys()))
-				write = send(str(response), response.headers())
+			if env['REQUEST_METHOD'] == 'OPTIONS' and env['PATH_INFO'] == '*': 
+				response = ResponseNoContent()
+				# TODO : get methods from router
+				response.header('Allow', ', '.join(self.config.methods))
+				write = send(str(response), headers=response.headers())
 				write(response.body if response.body else b'')
 				return
-			
-			# OPTIONS 를 제외한 각 메소드에 따른 라우팅에 따른 처리
+
 			patterns = self.router.matches(env['PATH_INFO'])
+
 			if not patterns:
 				raise NotFoundError('{} is not found in router'.format(env['PATH_INFO']))
+
+			if env['REQUEST_METHOD'] == 'OPTIONS':
+				# TODO : if Access-Control-Request-Method in headers, response specific CORS headers
+				response = ResponseNoContent()
+				response.header('Allow', ', '.join(patterns.keys()))
+				response.header('Access-Contorl-Allow-Methods', ', '.join(patterns.keys()))
+				origins = self.config.cors.origin
+				headers = self.config.cors.headers
+				exposeHeaders = self.config.cors.exposeHeaders
+				credentials = self.config.cors.credentials
+				age = self.config.cors.age
+				for match in patterns:
+					origins.extend(match.route.cors.origin)
+					headers.extend(match.route.cors.headers)
+					exposeHeaders.extend(match.route.cors.exposeHeaders)
+					if match.route.cors.credentials:
+						credentials = match.route.cors.credentials
+					if match.route.cors.age and match.route.cors.age > age:
+						age = match.route.cors.age
+				if len(origins):
+					response.header('Access-Control-Allow-Origin', ', '.join(list(set(origins))))
+				if len(headers):
+					response.header('Access-Control-Allow-Headers', ', '.join(list(set(headers))))
+				if credentials:
+					response.header('Access-Control-All-Credentials', 'true')
+				if len(exposeHeaders):
+					response.header('Access-Control-Expose-Headers', ', '.join(list(set(exposeHeaders))))
+				if age:
+					response.header('Access-Control-Max-Age', ', '.join(list(set(headers))))
+				write = send(str(response), headers=response.headers())
+				write(response.body if response.body else b'')
+				return
 
 			if env['REQUEST_METHOD'] not in patterns.keys():
 				raise MethodNotAllowedError('{} is not allowed for {}'.format(
@@ -165,50 +155,63 @@ class Application(object):
 				parameters=parameters,
 				headers=headers,
 			)
+			cors = CORS(
+				origin=copy(self.config.cors.origin),
+				headers=copy(self.config.cors.headers),
+				exposeHeaders=copy(self.config.cors.exposeHeaders),
+				credentials=self.config.cors.credentials,
+				age=self.config.cors.age,
+			)
+			if runner.cors:
+				cors.origin.extend(runner.cors.origin)
+				cors.headers.extend(runner.cors.headers)
+				cors.exposeHeaders.extend(runner.cors.exposeHeaders)
+				cors.credentials=runner.cors.credentials
+				cors.age=runner.cors.age
 			writer = ResponseWriter(
 				request,
 				send,
 				self.requestHandler,
+				cors,
 			)
-			if self.requestHandler: 
-				request, response = self.requestHandler.onRequest(request)
-				if response:
-					write = send(str(response), response.headers())
-					write(response.body if response.body else b'')
-					return
-			if self.onRequest:
-				request, response = self.onRequest(request)
-				if response:
-					write = send(str(response), response.headers())
-					write(response.body if response.body else b'')
-					return
-			runner.run(request, reader, writer)
-			if self.requestHandler:
-				self.requestHandler.onRequestComplete(request)
+			try:
+				if self.requestHandler: 
+					request, response = self.requestHandler.onRequest(request)
+					if response:
+						write = send(str(response), response.headers())
+						write(response.body if response.body else b'')
+						return
+				runner.run(request, reader, writer)
+				if self.requestHandler:
+					self.requestHandler.onRequestComplete(request)
+			except Error as e:
+				if self.requestHandler:
+					response = self.requestHandler.onRequestError(request, e)
+				else:
+					response = ResponseError(e)
+				for k, v in cors.toHeaders().items(): response.header(k, v)
+				write = send(str(response), response.headers())
+				write(response.body if response.body else b'')
+			except Exception as e:
+				if self.requestHandler:
+					response = self.requestHandler.onRequestException(request, e)
+				else:
+					response = ResponseError(e)
+				for k, v in cors.toHeaders().items(): response.header(k, v)
+				write = send(str(response), response.headers())
+				write(response.body if response.body else b'')
 		except Error as e:
 			if self.requestHandler: 
-				if not request:
-					request = Request(
-						address=env['REMOTE_ADDR'],
-						port=env['REMOTE_PORT'] if 'REMOTE_PORT' in env else 0,
-						method=env['REQUEST_METHOD'],
-						uri='{}{}'.format(
-							env['PATH_INFO'],
-							'?{}'.format(env['QUERY_STRING']) if 'QUERY_STRING' in env and env['QUERY_STRING'] else ''
-						),
-						parameters={},
-						headers=headers,
-					)
-				response = self.requestHandler.onError(request, e)
+				response = self.requestHandler.onError(e)
 			else:
 				response = ResponseError(e)
 			write = send(str(response), response.headers())
 			write(response.body if response.body else b'')
-		except BaseException as e:
+		except Exception as e:
 			if self.requestHandler: 
-				response = self.requestHandler.onException(request, e)
+				response = self.requestHandler.onException(e)
 			else:
-				response = ResponseError(InternalServerError(e))
+				response = ResponseError(ServiceUnavailableError(e))
 			write = send(str(response), response.headers())
 			write(response.body if response.body else b'')
 		return
