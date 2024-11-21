@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from Liquirizia.WSGI import Request, RequestProperties
+from Liquirizia.WSGI import Request, RequestProperties, CORS
 from Liquirizia.WSGI.Properties import RequestRunner
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import BadRequestError
@@ -71,6 +71,10 @@ __all__ = (
 				),
 			})
 		),
+	),
+	cors=CORS(
+		headers=['X-Token'],
+		exposeHeaders=['X-Refresh-Token'],
 	),
 	description=Description(
 		description='GET 동작 샘플',

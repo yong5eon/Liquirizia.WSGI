@@ -3,14 +3,14 @@
 from Liquirizia.WSGI import (
 		Application, 
 		Configuration,
-		RequestHandler,
+		Handler,
 		Request,
 		Response,
 		Router,
 		Error,
 		serve,
 )
-from Liquirizia.WSGI.Responses import ResponseJSON
+from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Filters import RequestFilters
 from Liquirizia.WSGI.Documentation import Information, Contact
 
@@ -33,50 +33,58 @@ FileSystemObjectHelper.Set(
 		FileSystemObjectConfiguration('sample/res/images')
 )
 
-class SampleHandler(RequestHandler):
+class SampleHandler(Handler):
 		def onRequest(self, request: Request):
 				print('REQUEST	: {}'.format(str(request)))
 				return request, None
-		def onResponse(self, request: Request, response: Response):
-				print('RESPONSE : {}'.format(str(response)))
+		def onRequestResponse(self, request: Request, response: Response):
+				print('REQUEST RESPONSE : {} - {}'.format(str(response), response.size))
 				return response
 		def onRequestComplete(self, request: Request):
-				print('COMPLETE : {}'.format(str(request)))
+				print('REQUEST COMPLETE : {}'.format(str(request)))
 				return
-		def onError(self, request: Request, error: Error):
-				print(str(request))
+		def onRequestError(self, request: Request, error: Error):
+				print('REQUEST ERROR : {}'.format(str(request)))
 				tb =	str(error)
 				tb += '\n'
 				for line in ''.join(format_tb(error.__traceback__)).strip().split('\n'):
 						tb += line
 						tb += '\n'
 				print(tb)
-				body={
-						'reason': str(error),
-						'traceback': tb
-				}
-				return ResponseJSON(
-						status=400,
-						message='Bad Request',
-						body=body,
-						format='application/json',
-						charset='utf-8',
-				)
-		def onException(self, request: Request, e: Exception):
-				print(str(request))
+				return ResponseError(error, body=tb, format='text/plain', charset='utf-8')
+		def onRequestException(self, request: Request, e: Exception):
+				print('REQUEST EXCEPTION : {}'.format(str(request)))
 				tb =	str(e)
 				tb += '\n'
 				for line in ''.join(format_tb(e.__traceback__)).strip().split('\n'):
 						tb += line
 						tb += '\n'
 				print(tb)
-				return Response(503, 'Service Temporarily Unavailable', body=tb.encode('utf-8'), format='text/plain', charset='utf-8')
-		
+				return ResponseInternalServerError(body=tb, format='text/plain', charset='utf-8')
+		def onError(self, error: Error):
+				print('ERROR : {}'.format(str(error)))
+				tb =	str(error)
+				tb += '\n'
+				for line in ''.join(format_tb(error.__traceback__)).strip().split('\n'):
+						tb += line
+						tb += '\n'
+				print(tb)
+				return ResponseError(error, body=tb, format='text/plain', charset='utf-8')
+		def onException(self, e: Exception):
+				print('EXCEPTION : {}'.format(str(e)))
+				tb =	str(e)
+				tb += '\n'
+				for line in ''.join(format_tb(e.__traceback__)).strip().split('\n'):
+						tb += line
+						tb += '\n'
+				print(tb)
+				return ResponseServiceUnavailable(body=tb, format='text/plain', charset='utf-8')
+
 
 aps = Application(
 		handler=SampleHandler(),
 		conf=Configuration(
-				headers={
+				envToHeaders={
 						'X_TOKEN': 'X-Token',
 				},
 		)

@@ -15,7 +15,7 @@ __all__ = (
 class Server(WSGIServer): pass
 
 class ServerHandler(BaseHandler):
-	server_software = 'HuGraph-WSGIServer/0.1.0'
+	server_software = 'Liquirizia(WSGI)'
 	def __init__(
 		self,
 		stdin,
