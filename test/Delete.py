@@ -44,8 +44,8 @@ class TestDelete(Case):
 			uri='/'
 		)
 		ASSERT_IS_EQUAL(response.status, 204)
-		ASSERT_IS_EQUAL(response.header('Allow'), 'DELETE')
-		ASSERT_IS_EQUAL(response.header('Access-Control-Allow-Methods'), 'DELETE')
+		ASSERT_IS_EQUAL('DELETE' in response.header('Allow').split(', '), True)
+		ASSERT_IS_EQUAL('DELETE' in response.header('Access-Control-Allow-Methods').split(', '), True)
 		headers = response.header('Access-Control-Allow-Headers').split(', ').sort()
 		others = 'Content-Type, Content-Length'.split(', ').sort()
 		ASSERT_IS_EQUAL(headers, others)

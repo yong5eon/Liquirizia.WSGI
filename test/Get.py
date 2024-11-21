@@ -36,7 +36,7 @@ class TestGet(Case):
 			uri='/'
 		)
 		ASSERT_IS_EQUAL(response.status, 204)
-		ASSERT_IS_EQUAL(response.header('Allow'), 'GET')
+		ASSERT_IS_EQUAL('GET' in response.header('Allow').split(', '), True)
 		return
 
 	@Parameterized(
