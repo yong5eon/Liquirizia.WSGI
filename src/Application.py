@@ -106,22 +106,20 @@ class Application(object):
 				# TODO : if Access-Control-Request-Method in headers, response specific CORS headers
 				response = ResponseNoContent()
 				response.header('Allow', ', '.join(patterns.keys()))
-				response.header('Access-Contorl-Allow-Methods', ', '.join(patterns.keys()))
-				origins = self.config.cors.origin
+				response.header('Access-Control-Allow-Methods', ', '.join(patterns.keys()))
+				origin = self.config.cors.origin
 				headers = self.config.cors.headers
 				exposeHeaders = self.config.cors.exposeHeaders
 				credentials = self.config.cors.credentials
 				age = self.config.cors.age
-				for match in patterns:
-					origins.extend(match.route.cors.origin)
-					headers.extend(match.route.cors.headers)
-					exposeHeaders.extend(match.route.cors.exposeHeaders)
-					if match.route.cors.credentials:
-						credentials = match.route.cors.credentials
-					if match.route.cors.age and match.route.cors.age > age:
-						age = match.route.cors.age
-				if len(origins):
-					response.header('Access-Control-Allow-Origin', ', '.join(list(set(origins))))
+				for _, match in patterns.items():
+					if match.route.cors.origin: origin = match.route.cors.origin
+					if match.route.cors.headers: headers = match.route.cors.headers
+					if match.route.cors.exposeHeaders: exposeHeaders = match.route.cors.exposeHeaders
+					if match.route.cors.credentials: credentials=match.route.cors.credentials
+					if match.route.cors.age and match.route.cors.age > age: age=match.route.cors.age
+				if len(origin):
+					response.header('Access-Control-Allow-Origin', ', '.join(list(set(origin))))
 				if len(headers):
 					response.header('Access-Control-Allow-Headers', ', '.join(list(set(headers))))
 				if credentials:
