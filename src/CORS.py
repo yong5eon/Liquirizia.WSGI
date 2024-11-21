@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from typing import Sequence
+
 __all__ = (
 	'CORS'
 )
@@ -7,27 +9,31 @@ __all__ = (
 
 class CORS(object):
 	"""CORS(Cross Origin Resource Sharing) Class"""
-
-	ORIGIN = ('*',)
-	HEADERS = ('Accept', 'Accept-Language', 'Content-Type', 'Content-Language', 'Content-Length')
-	EXPOSE_HEADERS = ()
-	AGE = None
-
-	def __init__(self, origin=ORIGIN, headers=HEADERS, exposeHeaders=EXPOSE_HEADERS, age=AGE):
-		self.origin = list(set(origin))
-		self.headers = list(set(headers))
-		self.exposeHeaders = list(set(exposeHeaders))
-		self.age = age if age else self.__class__.AGE
+	def __init__(
+		self,
+		origin: Sequence[str] = None,
+		headers: Sequence[str] = None,
+		exposeHeaders: Sequence[str] = None,
+		age: int = None,
+		credentials: bool = False,
+	):
+		self.origin = origin if origin else []
+		self.headers = headers if headers else []
+		self.exposeHeaders = exposeHeaders if exposeHeaders else []
+		self.age = age
+		self.credentials = credentials
 		return
 
 	def toHeaders(self):
 		headers = dict()
-		if len(self.origin):
-			headers['Access-Control-Allow-Origin'] = ','.join(self.origin)
-		if len(self.headers):
-			headers['Access-Control-Allow-Headers'] = ','.join(self.headers)
-		if len(self.exposeHeaders):
-			headers['Access-Control-Expose-Headers'] = ','.join(self.exposeHeaders)
+		if self.origin:
+			headers['Access-Control-Allow-Origin'] = ', '.join(list(set(self.origin)))
+		if self.headers:
+			headers['Access-Control-Allow-Headers'] = ', '.join(list(set(self.headers)))
+		if self.exposeHeaders:
+			headers['Access-Control-Expose-Headers'] = ', '.join(list(set(self.exposeHeaders)))
+		if self.credentials:
+			headers['Access-Control-Allow-Credentials'] = 'true'
 		if self.age:
 			headers['Access-Control-Max-Age'] = self.age
 		return headers

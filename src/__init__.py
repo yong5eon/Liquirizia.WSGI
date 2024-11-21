@@ -15,7 +15,7 @@ from .Error import Error
 from .Cookie import Cookie
 from .CORS import CORS
 
-from .RequestHandler import RequestHandler
+from .Handler import Handler
 
 from .Server import serve
 
@@ -29,6 +29,7 @@ from .Serializers.FormUrlEncoded import (
 __all__ = (
 	'Application',
 	'Configuration',
+	'Handler',
 	'Request',
 	'Response',
 	'RequestProperties',
@@ -38,7 +39,6 @@ __all__ = (
 	'Error',
 	'Cookie',
 	'CORS',
-	'RequestHandler',
 	'serve',
 )
 

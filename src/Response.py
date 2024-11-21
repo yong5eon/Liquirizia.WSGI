@@ -44,10 +44,9 @@ class Response(object):
 		)
 	
 	def __str__(self):
-		return '{} {}{}'.format(
+		return '{} {}'.format(
 			self.status,
 			self.message,
-			' - {}'.format(self.header('Content-Length')) if self.header('Content-Length') else ''
 		)
 
 	def header(self, key: str, value=None):

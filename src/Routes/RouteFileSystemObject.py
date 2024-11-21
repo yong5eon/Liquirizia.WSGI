@@ -33,7 +33,7 @@ class RouteFileSystemObject(Route, RouteRun):
 		fso: Connection,
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
-		cors: CORS = None,
+		cors: CORS = CORS(),
 	):
 		super(RouteFileSystemObject, self).__init__('GET', '{}'.format(prefix), cors=cors)
 		self.prefix = prefix

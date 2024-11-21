@@ -32,7 +32,7 @@ class RequestProperties(object):
 		body: Validator = None,
 		onRequest: RequestFilter = None,
 		onResponse : ResponseFilter = None,
-		cors: CORS = None,
+		cors: CORS = CORS(),
 		description: Description = None,
 	):
 		self.method = method
