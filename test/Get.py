@@ -2,33 +2,54 @@
 
 from Liquirizia.Test import *
 
-from webtest import TestApp
-
 from Liquirizia.WSGI import (
 		Application, 
 		Configuration,
+		CORS,
 )
 
-from Liquirizia.WSGI import Request, RequestProperties
+from Liquirizia.WSGI import Request, RequestProperties, Response
 from Liquirizia.WSGI.Properties import RequestRunner
 from Liquirizia.WSGI.Responses import *
+
+from Liquirizia.WSGI.Test import TestRequest
 
 
 @RequestProperties(
 	method='GET',
-	url='/'
+	url='/',
 )
 class RunGet(RequestRunner):
-	def __init__(self, request):
+	def __init__(self, request: Request):
 		self.request = request
 		return
-	def run(self):
-		return ResponseOK()
+	def run(self) -> Response:
+		return ResponseJSON(self.request.qs)
 
 
 class TestGet(Case):
 	@Order(0)
-	def testGet(self):
-		tester = TestApp(Application(conf=Configuration()), extra_environ={'REMOTE_ADDR': '127.0.0.1', 'REMOTE_PORT': '0'})
-		response = tester.get('/')
+	def testOptions(self):
+		_ = TestRequest(Application(conf=Configuration()))
+		response = _.request(
+			method='OPTIONS',
+			uri='/'
+		)
+		ASSERT_IS_EQUAL(response.status, 204)
+		ASSERT_IS_EQUAL(response.header('Allow'), 'GET')
+		return
+
+	@Parameterized(
+			{'qs': {'a': '1', 'b': '3'}},
+	)
+	@Order(1)
+	def testRequest(self, qs):
+		_ = TestRequest(Application(conf=Configuration()))
+		response = _.request(
+			method='GET',
+			uri='/',
+			qs=qs,
+		)
+		ASSERT_IS_EQUAL(response.status, 200)
+		ASSERT_IS_EQUAL(response.body, qs)
 		return
