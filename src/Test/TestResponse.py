@@ -4,6 +4,8 @@ from ..Util import ToHeaderName
 
 from Liquirizia.Serializer import SerializerHelper
 
+from io import BytesIO
+
 from typing import Dict
 
 __all__ = (
@@ -30,11 +32,27 @@ class TestResponse(object):
 				'args': args.split(','),
 				'kwargs': kwargs
 			}
-		self.body = SerializerHelper.Decode(
-			body,
-			self.format,
-			self.charset
-		) if body else None
+		if self.header('Transfer-Encoding') == 'chunked':
+			buffer = bytes()
+			buf = BytesIO(body)
+			while True:
+				line = buf.readline()
+				size = int(line, 16)
+				if not size:
+					break
+				buffer += buf.read(size)
+				line = buf.readline()
+			self.body = SerializerHelper.Decode(
+				buffer,
+				self.format,
+				self.charset
+			) if buffer else None
+		else:
+			self.body = SerializerHelper.Decode(
+				body,
+				self.format,
+				self.charset
+			) if body else None
 		return
 
 	def header(self, key: str):
