@@ -38,7 +38,7 @@ class RunStreamIn(RequestStreamRunner):
 
 	def run(self, reader: RequestReader, writer: ResponseWriter):
 		if not self.request.size:
-			response = ResponseBadRequest('본문의 길이가 없습니다.')
+			response = ResponseBadRequest('본문의 길이가 없습니다.', format='text/plain', charset='utf-8')
 			writer.response(response)
 			return
 		size = self.request.size
