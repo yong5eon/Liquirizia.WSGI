@@ -2,7 +2,7 @@
 
 from .Request import Request
 
-from io import BufferedReader
+from io import BufferedReader, BytesIO, SEEK_END
 
 __all__ = (
 	'RequestReader'
@@ -14,18 +14,22 @@ class RequestReader(object):
 
 	CRLF = '\r\n'
 
-	def __init__(self, reader):
-		self.reader = reader
+	def __init__(self, reader: BytesIO):
+		self.reader = BufferedReader(reader)
+		self.cursor = 0
 		return
 
 	def read(self, size=None):
-		return self.reader.read(size)
-
-	def chunk(self):
+		self.reader.seek(self.cursor)
+		buf = self.reader.read(size)
+		self.cursor += len(buf)
+		return buf
+	
+	def readline(self):
+		self.reader.seek(self.cursor)
 		line = self.reader.readline()
-		size = int(line, 16)
-		if not size:
+		if not line:
 			return None
-		buffer = self.reader.read(size)
-		self.reader.readline()
-		return buffer
+		self.cursor += len(line)
+		return line
+
