@@ -93,6 +93,8 @@ class Application(object):
 				response = ResponseNoContent()
 				# TODO : get methods from router
 				response.header('Allow', ', '.join(sorted(list(set(self.router.methods)))))
+				if self.requestHandler.onOptions:
+					response = self.requestHandler.onOptions(env, response)
 				write = send(str(response), headers=response.headers())
 				write(response.body if response.body else b'')
 				return
@@ -122,6 +124,8 @@ class Application(object):
 					if match.route.cors.exposeHeaders: cors.exposeHeaders.extend(match.route.cors.exposeHeaders)
 					if match.route.cors.age and match.route.cors.age > cors.age: cors.age = match.route.cors.age
 				for k, v in cors.toHeaders().items(): response.header(k, v)
+				if self.requestHandler.onOptions:
+					response = self.requestHandler.onOptions(env, response)
 				write = send(str(response), headers=response.headers())
 				write(response.body if response.body else b'')
 				return
@@ -194,32 +198,16 @@ class Application(object):
 				write(response.body if response.body else b'')
 		except Error as e:
 			if self.requestHandler: 
-				response = self.requestHandler.onError(e)
+				response = self.requestHandler.onError(env, e)
 			else:
 				response = ResponseError(e)
-			cors = CORS(
-				origin=self.config.cors.origin,
-				headers=self.config.cors.headers,
-				exposeHeaders=self.config.cors.exposeHeaders,
-				credentials=self.config.cors.credentials,
-				age=self.config.cors.age,
-			)
-			for k, v in cors.toHeaders().items(): response.header(k, v)
 			write = send(str(response), response.headers())
 			write(response.body if response.body else b'')
 		except Exception as e:
 			if self.requestHandler: 
-				response = self.requestHandler.onException(e)
+				response = self.requestHandler.onException(env, e)
 			else:
 				response = ResponseError(ServiceUnavailableError(e))
-			cors = CORS(
-				origin=self.config.cors.origin,
-				headers=self.config.cors.headers,
-				exposeHeaders=self.config.cors.exposeHeaders,
-				credentials=self.config.cors.credentials,
-				age=self.config.cors.age,
-			)
-			for k, v in cors.toHeaders().items(): response.header(k, v)
 			write = send(str(response), response.headers())
 			write(response.body if response.body else b'')
 		return
