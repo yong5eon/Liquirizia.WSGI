@@ -93,7 +93,7 @@ class Application(object):
 				response = ResponseNoContent()
 				# TODO : get methods from router
 				response.header('Allow', ', '.join(sorted(list(set(self.router.methods)))))
-				if self.requestHandler.onOptions:
+				if self.requestHandler:
 					response = self.requestHandler.onOptions(env, response)
 				write = send(str(response), headers=response.headers())
 				write(response.body if response.body else b'')
@@ -124,7 +124,7 @@ class Application(object):
 					if match.route.cors.exposeHeaders: cors.exposeHeaders.extend(match.route.cors.exposeHeaders)
 					if match.route.cors.age and match.route.cors.age > cors.age: cors.age = match.route.cors.age
 				for k, v in cors.toHeaders().items(): response.header(k, v)
-				if self.requestHandler.onOptions:
+				if self.requestHandler:
 					response = self.requestHandler.onOptions(env, response)
 				write = send(str(response), headers=response.headers())
 				write(response.body if response.body else b'')
