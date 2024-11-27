@@ -27,11 +27,11 @@ class CORS(object):
 	def toHeaders(self):
 		headers = dict()
 		if self.origin:
-			headers['Access-Control-Allow-Origin'] = ', '.join(list(set(self.origin)))
+			headers['Access-Control-Allow-Origin'] = ', '.join(sorted(list(set(self.origin))))
 		if self.headers:
-			headers['Access-Control-Allow-Headers'] = ', '.join(list(set(self.headers)))
+			headers['Access-Control-Allow-Headers'] = ', '.join(sorted(list(set(self.headers))))
 		if self.exposeHeaders:
-			headers['Access-Control-Expose-Headers'] = ', '.join(list(set(self.exposeHeaders)))
+			headers['Access-Control-Expose-Headers'] = ', '.join(sorted(list(set(self.exposeHeaders))))
 		if self.credentials:
 			headers['Access-Control-Allow-Credentials'] = 'true'
 		if self.age:

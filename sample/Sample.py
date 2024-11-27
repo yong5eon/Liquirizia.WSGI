@@ -84,7 +84,7 @@ class SampleHandler(Handler):
 aps = Application(
 		handler=SampleHandler(),
 		conf=Configuration(
-				envToHeaders={
+				headers={
 						'X_TOKEN': 'X-Token',
 				},
 		)
