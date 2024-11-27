@@ -33,6 +33,12 @@ class TestGet(Case):
 		_ = TestRequest(Application(conf=Configuration()))
 		response = _.request(
 			method='OPTIONS',
+			uri='*'
+		)
+		ASSERT_IS_EQUAL(response.status, 204)
+		ASSERT_IS_EQUAL('GET' in response.header('Allow').split(', '), True)
+		response = _.request(
+			method='OPTIONS',
 			uri='/'
 		)
 		ASSERT_IS_EQUAL(response.status, 204)

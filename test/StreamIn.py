@@ -61,6 +61,12 @@ class TestPutStream(Case):
 		_ = TestRequest(Application(conf=Configuration()))
 		response = _.request(
 			method='OPTIONS',
+			uri='*'
+		)
+		ASSERT_IS_EQUAL(response.status, 204)
+		ASSERT_IS_EQUAL('PUT' in response.header('Allow').split(', '), True)
+		response = _.request(
+			method='OPTIONS',
 			uri='/stream'
 		)
 		ASSERT_IS_EQUAL(response.status, 204)
