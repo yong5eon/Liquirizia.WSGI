@@ -28,6 +28,7 @@ class Router(Singleton):
 		self.routes = []
 		self.maps = {}
 		self.authes = {}
+		self.methods = {'OPTIONS'}
 		return
 
 	def matches(self, url: str):
@@ -51,6 +52,7 @@ class Router(Singleton):
 
 	def add(self, route: Route, description: Description = None):
 		self.routes.append(route)
+		self.methods.add(route.method)
 		if not description: return
 		regex = compile(r':(\w+)')
 		url = regex.sub(r"{\1}", route.url)

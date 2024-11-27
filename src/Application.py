@@ -92,7 +92,9 @@ class Application(object):
 			if env['REQUEST_METHOD'] == 'OPTIONS' and env['PATH_INFO'] == '*': 
 				response = ResponseNoContent()
 				# TODO : get methods from router
-				response.header('Allow', ', '.join(self.config.methods))
+				response.header('Allow', ', '.join(sorted(list(set(self.router.methods)))))
+				if self.requestHandler.onOptions:
+					response = self.requestHandler.onOptions(env, response)
 				write = send(str(response), headers=response.headers())
 				write(response.body if response.body else b'')
 				return
@@ -104,30 +106,26 @@ class Application(object):
 
 			if env['REQUEST_METHOD'] == 'OPTIONS':
 				# TODO : if Access-Control-Request-Method in headers, response specific CORS headers
+				# TODO : Use ResponseOK in HTTP/1.0
 				response = ResponseNoContent()
 				response.header('Allow', ', '.join(patterns.keys()))
 				response.header('Access-Control-Allow-Methods', ', '.join(patterns.keys()))
-				origin = self.config.cors.origin
-				headers = self.config.cors.headers
-				exposeHeaders = self.config.cors.exposeHeaders
-				credentials = self.config.cors.credentials
-				age = self.config.cors.age
+				cors = CORS(
+					origin=self.config.cors.origin,
+					headers=self.config.cors.headers,
+					exposeHeaders=self.config.cors.exposeHeaders,
+					credentials=self.config.cors.credentials,
+					age=self.config.cors.age,
+				)
 				for _, match in patterns.items():
-					if match.route.cors.origin: origin = match.route.cors.origin
-					if match.route.cors.headers: headers = match.route.cors.headers
-					if match.route.cors.exposeHeaders: exposeHeaders = match.route.cors.exposeHeaders
-					if match.route.cors.credentials: credentials=match.route.cors.credentials
-					if match.route.cors.age and match.route.cors.age > age: age=match.route.cors.age
-				if len(origin):
-					response.header('Access-Control-Allow-Origin', ', '.join(list(set(origin))))
-				if len(headers):
-					response.header('Access-Control-Allow-Headers', ', '.join(list(set(headers))))
-				if credentials:
-					response.header('Access-Control-All-Credentials', 'true')
-				if len(exposeHeaders):
-					response.header('Access-Control-Expose-Headers', ', '.join(list(set(exposeHeaders))))
-				if age:
-					response.header('Access-Control-Max-Age', ', '.join(list(set(headers))))
+					if match.route.cors.origin: cors.origin.extend(match.route.cors.origin)
+					if match.route.cors.headers: cors.headers.extend(match.route.cors.headers)
+					if match.route.cors.credentials: cors.credentials = match.route.cors.credentials
+					if match.route.cors.exposeHeaders: cors.exposeHeaders.extend(match.route.cors.exposeHeaders)
+					if match.route.cors.age and match.route.cors.age > cors.age: cors.age = match.route.cors.age
+				for k, v in cors.toHeaders().items(): response.header(k, v)
+				if self.requestHandler.onOptions:
+					response = self.requestHandler.onOptions(env, response)
 				write = send(str(response), headers=response.headers())
 				write(response.body if response.body else b'')
 				return
@@ -161,11 +159,11 @@ class Application(object):
 				age=self.config.cors.age,
 			)
 			if runner.cors:
-				if runner.cors.origin: cors.origin = runner.cors.origin
-				if runner.cors.headers: cors.headers = runner.cors.headers
-				if runner.cors.exposeHeaders: cors.exposeHeaders = runner.cors.exposeHeaders
-				if runner.cors.credentials: cors.credentials=runner.cors.credentials
-				if runner.cors.age: cors.age=runner.cors.age
+				if runner.cors.origin: cors.origin.extend(runner.cors.origin)
+				if runner.cors.headers: cors.headers.extend(runner.cors.headers)
+				if runner.cors.credentials: cors.credentials = runner.cors.credentials
+				if runner.cors.exposeHeaders: cors.exposeHeaders.extend(runner.cors.exposeHeaders)
+				if runner.cors.age and runner.cors.age > cors.age : cors.age = runner.cors.age
 			writer = ResponseWriter(
 				request,
 				send,
@@ -200,32 +198,16 @@ class Application(object):
 				write(response.body if response.body else b'')
 		except Error as e:
 			if self.requestHandler: 
-				response = self.requestHandler.onError(e)
+				response = self.requestHandler.onError(env, e)
 			else:
 				response = ResponseError(e)
-			cors = CORS(
-				origin=self.config.cors.origin,
-				headers=self.config.cors.headers,
-				exposeHeaders=self.config.cors.exposeHeaders,
-				credentials=self.config.cors.credentials,
-				age=self.config.cors.age,
-			)
-			for k, v in cors.toHeaders().items(): response.header(k, v)
 			write = send(str(response), response.headers())
 			write(response.body if response.body else b'')
 		except Exception as e:
 			if self.requestHandler: 
-				response = self.requestHandler.onException(e)
+				response = self.requestHandler.onException(env, e)
 			else:
 				response = ResponseError(ServiceUnavailableError(e))
-			cors = CORS(
-				origin=self.config.cors.origin,
-				headers=self.config.cors.headers,
-				exposeHeaders=self.config.cors.exposeHeaders,
-				credentials=self.config.cors.credentials,
-				age=self.config.cors.age,
-			)
-			for k, v in cors.toHeaders().items(): response.header(k, v)
 			write = send(str(response), response.headers())
 			write(response.body if response.body else b'')
 		return
