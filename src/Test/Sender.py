@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from .TestResponse import TestResponse
-
 from typing import List, Tuple
 
 __all__ = (
@@ -25,7 +23,3 @@ class Sender(object):
 	def write(self, buffer: bytes):
 		self.buffer += buffer
 		return
-	
-	def getResponse(self):
-		return TestResponse(int(self.status), self.message, dict(self.headers) if self.headers else None, bytes(self.buffer))
-	

@@ -69,4 +69,4 @@ class TestRequest(object):
 			env['HTTP_' + k.upper().replace('-', '_')] = v
 		sender = Sender()
 		self.application(env, send=sender)
-		return sender.getResponse()
+		return TestResponse(sender)

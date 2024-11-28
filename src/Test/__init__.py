@@ -1,12 +1,19 @@
 # -*- coding: utf-8 -*-
 
 from .TestRequest import TestRequest
-from .TestResponse import TestResponse
 from .TestRequestStream import TestRequestStream, TestRequestStreamCallback
+from .TestRequestServerSentEvents import TestRequestServerSentEvents
+
+from .TestResponse import (
+	TestResponse,
+	TestResponseServerSentEvents,
+)
 
 __all__ = (
 	'TestRequest',
-	'TestResponse',
 	'TestRequestStream',
 	'TestRequestStreamCallback',
+	'TestRequestServerSentEvents',
+	'TestResponse',
+	'TestResponseServerSentEvents',
 )

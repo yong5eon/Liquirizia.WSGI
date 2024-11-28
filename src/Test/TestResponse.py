@@ -2,30 +2,31 @@
 
 from ..Util import ToHeaderName
 
+from .Sender import Sender
+
 from Liquirizia.Serializer import SerializerHelper
 
 from io import BytesIO
+from cgi import parse_header
 
-from typing import Dict
+from typing import Iterable
 
 __all__ = (
 	'TestResponse',
+	'TestResponseServerSentEvents',
+	'ServerSentEvent',
 )
 
 
 class TestResponse(object):
 	def __init__(
 		self,
-		status: int,
-		message: str,
-		headers: Dict[str, str] = None,
-		body: bytes = None,
+		sender: Sender,
 	):
-		from cgi import parse_header
-		self.status = status
-		self.message = message
+		self.status = int(sender.status)
+		self.message = sender.message
 		self.headers = {}
-		for k, v in headers.items() if headers else []:
+		for k, v in sender.headers:
 			args, kwargs = parse_header(v)
 			self.headers[ToHeaderName(k)] = {
 				'expr': str(v),
@@ -34,7 +35,7 @@ class TestResponse(object):
 			}
 		if self.header('Transfer-Encoding') == 'chunked':
 			buffer = bytes()
-			buf = BytesIO(body)
+			buf = BytesIO(sender.buffer)
 			while True:
 				line = buf.readline()
 				size = int(line, 16)
@@ -46,13 +47,13 @@ class TestResponse(object):
 				buffer,
 				self.format,
 				self.charset
-			) if buffer else None
+			) if sender.buffer else None
 		else:
 			self.body = SerializerHelper.Decode(
-				body,
+				sender.buffer,
 				self.format,
 				self.charset
-			) if body else None
+			) if sender.buffer else None
 		return
 
 	def header(self, key: str):
@@ -79,3 +80,56 @@ class TestResponse(object):
 		if 'charset' not in self.headers['Content-Type']['kwargs'].keys():
 			return None
 		return self.headers['Content-Type']['kwargs']['charset']
+	
+
+class ServerSentEvent(object):
+	def __init__(
+		self,
+		id: str = None,
+		event: str = None,
+		data: str = None,
+	):
+		self.id = id
+		self.event = event
+		self.data = data
+		return
+	
+
+class TestResponseServerSentEvents(TestResponse):
+	def __init__(self, sender):
+		self.status = int(sender.status)
+		self.message = sender.message
+		self.headers = {}
+		for k, v in sender.headers:
+			args, kwargs = parse_header(v)
+			self.headers[ToHeaderName(k)] = {
+				'expr': str(v),
+				'args': args.split(','),
+				'kwargs': kwargs
+			}
+		self.buffer = sender.buffer
+		return
+
+	def events(self) -> Iterable[ServerSentEvent]:
+		# TODO : return parsed event stream buffer to events(data, id, event)
+		from io import BufferedReader	
+		reader = BufferedReader(BytesIO(self.buffer))
+		events = []
+		event = ServerSentEvent()
+		while True:
+			line = reader.readline().decode('utf-8')
+			if not line:
+				break
+			line = line[:-2]
+			try:
+				key, value = line.split(': ', maxsplit=1)
+				if key == 'id':
+					event.id = value
+				if key == 'event':
+					event.event = value
+				if key == 'data':
+					event.data = value
+			except:
+				events.append(event)
+				event = ServerSentEvent()
+		return events
