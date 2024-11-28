@@ -16,25 +16,29 @@ class ServerSentEvents(object):
 	def response(self, response: Response):
 		return self.writer.response(response)
 
-	def begin(self, headers: dict = {}, charset: str = None):
-		self.charset = charset
-		headers['Content-Type'] = 'text/event-stream{}'.format(
-			'; charset={}'.format(charset) if charset else ''
-		)
-		# TODO: fix header problems
-		# according to PEP333, chunkend and keep-alive is commented
-		#
-		# headers['Connection'] = 'keep-alive'
+	def begin(self, headers: dict = {}):
+		headers['Content-Type'] = 'text/event-stream'
 		headers['Cache-Control'] = 'no-cache'
 		self.writer.send(200, 'OK', headers=headers)
 		return
 
-	def emit(self, data: str):
+	def emit(self, data: str, event: str = None, id: str = None):
+		# text/event-stream is always encoded in utf-8
 		CRLF = '\r\n'
-		self.writer.write('data: {}'.format(data).encode(self.charset if self.charset else ''))
-		self.writer.write(CRLF.encode(self.charset if self.charset else ''))
-		self.writer.write(CRLF.encode(self.charset if self.charset else ''))
+		if id:
+			self.writer.write('id: {}{}'.format(id, CRLF).encode('utf-8'))
+		if event:
+			self.writer.write('event: event{}'.format(id, CRLF).encode('utf-8'))
+		for line in data.split('\n'):
+			if not line: continue
+			self.writer.write('data: {}{}'.format(line, CRLF).encode('utf-8'))
+		self.writer.write(CRLF.encode('utf-8'))
 		return
+	
+	def retry(self, ms: int):
+		CRLF = '\r\n'
+		self.writer.write('retry: {}{}'.format(ms, CRLF).encode('utf-8'))
+		self.writer.write(CRLF.encode('utf-8'))
 
 	def end(self):
 		self.writer.write(b'')
