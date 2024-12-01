@@ -79,12 +79,12 @@ class WebSocket(object):
 		except ValueError as e:
 			b1, b2 = 0, 0
 
-		fin = b1 & self.__class__.FIN
-		opcode = b1 & self.__class__.OPCODE
-		masked = b2 & self.__class__.MASKED
-		size = b2 & self.__class__.PAYLOAD_LEN
+		fin = b1 & self.FIN
+		opcode = b1 & self.OPCODE
+		masked = b2 & self.MASKED
+		size = b2 & self.PAYLOAD_LEN
 
-		if opcode == self.__class__.OPCODE_CLOSE_CONN:
+		if opcode == self.OPCODE_CLOSE_CONN:
 			return opcode, None
 
 		if not masked:
@@ -114,15 +114,15 @@ class WebSocket(object):
 		size = len(buffer)
 
 		if size <= 125:  # Normal payload
-			header.append(self.__class__.FIN | opcode)
+			header.append(self.FIN | opcode)
 			header.append(size)
 		elif 126 <= size <= 65535:  # Extended payload
-			header.append(self.__class__.FIN | opcode)
-			header.append(self.__class__.PAYLOAD_LEN_EXT16)
+			header.append(self.FIN | opcode)
+			header.append(self.PAYLOAD_LEN_EXT16)
 			header.extend(pack(b'>H', size))
 		elif size < 18446744073709551616:  # Huge extended payload
-			header.append(self.__class__.FIN | opcode)
-			header.append(self.__class__.PAYLOAD_LEN_EXT64)
+			header.append(self.FIN | opcode)
+			header.append(self.PAYLOAD_LEN_EXT64)
 			header.extend(pack(b'>Q', size))
 		else:
 			raise RuntimeError('Message is too big, Consider breaking it into chunks.')
@@ -137,7 +137,7 @@ class WebSocket(object):
 				status: Status as defined in https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1
 				reason: Text with reason of closing the connection
 		"""
-		if status < self.__class__.CLOSE_STATUS_NORMAL or status > 1015:
+		if status < self.CLOSE_STATUS_NORMAL or status > 1015:
 			raise Exception(f"CLOSE status must be between 1000 and 1015, got {status}")
 
 		header = bytearray()
@@ -146,7 +146,7 @@ class WebSocket(object):
 		assert payload_length <= 125, "We only support short closing reasons at the moment"
 
 		# Send CLOSE with status & reason
-		header.append(self.__class__.FIN | self.__class__.OPCODE_CLOSE_CONN)
+		header.append(self.FIN | self.OPCODE_CLOSE_CONN)
 		header.append(payload_length)
 
 		self.writer.write(bytes(header + payload))
@@ -154,11 +154,11 @@ class WebSocket(object):
 		return
 
 	def ping(self, message):
-		self.write(message, opcode=self.__class__.OPCODE_PING)
+		self.write(message, opcode=self.OPCODE_PING)
 		return
 
 	def pong(self, message):
-		self.write(message, opcode=self.__class__.OPCODE_PONG)
+		self.write(message, opcode=self.OPCODE_PONG)
 		return
 
 	def run(self, callback):
@@ -166,7 +166,7 @@ class WebSocket(object):
 			op, buffer = self.read()
 			if not op:
 				break
-			if op == self.__class__.OPCODE_CLOSE_CONN:
+			if op == self.OPCODE_CLOSE_CONN:
 				break
 			callback(self, op, buffer)
 		return
