@@ -14,22 +14,13 @@ class RequestReader(object):
 
 	CRLF = '\r\n'
 
-	def __init__(self, reader: BytesIO):
-		self.reader = BufferedReader(reader)
-		self.cursor = 0
+	def __init__(self, reader: BufferedReader):
+		self.reader = reader
 		return
 
-	def read(self, size=None):
-		self.reader.seek(self.cursor)
-		buf = self.reader.read(size)
-		self.cursor += len(buf)
-		return buf
+	def read(self, size: int = -1):
+		return self.reader.read(size)
 	
-	def readline(self):
-		self.reader.seek(self.cursor)
-		line = self.reader.readline()
-		if not line:
-			return None
-		self.cursor += len(line)
-		return line
+	def readline(self, size: int = -1):
+		return self.reader.readline(size)
 
