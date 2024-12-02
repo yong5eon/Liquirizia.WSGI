@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.Test import *
-
-from Liquirizia.WSGI import (
-		Application, 
-		Configuration,
-		CORS,
+from Liquirizia.WSGI.Test import (
+	TestRequest,
+	TestRequestStream,
+	TestRequestStreamCallback,
 )
 
 from Liquirizia.WSGI import (
+	Application, 
+	Configuration,
+	CORS,
+	Handler,
+	Error,
 	RequestProperties,
 	Request,
 	Response,
@@ -18,14 +22,66 @@ from Liquirizia.WSGI import (
 from Liquirizia.WSGI.Properties import RequestStreamRunner
 from Liquirizia.WSGI.Responses import *
 
-from Liquirizia.WSGI.Test import TestRequest, TestRequestStream, TestRequestStreamCallback
 
+from traceback import format_tb
 from time import sleep
+
+
+class TestHandler(Handler):
+	def onOptions(self, env, response):
+		print('OPTIONS  : {}, {}'.format(env['PATH_INFO'], str(response)))
+		return response
+	def onRequest(self, request: Request):
+		print('REQUEST	: {}'.format(str(request)))
+		return request, None
+	def onRequestResponse(self, request: Request, response: Response):
+		print('REQUEST RESPONSE : {} - {}'.format(str(response), response.size))
+		return response
+	def onRequestComplete(self, request: Request):
+		print('REQUEST COMPLETE : {}'.format(str(request)))
+		return
+	def onRequestError(self, request: Request, error: Error):
+		print('REQUEST ERROR : {}'.format(str(request)))
+		tb =	str(error)
+		tb += '\n'
+		for line in ''.join(format_tb(error.__traceback__)).strip().split('\n'):
+			tb += line
+			tb += '\n'
+			print(tb)
+		return ResponseError(error, body=tb, format='text/plain', charset='utf-8')
+	def onRequestException(self, request: Request, e: Exception):
+		print('REQUEST EXCEPTION : {}'.format(str(request)))
+		tb =	str(e)
+		tb += '\n'
+		for line in ''.join(format_tb(e.__traceback__)).strip().split('\n'):
+			tb += line
+			tb += '\n'
+		print(tb)
+		return ResponseInternalServerError(body=tb, format='text/plain', charset='utf-8')
+	def onError(self, env, error: Error):
+		print('ERROR : {} - {}'.format(env['PATH_INFO'], str(error)))
+		tb =	str(error)
+		tb += '\n'
+		for line in ''.join(format_tb(error.__traceback__)).strip().split('\n'):
+			tb += line
+			tb += '\n'
+		print(tb)
+		return ResponseError(error, body=tb, format='text/plain', charset='utf-8')
+	def onException(self, env, e: Exception):
+		print('EXCEPTION : {} - {}'.format(env['PATH_INFO'], str(e)))
+		tb =	str(e)
+		tb += '\n'
+		for line in ''.join(format_tb(e.__traceback__)).strip().split('\n'):
+			tb += line
+			tb += '\n'
+		print(tb)
+		return ResponseServiceUnavailable(body=tb, format='text/plain', charset='utf-8')
 
 
 @RequestProperties(
 	method='PUT',
 	url='/stream',
+	cors=CORS(),
 )
 class RunPutStream(RequestStreamRunner):
 	def __init__(self, request: Request):
@@ -82,16 +138,15 @@ class TestPutStream(Case):
 					sleep(0.1)
 				return
 		_ = TestRequestStream(Application(conf=Configuration()))
-		_.send(
+		response = _.send(
 			method='PUT',
 			uri='/stream',
 			headers={
 				'Content-Type': 'text/plain; charset=utf-8',
 				'Content-Length': str(10),
 			},
-			input=Callback(),
+			cb=Callback(),
 		)
-		response = _.response()	
 		ASSERT_IS_EQUAL(response.status, 200)
-		ASSERT_IS_EQUAL(response.body, '0123456789')
+		ASSERT_IS_EQUAL(response.buffer.read(), b'0123456789')
 		return

@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.Test import *
-from Liquirizia.WSGI.Test import TestRequest, TestRequestStream, TestRequestStreamCallback
+from Liquirizia.WSGI.Test import (
+	TestRequest,
+	TestRequestWebSocket,
+	TestRequestWebSocketCallback,
+)
 
 from Liquirizia.WSGI import (
 	Application, 
@@ -12,15 +16,18 @@ from Liquirizia.WSGI import (
 	RequestProperties,
 	Request,
 	Response,
-	RequestReader,
-	ResponseWriter,
 )
-from Liquirizia.WSGI.Properties import RequestStreamRunner
+from Liquirizia.WSGI.Properties import RequestWebSocketRunner
 from Liquirizia.WSGI.Responses import *
-from Liquirizia.WSGI.Extends import ChunkedStreamReader, ChunkedStreamWriter
 
-from traceback import format_tb
+from Liquirizia.WSGI.Extends import WebSocket
+
+
 from time import sleep
+from uuid import uuid4
+from traceback import format_tb
+
+from typing import List
 
 
 class TestHandler(Handler):
@@ -75,32 +82,30 @@ class TestHandler(Handler):
 
 
 @RequestProperties(
-	method='PUT',
-	url='/stream/chunked',
+	method='GET',
+	url='/ws',
+	cors=CORS(),
 )
-class RunPutChunkedStream(RequestStreamRunner):
+class RunWebSocket(RequestWebSocketRunner):
 	def __init__(self, request: Request):
 		self.request = request
 		return
-	def run(self, reader: RequestReader, writer: ResponseWriter):
-		if not self.request.header('Transfer-Encoding'):
-			response = ResponseBadRequest('본문이 청크 형식이 아닙니다.')
-			writer.response(response)
-			return
-		reader = ChunkedStreamReader(reader)
-		writer = ChunkedStreamWriter(writer)
-		writer.begin(format=self.request.format, charset=self.request.charset)
-		while True:
-			buffer = reader.chunk()
-			if not buffer:
-				break
-			writer.chunk(buffer)
-			sleep(0.1)
-		writer.end()
-		return
-	
+	def switch(self, protocol: str):
+		return True
 
-class TestPutChunkedStream(Case):
+	def run(self, ws: WebSocket, op, buffer):
+		if op == ws.OPCODE_PING:
+			ws.pong(buffer)
+		if op == ws.OPCODE_PONG:
+			ws.ping(buffer)
+		if op == ws.OPCODE_TEXT:
+			ws.write(buffer, ws.OPCODE_TEXT)
+		if op == ws.OPCODE_BINARY:
+			ws.write(buffer, ws.OPCODE_BINARY)
+		return
+
+
+class TestWebSocket(Case):
 	@Order(0)
 	def testOptions(self):
 		_ = TestRequest(Application(conf=Configuration()))
@@ -109,44 +114,48 @@ class TestPutChunkedStream(Case):
 			uri='*'
 		)
 		ASSERT_IS_EQUAL(response.status, 204)
-		ASSERT_IS_EQUAL('PUT' in response.header('Allow').split(', '), True)
+		ASSERT_IS_EQUAL('GET' in response.header('Allow').split(', '), True)
 		response = _.request(
 			method='OPTIONS',
-			uri='/stream/chunked'
+			uri='/ws'
 		)
 		ASSERT_IS_EQUAL(response.status, 204)
-		ASSERT_IS_EQUAL('PUT' in response.header('Allow').split(', '), True)
+		ASSERT_IS_EQUAL('GET' in response.header('Allow').split(', '), True)
 		return
 
 	@Order(1)
 	def testRequest(self):
-		class Callback(TestRequestStreamCallback):
-			def __call__(self, testRequestStream):
-				for i in range(0, 10):
-					testRequestStream.chunk(str(i).encode('utf-8'))
-					sleep(0.1)
-				testRequestStream.end()
+		class Callback(TestRequestWebSocketCallback):
+			def __init__(self, input: List[bytes]):
+				self.input: List[bytes] = input
+				self.output: List[bytes] = []
 				return
-		_ = TestRequestStream(Application(conf=Configuration()))
+			def __call__(self, testRequestWebSocket):
+				for input in self.input:
+					testRequestWebSocket.write(input)
+					while True:
+						op, buffer = testRequestWebSocket.read()
+						if not op:
+							continue
+						if op == testRequestWebSocket.OPCODE_CLOSE_CONN:
+							break
+						self.output.append(buffer)
+						break
+				testRequestWebSocket.end()
+				return
+
+		cb = Callback([b'123', b'456', b'789'])
+		_ = TestRequestWebSocket(Application(conf=Configuration()))
 		response = _.send(
-			method='PUT',
-			uri='/stream/chunked',
+			method='GET',
+			uri='/ws',
 			headers={
-				'Content-Type': 'text/plain; charset=utf-8',
-				'Content-Length': str(10),
-				'Transfer-Encoding': 'chunked',
+				'Sec-WebSocket-Key': uuid4().hex
 			},
-			cb=Callback(),
+			cb=cb,
 		)
-		ASSERT_IS_EQUAL(response.status, 200)
-		ASSERT_IS_EQUAL(response.chunk(), b'0')
-		ASSERT_IS_EQUAL(response.chunk(), b'1')
-		ASSERT_IS_EQUAL(response.chunk(), b'2')
-		ASSERT_IS_EQUAL(response.chunk(), b'3')
-		ASSERT_IS_EQUAL(response.chunk(), b'4')
-		ASSERT_IS_EQUAL(response.chunk(), b'5')
-		ASSERT_IS_EQUAL(response.chunk(), b'6')
-		ASSERT_IS_EQUAL(response.chunk(), b'7')
-		ASSERT_IS_EQUAL(response.chunk(), b'8')
-		ASSERT_IS_EQUAL(response.chunk(), b'9')
+		ASSERT_IS_EQUAL(response.status, 101)
+		ASSERT_IS_EQUAL(cb.output[0], b'123')
+		ASSERT_IS_EQUAL(cb.output[1], b'456')
+		ASSERT_IS_EQUAL(cb.output[2], b'789')
 		return

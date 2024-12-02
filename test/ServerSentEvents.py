@@ -1,21 +1,18 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.Test import *
+from Liquirizia.WSGI.Test import TestRequest, TestRequestServerSentEvents
 
 from Liquirizia.WSGI import (
-		Application, 
-		Configuration,
-)
-
-from Liquirizia.WSGI import (
+	Application, 
+	Configuration,
+	CORS,
 	RequestProperties,
 	Request,
 )
 from Liquirizia.WSGI.Properties import RequestServerSentEventsRunner
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Extends import ServerSentEvents
-
-from Liquirizia.WSGI.Test import TestRequest, TestRequestServerSentEvents
 
 from time import sleep
 from random import randrange
@@ -24,8 +21,9 @@ from random import randrange
 @RequestProperties(
 	method='GET',
 	url='/sse',
+	cors=CORS()
 )
-class RunGetChunkedStream(RequestServerSentEventsRunner):
+class RunGetServerSentEvents(RequestServerSentEventsRunner):
 	def __init__(self, request: Request):
 		self.request = request
 		return
@@ -38,7 +36,7 @@ class RunGetChunkedStream(RequestServerSentEventsRunner):
 		return
 
 
-class TestGetChunkedStream(Case):
+class TestGetServerSentEvents(Case):
 	@Order(0)
 	def testOptions(self):
 		_ = TestRequest(Application(conf=Configuration()))
