@@ -23,5 +23,5 @@ class RequestWebSocketRunner(metaclass=ABCMeta):
 		raise NotImplementedError('{} must be implemented switch'.format(self.__class__.__name__))
 
 	@abstractmethod
-	def run(self, ws: WebSocket, op, buffer):
+	def run(self, ws: WebSocket, op: int, buffer: bytes):
 		raise NotImplementedError('{} must be implemented run'.format(self.__class__.__name__))
