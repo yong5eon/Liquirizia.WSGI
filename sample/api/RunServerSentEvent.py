@@ -40,10 +40,12 @@ class RunServerSentEvent(RequestServerSentEventsRunner):
 
 	def run(self, writer: ServerSentEvents):
 		try:
-			writer.begin(charset='utf-8')
+			writer.begin()
 			while True:
 				i = randrange(1, 1000)
-				writer.emit(data=str(i))
+				writer.emit(data=str(i), id=str(i))
+				if i % 5 == 0:
+					writer.retry(1000)
 				sleep(1)
 			writer.end()
 		except Exception as e:

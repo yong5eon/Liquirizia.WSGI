@@ -4,7 +4,7 @@ from ..ResponseWriter import ResponseWriter
 from ..Response import Response
 
 __all__ = (
-	'StreamChunked'
+	'ChunkedStreamWriter'
 )
 
 class ChunkedStreamWriter(object):
@@ -27,8 +27,7 @@ class ChunkedStreamWriter(object):
 			)
 		# TODO: fix header problems
 		# according to PEP333, chunkend and keep-alive is commented
-		#
-		# headers['Transfer-Encoding'] = 'chunked'
+		headers['Transfer-Encoding'] = 'chunked'
 		# headers['Connection'] = 'keep-alive'
 		headers['Cache-Control'] = 'no-cache'
 		self.writer.send(200, 'OK', headers=headers)

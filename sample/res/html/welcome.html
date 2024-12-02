@@ -179,27 +179,21 @@
 				$('#btnTestServerSentEventStop').show();
 				const es = new EventSource('/api/run/stream/sse');
 				es.onopen = function(event) {
+					console.log(event.type);
 					$('#frmTestServerSentEvent p').text('open');
 					$('#frmTestServerSentEvent pre').text('');
-					console.log(event.type);
 				};
 				es.onmessage = function(event) {
+					console.log(event.type);
 					$('#frmTestServerSentEvent p').text('message');
-					console.log(event.type);
 					$('#frmTestServerSentEvent pre').append(event.data);
+					$('#frmTestServerSentEvent pre').append('\n');
 				};
-				es.addEventListener('start', function(event) {
-					$('#frmTestServerSentEvent p').text('started');
-					console.log(event.type);
-				});
-				es.addEventListener('end', function(event) {
-					$('#frmTestServerSentEvent p').text('end');
-					console.log(event.type);
-				});
 				es.onerror = function(event) {
 					console.log(event.type);
 					$('#frmTestServerSentEvent p').text('error');
 					$('#frmTestServerSentEvent pre').append(event);
+					$('#frmTestServerSentEvent pre').append('\n');
 				}
 				$('#btnTestServerSentEventStop').click(function(e) {
 					$('#btnTestServerSentEventStop').hide();
