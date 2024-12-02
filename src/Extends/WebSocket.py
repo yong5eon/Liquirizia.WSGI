@@ -9,6 +9,8 @@ from struct import pack, unpack
 
 from uuid import uuid4
 
+from typing import Tuple
+
 __all__ = (
 	'WebSocket'
 )
@@ -18,17 +20,17 @@ class WebSocket(object):
 	"""Web Socket Class"""
 	"""
 	+-+-+-+-+-------+-+-------------+-------------------------------+
-	|0				   1				   2				   3  |
+	|0               1               2               3              |
 	|0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1|
 	+-+-+-+-+-------+-+-------------+-------------------------------+
-	|F|R|R|R| opcode|M| Payload len |	Extended payload length	|
-	|I|S|S|S|  (4)  |A|	 (7)	 |			 (16/64)		   |
-	|N|V|V|V|	   |S|			 |   (if payload len==126/127)   |
-	| |1|2|3|	   |K|			 |							   |
+	|F|R|R|R| opcode|M| Payload len |	Extended payload length       |
+	|I|S|S|S|  (4)  |A|     (7)     |           (16/64)             |
+	|N|V|V|V|       |S|             |   (if payload len==126/127)   |
+	| |1|2|3|       |K|             |                               |
 	+-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
-	|	 Extended payload length continued, if payload len == 127  |
+	|	 Extended payload length continued, if payload len == 127     |
 	+ - - - - - - - - - - - - - - - +-------------------------------+
-	|					 Payload Data continued ...				|
+	|                    Payload Data continued                     |
 	+---------------------------------------------------------------+
 	"""
 
@@ -39,12 +41,12 @@ class WebSocket(object):
 	PAYLOAD_LEN_EXT16 = 0x7e
 	PAYLOAD_LEN_EXT64 = 0x7f
 
-	OPCODE_CONTINUATION = 0x0
-	OPCODE_TEXT = 0x1
-	OPCODE_BINARY = 0x2
-	OPCODE_CLOSE_CONN = 0x8
-	OPCODE_PING = 0x9
-	OPCODE_PONG = 0xA
+	OPCODE_CONTINUATION = 0x00
+	OPCODE_TEXT = 0x01
+	OPCODE_BINARY = 0x02
+	OPCODE_CLOSE_CONN = 0x08
+	OPCODE_PING = 0x09
+	OPCODE_PONG = 0x0a
 
 	CLOSE_STATUS_NORMAL = 1000
 	DEFAULT_CLOSE_REASON = bytes('', encoding='utf-8')
@@ -71,7 +73,7 @@ class WebSocket(object):
 		self.writer.send(101, 'Switching Protocols', headers=headers)
 		return
 	
-	def read(self):
+	def read(self) -> Tuple[int, bytes]:
 		try:
 			b1, b2 = self.reader.read(2)
 		except (ConnectionResetError, ConnectionAbortedError, ConnectionError) as e:
@@ -87,20 +89,20 @@ class WebSocket(object):
 		if opcode == self.OPCODE_CLOSE_CONN:
 			return opcode, None
 
-		if not masked:
-			return opcode, None
-
 		if size == 126:
 			size = unpack('>H', self.reader.read(2))[0]
 		elif size == 127:
 			size = unpack('>Q', self.reader.read(8))[0]
 
-		masks = self.reader.read(4)
-
-		buffer = bytearray()
-		for buf in self.reader.read(size):
-			buf ^= masks[len(buffer) % 4]
-			buffer.append(buf)
+		if masked:
+			masks = self.reader.read(4)
+			buffer = bytearray()
+			for buf in self.reader.read(size):
+				buf ^= masks[len(buffer) % 4]
+				buffer.append(buf)
+			buffer = bytes(buffer)
+		else:
+			buffer = self.reader.read(size)
 
 		return opcode, buffer
 
@@ -127,7 +129,8 @@ class WebSocket(object):
 		else:
 			raise RuntimeError('Message is too big, Consider breaking it into chunks.')
 
-		self.writer.write(bytes(header + buffer))
+		self.writer.write(bytes(header))
+		self.writer.write(buffer)
 		return
 
 	def end(self, status=CLOSE_STATUS_NORMAL, reason=DEFAULT_CLOSE_REASON):
