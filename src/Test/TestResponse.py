@@ -6,13 +6,14 @@ from .Sender import Sender
 
 from Liquirizia.Serializer import SerializerHelper
 
-from io import BytesIO
+from io import BytesIO, BufferedReader
 from cgi import parse_header
 
 from typing import Iterable
 
 __all__ = (
 	'TestResponse',
+	'TestResponseStream',
 	'TestResponseServerSentEvents',
 	'ServerSentEvent',
 )
@@ -80,8 +81,41 @@ class TestResponse(object):
 		if 'charset' not in self.headers['Content-Type']['kwargs'].keys():
 			return None
 		return self.headers['Content-Type']['kwargs']['charset']
-	
 
+
+class TestResponseStream(TestResponse):
+	def __init__(self, sender):
+		self.status = int(sender.status)
+		self.message = sender.message
+		self.headers = {}
+		for k, v in sender.headers:
+			args, kwargs = parse_header(v)
+			self.headers[ToHeaderName(k)] = {
+				'expr': str(v),
+				'args': args.split(','),
+				'kwargs': kwargs
+			}
+		self.buffer = sender.buffer
+		return
+
+	def read(self, size: int = -1):
+		return self.buffer.read(size)
+	
+	def readline(self, size: int = -1):
+		return self.buffer.readline(size)
+
+	def chunk(self):
+		line = self.buffer.readline()
+		if not line:
+			return None
+		size = int(line, 16)
+		if not size:
+			return None
+		buffer = self.buffer.read(size)
+		line = self.buffer.readline()
+		return buffer
+
+	
 class ServerSentEvent(object):
 	def __init__(
 		self,
@@ -111,8 +145,6 @@ class TestResponseServerSentEvents(TestResponse):
 		return
 
 	def events(self) -> Iterable[ServerSentEvent]:
-		# TODO : return parsed event stream buffer to events(data, id, event)
-		from io import BufferedReader	
 		reader = BufferedReader(BytesIO(self.buffer))
 		events = []
 		event = ServerSentEvent()

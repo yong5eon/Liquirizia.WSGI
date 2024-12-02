@@ -5,11 +5,9 @@ from .TestResponse import TestResponse
 
 from ..Application import Application
 
-from Liquirizia.Serializer import SerializerHelper
-
 from urllib.parse import urlencode
 from sys import stderr
-from io import BytesIO
+from io import BytesIO, BufferedReader
 
 from typing import Any, Dict, List, Tuple
 
@@ -58,7 +56,7 @@ class TestRequest(object):
 			# 'AUTH_TYPE': '',
 			'wsgi.version': version,
 			'wsgi.url_scheme': 'http',
-			'wsgi.input': BytesIO(body),
+			'wsgi.input': BufferedReader(BytesIO(body)),
 			'wsgi.errors': stderr,
 			'wsgi.multithread': False,
 			'wsgi.multiprocess': False,

@@ -3,6 +3,7 @@
 from .TestRequest import TestRequest
 from .TestRequestStream import TestRequestStream, TestRequestStreamCallback
 from .TestRequestServerSentEvents import TestRequestServerSentEvents
+from .TestRequestWebSocket import TestRequestWebSocket, TestRequestWebSocketCallback
 
 from .TestResponse import (
 	TestResponse,
@@ -14,6 +15,8 @@ __all__ = (
 	'TestRequestStream',
 	'TestRequestStreamCallback',
 	'TestRequestServerSentEvents',
+	'TestRequestWebSocket',
+	'TestRequestWebSocketCallback',
 	'TestResponse',
 	'TestResponseServerSentEvents',
 )

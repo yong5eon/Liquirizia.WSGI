@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from .Sender import Sender
-from .TestResponse import TestResponse
+from .Sender import SenderStream, BufferedStream
+from .TestResponse import TestResponse, TestResponseStream
 
 from ..Application import Application
 
 from urllib.parse import urlencode
 from sys import stderr
-from io import BytesIO
 from threading import Thread
 
 from abc import ABCMeta, abstractmethod
@@ -35,8 +34,8 @@ class TestRequestStream(object):
 	):
 		self.application = application
 		self.env = env
-		self.input = BytesIO()
-		self.sender = Sender()
+		self.sender = SenderStream()
+		self.input = BufferedStream()
 		return
 	
 	def send(
@@ -45,8 +44,7 @@ class TestRequestStream(object):
 		uri: str, 
 		qs: Dict = None,
 		headers: Dict = None,
-		input: TestRequestStreamCallback = None,
-		output: TestRequestStreamCallback = None,
+		cb: TestRequestStreamCallback = None,
 		version: Tuple[int, int] = (1, 0),
 	):
 		env = {
@@ -66,7 +64,7 @@ class TestRequestStream(object):
 			# 'AUTH_TYPE': '',
 			'wsgi.version': version,
 			'wsgi.url_scheme': 'http',
-			'wsgi.input': self.input,
+			'wsgi.input': self.input.reader,
 			'wsgi.errors': stderr,
 			'wsgi.multithread': False,
 			'wsgi.multiprocess': False,
@@ -81,24 +79,42 @@ class TestRequestStream(object):
 				env[k.upper().replace('-', '_')] = v
 				continue
 			env['HTTP_' + k.upper().replace('-', '_')] = v
-		if input:
-			thread = Thread(target=input, args=(self,))
+		if cb:
+			thread = Thread(target=cb, args=(self,))
 			thread.start()
 		self.application(env, send=self.sender)
-		return
+		self.sender.close()
+		return TestResponseStream(self.sender)
+	
+	def read(self, size: int = -1):
+		return self.sender.read(size)
+	
+	def readline(self, size: int = -1):
+		return self.sender.readline(size)
 	
 	def write(self, buffer: bytes):
 		self.input.write(buffer)
 		return
 	
-	def chunk(self, buffer: bytes):
+	def chunk(self, buffer: bytes = None):
 		CRLF = '\r\n'
-		size = '{:x}'.format(len(buffer) if buffer else 0)
-		self.input.write(size.encode())
-		self.input.write(CRLF.encode())
-		self.input.write(buffer)
-		self.input.write(CRLF.encode())
-		return
+		if buffer:
+			size = '{:x}'.format(len(buffer) if buffer else 0)
+			self.input.write(size.encode())
+			self.input.write(CRLF.encode())
+			self.input.write(buffer)
+			self.input.write(CRLF.encode())
+			return
+		else:
+			line = self.sender.readline()
+			if not line:
+				return None
+			size = int(line, 16)
+			if not size:
+				return None
+			buffer = self.sender.read(size)
+			line = self.sender.readline()
+			return buffer
 	
 	def end(self):
 		CRLF = '\r\n'
@@ -107,6 +123,3 @@ class TestRequestStream(object):
 		self.input.write(CRLF.encode())
 		self.input.write(b'')
 		return
-
-	def response(self):
-		return TestResponse(self.sender)
