@@ -42,7 +42,7 @@ jobs:
         with:
           tag_name: ${{env.VERSION}}
           name: "Release - ${{env.VERSION}}"
-          body_path: release/${{env.VERSION}}.md
+          body_path: releases/${{env.VERSION}}.md
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
