@@ -1,20 +1,26 @@
-name: Update VERSION
+name: Create Version
 on:
   pull_request:
     types:
       - closed
 jobs:
-  update-version:
-    if: github.event.pull_request.merged == true
+  create-version:
+    if: |
+      github.event.pull_request.merged == true && 
+      (
+        startsWith(github.event.pull_request.head.ref, 'feature/') ||
+        startsWith(github.event.pull_request.head.ref, 'bug/') ||
+        startsWith(github.event.pull_request.head.ref, 'fix/')
+      )
     permissions:
       contents: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: ${{github.event.pull_request.base.ref}}
-          fetch-depth: 0
       - name: Show base and merged branch
         run: |
           echo "BASE=${{github.event.pull_request.base.ref}}"
@@ -38,10 +44,10 @@ jobs:
           IFS='.' read -r MAJOR MINOR PATCH <<< "$OLD_VERSION"
           UPDATED=false
           # Determine update logic based on branch name
-          if [[ "${{env.MERGED}}" =~ ^(bug|fix|hotfix) ]]; then
+          if [[ "${{env.MERGED}}" =~ ^(bug|fix) ]]; then
             PATCH=$((PATCH + 1))
             UPDATED=true
-          elif [[ "${{env.MERGED}}" =~ ^(feature|feat) ]]; then
+          elif [[ "${{env.MERGED}}" =~ ^(feature) ]]; then
             MINOR=$((MINOR + 1))
             PATCH=0  # Reset PATCH when MINOR is incremented
             UPDATED=true
@@ -55,42 +61,38 @@ jobs:
           echo "OLD_VERSION=$OLD_VERSION" >> $GITHUB_ENV
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
           echo "UPDATED=$UPDATED" >> $GITHUB_ENV
-      - name: Commit and Push Updated VERSION and CHANGES
-        if: env.UPDATED == 'true'
+      - name: Create Release Branch and Commit Changes
+        if: ${{env.UPDATED == 'true'}}
         run: |
-          if [ ! -f "docs/${{env.MERGED}}.md" ]; then
-            echo "docs/${{env.MERGED}}.md file is not found"
+          RELEASE_BRANCH="release/${{env.NEW_VERSION}}"
+          echo "RELEASE BRANCH : $RELEASE_BRANCH"
+          echo "MERGED         : ${{env.MERGED}}"
+          echo "OLD VERSION    : ${{env.OLD_VERSION}}"
+          echo "NEW VERSION    : ${{env.NEW_VERSION}}"
+          if [ ! -f "issues/${{env.MERGED}}.md" ]; then
+            echo "issues/${{env.MERGED}}.md file is not found"
             exit 1
           fi
+          git checkout -b $RELEASE_BRANCH
+          git config user.name "${{vars.ACTION_USERNAME}}"
+          git config user.email "${{vars.ACTION_USEREMAIL}}"
           echo "${{env.NEW_VERSION}}" > VERSION
-          CHANGES=$(cat docs/${{env.MERGED}}.md)
-          echo "$CHANGES" > docs/VERSION/${{env.NEW_VERSION}}.md
-          git config user.name "${{vars.ACTION_USERNAME}}"
-          git config user.email "${{vars.ACTION_USEREMAIL}}"
+          CHANGES=$(cat issues/${{env.MERGED}}.md)
+          echo "$CHANGES" > release/${{env.NEW_VERSION}}.md
           git add VERSION
-          git add docs/VERSION/${{env.NEW_VERSION}}.md
-          git commit -m "Update VERSION from $OLD_VERSION to ${{env.NEW_VERSION}}"
-          git push origin ${{github.event.pull_request.base.ref}}
-      - name: Create Tag
-        if: github.event.pull_request.base.ref == 'master'
-        run: |
-          # Check version file
-          if [ ! -f "VERSION" ]; then
-            echo "VERSION file is not found!"
-            exit 1
-          fi
-          VERSION=$(cat VERSION)
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          git config user.name "${{vars.ACTION_USERNAME}}"
-          git config user.email "${{vars.ACTION_USEREMAIL}}"
-          git tag -a -f "$VERSION" -m "Release - $VERSION"
-          git push -f origin "$VERSION"
-      - name: Create Release
-        if: github.event.pull_request.base.ref == 'master'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{env.VERSION}}
-          name: "Release - ${{env.VERSION}}"
-          body_path: docs/VERSION/${{env.VERSION}}.md
+          git add release/${{env.NEW_VERSION}}.md
+          git commit -m "Update VERSION from ${{env.OLD_VERSION}} to ${{env.NEW_VERSION}}"
+          git push origin $RELEASE_BRANCH
+          git log -1
+          git branch -vv
+      - name: Create Pull Request
+        if: ${{env.UPDATED == 'true'}}
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        run: |
+          RELEASE_BRANCH="release/${{env.NEW_VERSION}}"
+          TITLE="Release - ${{env.NEW_VERSION}}"
+          BODY=$(cat release/${{env.NEW_VERSION}}.md)
+          BASE="${{github.event.pull_request.base.ref}}"
+          gh pr create --title "$TITLE" --body "$BODY" --head "$RELEASE_BRANCH" --base "$BASE_BRANCH"
+
