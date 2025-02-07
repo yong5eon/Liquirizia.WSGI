@@ -56,6 +56,7 @@ from importlib.machinery import SourceFileLoader
 from importlib import import_module
 from pkgutil import walk_packages
 from copy import copy
+from uuid import uuid4
 
 from typing import Type, Dict, Callable
 
@@ -79,6 +80,7 @@ class Application(object):
 
 	def __call__(self, env: Dict, send: Callable):
 		try:
+			env['REQUEST_ID'] = uuid4().hex
 			request = None
 			headers = {}
 			for k, v in env.items():
@@ -150,6 +152,7 @@ class Application(object):
 				),
 				parameters=parameters,
 				headers=headers,
+				id=env['REQUEST_ID'],
 			)
 			cors = CORS(
 				origin=self.config.cors.origin,

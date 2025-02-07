@@ -35,51 +35,43 @@ FileSystemObjectHelper.Set(
 
 class SampleHandler(Handler):
 	def onOptions(self, env, response):
-		print('OPTIONS  : {}, {}'.format(env['PATH_INFO'], str(response)))
+		print('{} - OPTIONS {}, {}'.format(env['REQUEST_ID'][:16], env['PATH_INFO'], str(response)))
 		return response
 	def onRequest(self, request: Request):
-		print('REQUEST	: {}'.format(str(request)))
+		print('{} - REQUEST           - {}'.format(request.id[:16], str(request)))
 		return request, None
 	def onRequestResponse(self, request: Request, response: Response):
-		print('REQUEST RESPONSE : {} - {}'.format(str(response), response.size))
+		print('{} - REQUEST RESPONSE  - {} - {}'.format(request.id[:16], str(response), response.size))
 		return response
 	def onRequestComplete(self, request: Request):
-		print('REQUEST COMPLETE : {}'.format(str(request)))
+		print('{} - REQUEST COMPLETE  - {}'.format(request.id[:16], str(request)))
 		return
 	def onRequestError(self, request: Request, error: Error):
-		print('REQUEST ERROR : {}'.format(str(request)))
+		print('{} - REQUEST ERROR     - {}'.format(request.id[:16], str(request)))
 		tb =	str(error)
 		tb += '\n'
-		for line in ''.join(format_tb(error.__traceback__)).strip().split('\n'):
-			tb += line
-			tb += '\n'
-			print(tb)
+		tb += ''.join(format_tb(error.__traceback__)).strip().replace('    ', '  ')
+		print(tb)
 		return ResponseError(error, body=tb, format='text/plain', charset='utf-8')
 	def onRequestException(self, request: Request, e: Exception):
-		print('REQUEST EXCEPTION : {}'.format(str(request)))
+		print('{} - REQUEST EXCEPTION - {}'.format(request.id[:16], str(request)))
 		tb =	str(e)
 		tb += '\n'
-		for line in ''.join(format_tb(e.__traceback__)).strip().split('\n'):
-			tb += line
-			tb += '\n'
+		tb += ''.join(format_tb(e.__traceback__)).strip().replace('    ', '  ')
 		print(tb)
 		return ResponseInternalServerError(body=tb, format='text/plain', charset='utf-8')
 	def onError(self, env, error: Error):
-		print('ERROR : {} - {}'.format(env['PATH_INFO'], str(error)))
+		print('{} - ERROR            - {} - {}'.format(env['REQUEST_ID'][:16], env['PATH_INFO'], str(error)))
 		tb =	str(error)
 		tb += '\n'
-		for line in ''.join(format_tb(error.__traceback__)).strip().split('\n'):
-			tb += line
-			tb += '\n'
+		tb += ''.join(format_tb(error.__traceback__)).strip().replace('    ', '  ')
 		print(tb)
 		return ResponseError(error, body=tb, format='text/plain', charset='utf-8')
 	def onException(self, env, e: Exception):
-		print('EXCEPTION : {} - {}'.format(env['PATH_INFO'], str(e)))
+		print('{} - EXCEPTION        - {} - {}'.format(env['REQUEST_ID'][:16], env['PATH_INFO'], str(e)))
 		tb =	str(e)
 		tb += '\n'
-		for line in ''.join(format_tb(e.__traceback__)).strip().split('\n'):
-			tb += line
-			tb += '\n'
+		tb += ''.join(format_tb(e.__traceback__)).strip().replace('    ', '  ')
 		print(tb)
 		return ResponseServiceUnavailable(body=tb, format='text/plain', charset='utf-8')
 
@@ -142,5 +134,8 @@ aps.addFileSystemObject(
 
 
 if __name__ == '__main__':
+	print('WSGI server init...')
 	with serve('127.0.0.1', 8000, aps) as httpd:
+		print('WSGI server run')
 		httpd.serve_forever()
+	print('WSGI server stopped')
