@@ -73,16 +73,17 @@ jobs:
             echo "issues/${{env.MERGED}}.md file is not found"
             exit 1
           fi
-          git checkout -b $RELEASE_BRANCH
           git config user.name "${{vars.ACTION_USERNAME}}"
           git config user.email "${{vars.ACTION_USEREMAIL}}"
+          git pull origin ${{env.BASE}}
+          git checkout -b $RELEASE_BRANCH
           echo "${{env.NEW_VERSION}}" > VERSION
           CHANGES=$(cat issues/${{env.MERGED}}.md)
           echo "$CHANGES" > releases/${{env.NEW_VERSION}}.md
           git add VERSION
           git add releases/${{env.NEW_VERSION}}.md
           git commit -m "Update VERSION from ${{env.OLD_VERSION}} to ${{env.NEW_VERSION}}"
-          git push origin $RELEASE_BRANCH
+          git push -f origin $RELEASE_BRANCH
           git log -1
           git branch -vv
       - name: Create Pull Request
