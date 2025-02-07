@@ -24,10 +24,26 @@ WSGI(Web Server Gateway Interface)
 
 ## Run
 
+### Run with serve
+
+```python
+from Liquirizia.WSGI import (
+	Application,
+	serve,
+)
+
+aps = Application(
+	...
+)
+
+with serve('127.0.0.1', 8000, aps) as httpd:
+	httpd.serve_forever()
+```
+
 ### Run with Gunicorn
 
 ```shell
-> gunicorn path.to.module.application --worker-class=[sync|gevent|eventlet]
+> gunicorn path.to.module.application --worker-class=[sync|gevent|eventlet|greenlet]
 ```
 
 ### Run With Gunicorn + Uvicorn
@@ -199,15 +215,6 @@ api_doc(
 )
 ```
 
-## Install Gunicorn and worker models
-
-```shell
-> pip install gunicorn
-> pip install gevent
-> pip install eventlet
-> pip install greenlet
-```
-
 ## Launch Configuration for VSCode
 
 ### With Liquirizia.WSGI.serve
@@ -215,7 +222,7 @@ api_doc(
 ```json
 ...
 {
-  "name": "Sample - WSGI",
+  "name": "${NAME}",
   "type": "debugpy",
   "request": "launch",
   "cwd": "/path/to",
@@ -227,6 +234,24 @@ api_doc(
   }
 },
 ...
+```
+
+### With Gunicorn
+
+```json
+{
+  "name": "- API-Chat",
+  "type": "debugpy",
+  "request": "launch",
+  "cwd": "/path/to",
+  "module": "gunicorn",
+  "args": "${MODULE}:${APPLICATION} --reload --log-level=${LOG_LEVEL} --timeout=${TIMEOUT} --keep-alive=${KEEP_ALIVE} --worker-class=${WORKER_CLASS}",
+  "console": "integratedTerminal",
+  "justMyCode": true,
+  "env": {
+    "GEVENT_SUPPORT": "true",
+  }
+},
 ```
 
 ## 참고
