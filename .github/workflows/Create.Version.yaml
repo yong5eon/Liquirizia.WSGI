@@ -78,9 +78,9 @@ jobs:
           git config user.email "${{vars.ACTION_USEREMAIL}}"
           echo "${{env.NEW_VERSION}}" > VERSION
           CHANGES=$(cat issues/${{env.MERGED}}.md)
-          echo "$CHANGES" > release/${{env.NEW_VERSION}}.md
+          echo "$CHANGES" > releases/${{env.NEW_VERSION}}.md
           git add VERSION
-          git add release/${{env.NEW_VERSION}}.md
+          git add releases/${{env.NEW_VERSION}}.md
           git commit -m "Update VERSION from ${{env.OLD_VERSION}} to ${{env.NEW_VERSION}}"
           git push origin $RELEASE_BRANCH
           git log -1
@@ -92,7 +92,7 @@ jobs:
         run: |
           RELEASE_BRANCH="release/${{env.NEW_VERSION}}"
           TITLE="Release - ${{env.NEW_VERSION}}"
-          BODY=$(cat release/${{env.NEW_VERSION}}.md)
+          BODY=$(cat releases/${{env.NEW_VERSION}}.md)
           BASE="${{github.event.pull_request.base.ref}}"
           gh pr create --title "$TITLE" --body "$BODY" --head "$RELEASE_BRANCH" --base "$BASE_BRANCH"
 
