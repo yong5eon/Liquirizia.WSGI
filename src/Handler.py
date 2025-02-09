@@ -16,9 +16,6 @@ __all__ = (
 class Handler(metaclass=ABCMeta):
 	"""Request Handler Interface"""
 	@abstractmethod
-	def onOptions(self, env: Dict[str, Any], response: Response) -> Response:
-		raise NotImplementedError('{} must be implemented onOptions'.format(self.__class__.__name__))
-	@abstractmethod
 	def onRequest(self, request: Request) -> Request:
 		raise NotImplementedError('{} must be implemented onRequest'.format(self.__class__.__name__))
 	@abstractmethod
