@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from .Configuration import Configuration
-
 from .Request import Request
 from .Router import Router
+from .RouteOptions import RouteOptions
 from .Routes import (
 	RouteFile,
 	RouteFileSystemObject,
@@ -33,13 +33,8 @@ from .RequestReader import RequestReader
 from .ResponseWriter import ResponseWriter
 from .Error import Error
 
-from .Responses import (
-	ResponseError,
-	ResponseOK,
-	ResponseNoContent,
-)
+from .Responses import ResponseError
 from .Errors import (
-	InternalServerError,
 	ServiceUnavailableError,
 	MethodNotAllowedError,
 	NotFoundError,
@@ -55,7 +50,6 @@ from pathlib import Path
 from importlib.machinery import SourceFileLoader
 from importlib import import_module
 from pkgutil import walk_packages
-from copy import copy
 from uuid import uuid4
 
 from typing import Type, Dict, Callable
@@ -81,8 +75,12 @@ class Application(object):
 	def __call__(self, env: Dict, send: Callable):
 		try:
 			env['REQUEST_ID'] = uuid4().hex
+
 			request = None
+			runner = None
+			parameters = None
 			headers = {}
+
 			for k, v in env.items():
 				if k[0:5] == 'HTTP_':
 					k=ToHeaderName(k[5:])
@@ -91,55 +89,20 @@ class Application(object):
 				if k in ['CONTENT_TYPE', 'CONTENT_LENGTH'] and v:
 					headers[ToHeaderName(k)] = v
 
-			if env['REQUEST_METHOD'] == 'OPTIONS' and env['PATH_INFO'] == '*': 
-				response = ResponseNoContent()
-				# TODO : get methods from router
-				response.header('Allow', ', '.join(sorted(list(set(self.router.methods)))))
-				if self.requestHandler:
-					response = self.requestHandler.onOptions(env, response)
-				write = send(str(response), headers=response.headers())
-				write(response.body if response.body else b'')
-				return
-
-			patterns = self.router.matches(env['PATH_INFO'])
-
-			if not patterns:
-				raise NotFoundError('{} is not found in router'.format(env['PATH_INFO']))
-
 			if env['REQUEST_METHOD'] == 'OPTIONS':
-				# TODO : if Access-Control-Request-Method in headers, response specific CORS headers
-				# TODO : Use ResponseOK in HTTP/1.0
-				response = ResponseNoContent()
-				response.header('Allow', ', '.join(patterns.keys()))
-				response.header('Access-Control-Allow-Methods', ', '.join(patterns.keys()))
-				cors = CORS(
-					origin=self.config.cors.origin,
-					headers=self.config.cors.headers,
-					exposeHeaders=self.config.cors.exposeHeaders,
-					credentials=self.config.cors.credentials,
-					age=self.config.cors.age,
-				)
-				for _, match in patterns.items():
-					if match.route.cors.origin: cors.origin.extend(match.route.cors.origin)
-					if match.route.cors.headers: cors.headers.extend(match.route.cors.headers)
-					if match.route.cors.credentials: cors.credentials = match.route.cors.credentials
-					if match.route.cors.exposeHeaders: cors.exposeHeaders.extend(match.route.cors.exposeHeaders)
-					if match.route.cors.age and match.route.cors.age > cors.age: cors.age = match.route.cors.age
-				for k, v in cors.toHeaders().items(): response.header(k, v)
-				if self.requestHandler:
-					response = self.requestHandler.onOptions(env, response)
-				write = send(str(response), headers=response.headers())
-				write(response.body if response.body else b'')
-				return
+				runner = RouteOptions()
+			else:
+				patterns = self.router.matches(env['PATH_INFO'])
+				if not patterns:
+					raise NotFoundError('{} is not found in router'.format(env['PATH_INFO']))
 
-			if env['REQUEST_METHOD'] not in patterns.keys():
-				raise MethodNotAllowedError('{} is not allowed for {}'.format(
-					env['REQUEST_METHOD'],
-					env['PATH_INFO']
-				))
-	
-			runner = patterns[env['REQUEST_METHOD']].route
-			parameters = patterns[env['REQUEST_METHOD']].params
+				if env['REQUEST_METHOD'] not in patterns.keys():
+					raise MethodNotAllowedError('{} is not allowed for {}'.format(
+						env['REQUEST_METHOD'],
+						env['PATH_INFO']
+					))
+				runner = patterns[env['REQUEST_METHOD']].route
+				parameters = patterns[env['REQUEST_METHOD']].params
 
 			reader = RequestReader(env['wsgi.input'])
 			request = Request(
@@ -161,7 +124,7 @@ class Application(object):
 				credentials=self.config.cors.credentials,
 				age=self.config.cors.age,
 			)
-			if runner.cors:
+			if hasattr(runner, 'cors') and getattr(runner, 'cors'):
 				if runner.cors.origin: cors.origin.extend(runner.cors.origin)
 				if runner.cors.headers: cors.headers.extend(runner.cors.headers)
 				if runner.cors.credentials: cors.credentials = runner.cors.credentials

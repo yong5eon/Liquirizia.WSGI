@@ -34,9 +34,6 @@ FileSystemObjectHelper.Set(
 )
 
 class SampleHandler(Handler):
-	def onOptions(self, env, response):
-		print('{} - OPTIONS {}, {}'.format(env['REQUEST_ID'][:16], env['PATH_INFO'], str(response)))
-		return response
 	def onRequest(self, request: Request):
 		print('{} - REQUEST           - {}'.format(request.id[:16], str(request)))
 		return request, None
