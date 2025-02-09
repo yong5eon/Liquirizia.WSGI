@@ -11,6 +11,8 @@ from os.path import isfile, split
 from email.utils import formatdate
 from hashlib import sha1
 
+from typing import Dict, Any
+
 __all__ = (
 	'ResponseFile'
 )
@@ -26,8 +28,9 @@ class ResponseFile(Response):
 		size=None,
 		status=200,
 		message='OK',
+		headers: Dict[str, Any] = {} 
 	):
-		super(ResponseFile, self).__init__(status=status, message=message,)
+		super(ResponseFile, self).__init__(status=status, message=message, headers=headers)
 
 		if not isfile(file):
 			raise IOError('Resource {} is not found'.format(file))

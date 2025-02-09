@@ -4,6 +4,8 @@ from ..Response import Response
 
 from Liquirizia.Serializer import SerializerHelper
 
+from typing import Dict, Any
+
 __all__ = (
 	'ResponseMovePermanently',
 	'ResponseFound',
@@ -13,14 +15,15 @@ __all__ = (
 
 class ResponseMovePermanently(Response):
 	"""Response 301 Move Permanently Class"""
-	def __init__(self, url, body=None, format=None, charset=None):
+	def __init__(self, url, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		headers.update({
+			'Content-Length': len(body) if body else 0,
+			'Location': url,
+		})
 		super(ResponseMovePermanently, self).__init__(
 			status=301,
 			message='Move Permanently',
-			headers={
-				'Content-Length': len(body) if body else 0,
-				'Location': url,
-			},
+			headers=headers,
 			body=SerializerHelper.Encode(body, format, charset) if body else None,
 			format=format,
 			charset=charset,
@@ -30,14 +33,15 @@ class ResponseMovePermanently(Response):
 
 class ResponseFound(Response):
 	"""Response 302 Found Class"""
-	def __init__(self, url, body=None, format=None, charset=None):
+	def __init__(self, url, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		headers.update({
+			'Content-Length': len(body) if body else 0,
+			'Location': url,
+		})
 		super().__init__(
 			status=302,
 			message='Found',
-			headers={
-				'Content-Length': len(body) if body else 0,
-				'Location': url,
-			},
+			headers=headers,
 			body=SerializerHelper.Encode(body, format, charset) if body else None,
 			format=format,
 			charset=charset,
@@ -47,13 +51,12 @@ class ResponseFound(Response):
 
 class ResponseNotModified(Response):
 	"""Reponse 304 Not Modified Class"""
-	def __init__(self, body=None, format=None, charset=None):
+	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		headers.update({'Content-Length': len(body) if body else 0})
 		super(ResponseNotModified, self).__init__(
 			status=304,
 			message='Not Modified',
-			headers={
-				'Content-Length': len(body) if body else 0,
-			},
+			headers=headers,
 			body=SerializerHelper.Encode(body, format, charset) if body else None,
 			format=format,
 			charset=charset,
