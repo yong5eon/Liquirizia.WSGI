@@ -35,6 +35,7 @@ from .Error import Error
 
 from .Responses import ResponseError
 from .Errors import (
+	InternalServerError,
 	ServiceUnavailableError,
 	MethodNotAllowedError,
 	NotFoundError,
@@ -158,7 +159,7 @@ class Application(object):
 				if self.requestHandler:
 					response = self.requestHandler.onRequestException(request, e)
 				else:
-					response = ResponseError(e)
+					response = ResponseError(InternalServerError(str(e), error=e))
 				for k, v in cors.toHeaders().items(): response.header(k, v)
 				write = send(str(response), response.headers())
 				write(response.body if response.body else b'')
@@ -173,7 +174,7 @@ class Application(object):
 			if self.requestHandler: 
 				response = self.requestHandler.onException(env, e)
 			else:
-				response = ResponseError(ServiceUnavailableError(e))
+				response = ResponseError(ServiceUnavailableError(str(e), error=e))
 			write = send(str(response), response.headers())
 			write(response.body if response.body else b'')
 		return

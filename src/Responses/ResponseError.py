@@ -3,10 +3,6 @@
 from ..Response import Response
 from ..Error import Error
 
-from Liquirizia.Serializer import SerializerHelper
-
-from typing import Dict, Any
-
 __all__ = (
 	'ResponseError'
 )
@@ -14,13 +10,24 @@ __all__ = (
 
 class ResponseError(Response):
 	"""Response Error Class"""
-	def __init__(self, error: Error, body: str = None, format: str = None, charset: str = None, headers: Dict[str, Any] = {}):
-		headers.update({'Content-Length': len(body) if body else 0})
+	def __init__(self, error: Error):
+		headers = error.headers if error.headers else {}
+		body = None
+		format = None
+		charset = None
+		if error.body:
+			body = error.body
+			format = error.format
+			charset = error.charset
+		else:
+			body = error.traceback.encode('utf-8')
+			format = 'text/plain'
+			charset = 'utf-8'
 		super(ResponseError, self).__init__(
 			status=error.status,
 			message=error.message,
 			headers=headers,
-			body=SerializerHelper.Encode(body, format, charset) if body else None,
+			body=body,
 			format=format,
 			charset=charset,
 		)

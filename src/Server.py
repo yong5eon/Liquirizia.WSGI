@@ -4,7 +4,6 @@ from wsgiref.simple_server import (
 	make_server,
 	WSGIServer,
 	WSGIRequestHandler,
-	
 )
 from wsgiref.handlers import SimpleHandler, BaseHandler
 
@@ -80,7 +79,7 @@ class ServerHandler(BaseHandler):
 				exc_info = None		# avoid dangling circular ref
 		elif self.headers is not None:
 			raise AssertionError("Headers already set!")
-
+		
 		self.status = status
 		self.headers = self.headers_class(headers)
 		status = self._convert_string_type(status, "Status")
@@ -124,8 +123,12 @@ class ServerRequestHandler(WSGIRequestHandler):
 			return
 
 		handler = ServerHandler(
-			self.rfile, self.wfile, self.get_stderr(), self.get_environ(),
-			multithread=False,
+			self.rfile,
+			self.wfile,
+			self.get_stderr(),
+			self.get_environ(),
+			multithread=True,
+			multiprocess=False,
 		)
 		handler.request_handler = self	  # backpointer for logging
 		handler.run(self.server.get_app())
