@@ -26,57 +26,6 @@ from traceback import format_tb
 from time import sleep
 
 
-class TestHandler(Handler):
-	def onOptions(self, env, response):
-		print('OPTIONS  : {}, {}'.format(env['PATH_INFO'], str(response)))
-		return response
-	def onRequest(self, request: Request):
-		print('REQUEST	: {}'.format(str(request)))
-		return request, None
-	def onRequestResponse(self, request: Request, response: Response):
-		print('REQUEST RESPONSE : {} - {}'.format(str(response), response.size))
-		return response
-	def onRequestComplete(self, request: Request):
-		print('REQUEST COMPLETE : {}'.format(str(request)))
-		return
-	def onRequestError(self, request: Request, error: Error):
-		print('REQUEST ERROR : {}'.format(str(request)))
-		tb =	str(error)
-		tb += '\n'
-		for line in ''.join(format_tb(error.__traceback__)).strip().split('\n'):
-			tb += line
-			tb += '\n'
-			print(tb)
-		return ResponseError(error, body=tb, format='text/plain', charset='utf-8')
-	def onRequestException(self, request: Request, e: Exception):
-		print('REQUEST EXCEPTION : {}'.format(str(request)))
-		tb =	str(e)
-		tb += '\n'
-		for line in ''.join(format_tb(e.__traceback__)).strip().split('\n'):
-			tb += line
-			tb += '\n'
-		print(tb)
-		return ResponseInternalServerError(body=tb, format='text/plain', charset='utf-8')
-	def onError(self, env, error: Error):
-		print('ERROR : {} - {}'.format(env['PATH_INFO'], str(error)))
-		tb =	str(error)
-		tb += '\n'
-		for line in ''.join(format_tb(error.__traceback__)).strip().split('\n'):
-			tb += line
-			tb += '\n'
-		print(tb)
-		return ResponseError(error, body=tb, format='text/plain', charset='utf-8')
-	def onException(self, env, e: Exception):
-		print('EXCEPTION : {} - {}'.format(env['PATH_INFO'], str(e)))
-		tb =	str(e)
-		tb += '\n'
-		for line in ''.join(format_tb(e.__traceback__)).strip().split('\n'):
-			tb += line
-			tb += '\n'
-		print(tb)
-		return ResponseServiceUnavailable(body=tb, format='text/plain', charset='utf-8')
-
-
 @RequestProperties(
 	method='GET',
 	url='/stream',
