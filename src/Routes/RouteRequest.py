@@ -8,6 +8,7 @@ from ..Properties import RequestRunner
 from ..Filters import *
 from ..RequestReader import RequestReader
 from ..ResponseWriter import ResponseWriter
+from ..Parser import Parser
 from ..CORS import CORS
 from ..Errors import BadRequestError, UnsupportedMediaTypeError
 
@@ -15,7 +16,7 @@ from Liquirizia.Serializer import SerializerHelper
 from Liquirizia.Serializer.Errors import NotSupportedError, DecodeError
 from Liquirizia.Validator import Validator
 
-from typing import Type
+from typing import Type, Dict
 
 __all__ = (
 	'RouteRequest'
@@ -34,6 +35,7 @@ class RouteRequest(Route, RouteRun):
 		header: Validator = None,
 		qs: Validator = None,
 		body: Validator = None,
+		bodyParsers: Dict[str, Parser] = {},
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
 		cors=CORS(),
@@ -46,6 +48,8 @@ class RouteRequest(Route, RouteRun):
 		self.parameter = parameter
 		self.qs = qs
 		self.body = body
+		self.bodyParsers = {}
+		for k, v in bodyParsers.items() if bodyParsers else {}: self.bodyParsers[k.lower()] = v
 		return
 
 	def run(
@@ -55,15 +59,16 @@ class RouteRequest(Route, RouteRun):
 		writer: ResponseWriter,
 	):
 		if request.size:
+			buffer = reader.read(request.size)
+			if not buffer:
+				raise BadRequestError('body is empty')
+			body = buffer.decode(request.charset if request.charset else '')
+			if request.format.lower() not in self.bodyParsers.keys():
+				raise UnsupportedMediaTypeError('{} is not supported media type'.format(request.format))
+			parse = self.bodyParsers[request.format]
 			try:
-				request.body = SerializerHelper.Decode(
-					reader.read(request.size),
-					format=request.format,
-					charset=request.charset,
-				)
-			except NotSupportedError as e:
-				raise UnsupportedMediaTypeError(str(e), error=e)
-			except DecodeError as e:
+				request.body = parse(body)
+			except Exception as e:
 				raise BadRequestError(str(e), error=e)
 
 		if self.parameter:

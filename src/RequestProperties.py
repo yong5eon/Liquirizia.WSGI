@@ -7,12 +7,17 @@ from .Filters import (
 	RequestFilter,
 	ResponseFilter,
 )
+from .Parser import (
+	Parser,
+	FormUrlEncodedParser,
+	JavaScriptObjectNotationParser,
+)
 from .CORS import CORS
 from .Description import Description
 
 from Liquirizia.Validator import Validator
 
-from typing import Union
+from typing import Union, Dict
 
 __all__ = (
 	'RequestProperties',
@@ -30,6 +35,14 @@ class RequestProperties(object):
 		header: Validator = None,
 		qs: Validator = None,
 		body: Validator = None,
+		bodyParsers: Dict[str, Parser] = {
+			'application/x-www-form-urlencoded': FormUrlEncodedParser(),
+			'application/x-www-form': FormUrlEncodedParser(),
+			'form-urlencoded': FormUrlEncodedParser(),
+			'form': FormUrlEncodedParser(),
+			'application/json': JavaScriptObjectNotationParser(),
+			'json': JavaScriptObjectNotationParser(),
+		},
 		onRequest: RequestFilter = None,
 		onResponse : ResponseFilter = None,
 		cors: CORS = CORS(),
@@ -41,6 +54,7 @@ class RequestProperties(object):
 		self.header = header
 		self.qs = qs
 		self.body = body
+		self.bodyParsers = bodyParsers
 		self.onRequest = onRequest
 		self.onResponse = onResponse
 		self.cors = cors
@@ -58,6 +72,7 @@ class RequestProperties(object):
 				header=self.header,
 				qs=self.qs,
 				body=self.body,
+				bodyParsers=self.bodyParsers,
 				onRequest=self.onRequest,
 				onResponse=self.onResponse,
 				cors=self.cors
