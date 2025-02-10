@@ -24,20 +24,7 @@ class RouteOptions(RouteRun):
 		reader: RequestReader,
 		writer: ResponseWriter,
 	):
-		if request.size:
-			try:
-				request.body = SerializerHelper.Decode(
-					reader.read(request.size),
-					format=request.format,
-					charset=request.charset,
-				)
-			except NotSupportedError as e:
-				raise UnsupportedMediaTypeError(str(e), error=e)
-			except DecodeError as e:
-				raise BadRequestError(str(e), error=e)
-
 		obj = Options(request)
 		response = obj.run()
-
 		writer.response(response)
 		return

@@ -9,22 +9,14 @@ from .RequestProperties import RequestProperties
 from .RequestReader import RequestReader
 from .ResponseWriter import ResponseWriter
 from .Router import Router
-
+from .Parser import Parser
 from .Error import Error
-
 from .Cookie import Cookie
 from .CORS import CORS
 
 from .Handler import Handler
 
 from .Server import serve
-
-from Liquirizia.Serializer import SerializerHelper
-from .Serializers.FormUrlEncoded import (
-	Encoder as FormUrlEncoder,
-	Decoder as FormUrlDecoder,
-	FORMATS as FORM_URL_ENCODED,
-)
 
 __all__ = (
 	'Application',
@@ -36,11 +28,9 @@ __all__ = (
 	'RequestReader',
 	'ResponseWriter',
 	'Router',
+	'Parser',
 	'Error',
 	'Cookie',
 	'CORS',
 	'serve',
 )
-
-for FORMAT in FORM_URL_ENCODED:
-	SerializerHelper.Set(FORMAT, FormUrlEncoder, FormUrlDecoder)
