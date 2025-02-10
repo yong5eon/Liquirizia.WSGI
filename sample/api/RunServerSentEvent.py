@@ -47,7 +47,7 @@ class RunServerSentEvent(RequestServerSentEventsRunner):
 				if i % 5 == 0:
 					writer.retry(1000)
 				sleep(1)
-			writer.end()
+			# writer.end()
 		except Exception as e:
 			tb =	str(e)
 			tb += '\n'
