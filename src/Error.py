@@ -1,19 +1,34 @@
 # -*- coding: utf-8 -*-
 
-import traceback
+from traceback import format_tb
+
+from typing import Dict, Any
 
 __all__ = (
-	'Error'
+	'Error',
 )
 
 
 class Error(BaseException):
-	"""Error Class of Web Application"""
-
-	def __init__(self, reason, status, message, error=None):
+	"""Error Class of WSGI"""
+	def __init__(
+		self,
+		reason: str,
+		status: int,
+		message: str,
+		headers: Dict[str, Any] = None,
+		body: bytes = None,
+		format: str = None,
+		charset: str = None,
+		error: BaseException = None
+	):
 		super(Error, self).__init__(reason)
 		self.status = status
 		self.message = message
+		self.headers = headers
+		self.body = body
+		self.format = format
+		self.charset = charset
 		self.error = error
 		return
 
@@ -21,11 +36,9 @@ class Error(BaseException):
 	def traceback(self):
 		reason = '{}\n'.format(str(self.error) if self.error else str(self))
 		if self.error:
-			for line in ''.join(traceback.format_tb(self.error.__traceback__)).strip().split('\n'):
-				reason += line + '\n'
+			reason += ''.join(format_tb(self.error.__traceback__)).strip().replace(' ' * 4, ' ' * 2)
 		else:
-			for line in ''.join(traceback.format_tb(self.__traceback__)).strip().split('\n'):
-				reason += line + '\n'
+			reason += ''.join(format_tb(self.__traceback__)).strip().replace(' ' * 4, ' ' * 2)
 		return reason
 	
 	@property
