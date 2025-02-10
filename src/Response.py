@@ -16,7 +16,7 @@ __all__ = (
 class Response(object):
 	"""HTTP Response Class"""
 
-	def __init__(self, status: int, message: str, headers: dict = None, body=None, format=None, charset=None):
+	def __init__(self, status: int, message: str, headers: dict = None, body: bytes = None, format: str = None, charset: str = None):
 		self.status = status
 		self.message = message
 		self.props = {}
