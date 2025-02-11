@@ -22,7 +22,7 @@ from ..Header import (
 	HeaderAsList,
 )
 
-from ..Util import ToDatetime
+from datetime import datetime
 
 __all__ = (
 	'Accept',
@@ -80,7 +80,7 @@ class Date(Header):
 	def __init__(self, value: str):
 		super().__init__(value)
 		try:
-			self.__datetime__ = ToDatetime(value)
+			self.__datetime__ = datetime.strptime(value, '%a, %d %b %Y %H:%M:%S GMT')
 		except:
 			self.__datetime__ = None
 		return

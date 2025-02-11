@@ -28,6 +28,8 @@ from ..Header import (
 	HeaderWithParameters,
 )
 
+from datetime import datetime
+
 __all__ = (
 	'ContentDigest',
 	'ContentDisposition',
@@ -35,6 +37,13 @@ __all__ = (
 	'ContentEncoding',
 	'ContentLanguage',
 	'ContentLength',
+	'ContentLocation',
+	'ContentRange',
+	'ContentSecuriyPolicy',
+	'ContentSecuriyPolicyReportOnly',
+	'ContentType'
+	'ETag',
+	'LastModified',
 	'ReprContentDigest',
 	'WantContentDigest',
 )
@@ -74,6 +83,69 @@ class ContentLength(Header):
 	def __init__(self, value):
 		super().__init__(value)
 		return
+
+
+class ContentLocation(Header):
+	def __init__(self, value):
+		super().__init__(value)
+		return
+
+
+class ContentRange(Header):
+	def __init__(self, value):
+		super().__init__(value)
+		ts = value.strip().split(' ', maxsplit=1)
+		self.unit = ts[0].strip().replace('"','').replace('<','').replace('>','')
+		rs = ts[1].strip().split('/')
+		self.size = int(rs[1].strip()) if rs[1].strip() != '*' else None
+		if rs[0].strip() == '*':
+			self.offset = 0
+			self.end = None
+		else:
+			ss = rs[0].strip().split('-')
+			self.offset = int(ss[0].strip())
+			self.end = int(ss[1].strip())
+		return
+
+
+class ContentSecurityPolicy(HeaderAsList):
+	def __init__(self, value):
+		super().__init__(value, sep=';')
+		return
+
+
+class ContentSecurityPolicyReportOnly(HeaderAsList):
+	def __init__(self, value):
+		super().__init__(value, sep=';')
+		return
+	
+
+class ContentType(HeaderWithParameters):
+	def __init__(self, value, sep = ';', paramsep = ','):
+		super().__init__(value, sep, paramsep)
+		self.charset = self.parameters['charset'] if 'charset' in self.parameters else None
+		self.boundary= self.parameters['boundary'] if 'boundary' in self.parameters else None
+		return
+
+
+class ETag(Header):
+	def __init__(self, value):
+		super().__init__(value)
+		if value[:2] == 'W/': value = value[2:]
+		self.etag = value.strip().replace('"',"").replace('<','').replace('>','')
+		return
+
+
+class LastModified(Header):
+	def __init__(self, value: str):
+		super().__init__(value)
+		try:
+			self.__datetime__ = datetime.strptime(value, '%a, %d %b %Y %H:%M:%S GMT')
+		except:
+			self.__datetime__ = None
+		return
+	@property
+	def dt(self): self.__datetime__
 
 
 class ReprContentDigest(HeaderAsParameters):
