@@ -158,7 +158,6 @@ class TestHeader(Case):
 		ASSERT_IS_EQUAL(str(_), o)
 		return
 
-
 	@Parameterized(
 		{'i': 'Tue, 11 Feb 2025 18:00:40 GMT', 'o': 'Tue, 11 Feb 2025 18:00:40 GMT' },
 	)
@@ -196,7 +195,6 @@ class TestHeader(Case):
 			ASSERT_IS_EQUAL(n.parameters, o[i]['parameters'])
 		return
 
-
 	@Parameterized(
 		{'i': 'no-cache', 'o': 'no-cache'},
 	)
@@ -217,7 +215,6 @@ class TestHeader(Case):
 		ASSERT_IS_EQUAL(_.u, o['u'])
 		ASSERT_IS_EQUAL(_.i, o['i'])
 		return
-
 
 	@Parameterized(
 		{'i': 'example/1, foo/2', 'o': [
@@ -264,5 +261,83 @@ class TestHeader(Case):
 	def testWarning(self, i, o):
 		_ = Warning(i)
 		ASSERT_IS_EQUAL(str(_), i)
+		return
+
+	@Parameterized(
+		{'i': 'sha-256=10, sha=3', 'o': {'sha-256': '10', 'sha': '3'}},
+	)
+	@Order(19)
+	def testContentDigest(self, i, o):
+		_ = ContentDigest(i)
+		ASSERT_IS_EQUAL(dict(_), o)
+		return
+
+	@Parameterized(
+		{'i': 'inline', 'o': {'value': 'inline', 'params': {}}},
+		{'i': 'attachment; filename="filename"', 'o': {'value': 'attachment', 'params': {'filename':'filename'}}},
+		{'i': 'form-data; name="name"; filename="filename"', 'o': {'value': 'form-data', 'params': {'name':'name','filename':'filename'}}},
+	)
+	@Order(20)
+	def testContentDisposition(self, i, o):
+		_ = ContentDisposition(i)
+		ASSERT_IS_EQUAL(_.value, o['value'])
+		ASSERT_IS_EQUAL(_.parameters, o['params'])
+		return
+
+	@Parameterized(
+		{'i': '1', 'o': '1'},
+	)
+	@Order(21)
+	def testContentDPR(self, i, o):
+		_ = ContentDPR(i)
+		ASSERT_IS_EQUAL(str(_), o)
+		return
+
+	@Parameterized(
+		{'i': 'deflate, gzip', 'o': ['deflate','gzip']},
+	)
+	@Order(22)
+	def testContentEncoding(self, i, o):
+		_ = ContentEncoding(i)
+		ASSERT_IS_EQUAL([str(h) for h in _], o)
+		return
+
+	@Parameterized(
+		{'i': 'en, kr, ko-KR', 'o': ['en','kr','ko-KR']},
+	)
+	@Order(23)
+	def testContentLanguage(self, i, o):
+		_ = ContentLanguage(i)
+		ASSERT_IS_EQUAL([str(h) for h in _], o)
+		return
+
+
+	@Parameterized(
+		{'i': '123232', 'o': 123232},
+	)
+	@Order(24)
+	def testContentLength(self, i, o):
+		_ = ContentLength(i)
+		ASSERT_IS_EQUAL(int(str(_)), o)
+		return
+
+
+	@Parameterized(
+		{'i': 'sha-256=10, sha=3', 'o': {'sha-256': '10', 'sha': '3'}},
+	)
+	@Order(28)
+	def testReprContentDigest(self, i, o):
+		_ = ReprContentDigest(i)
+		ASSERT_IS_EQUAL(dict(_), o)
+		return
+
+
+	@Parameterized(
+		{'i': 'sha-256=10, sha=3', 'o': {'sha-256': '10', 'sha': '3'}},
+	)
+	@Order(29)
+	def testWantContentDigest(self, i, o):
+		_ = WantContentDigest(i)
+		ASSERT_IS_EQUAL(dict(_), o)
 		return
 
