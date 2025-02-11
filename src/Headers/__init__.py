@@ -14,6 +14,16 @@ from .Common import (
 	Via,
 	Warning,
 )
+from .Content import (
+	ContentDigest,
+	ContentDisposition,
+	ContentDPR,
+	ContentEncoding,
+	ContentLanguage,
+	ContentLength,
+	ReprContentDigest,
+	WantContentDigest,
+)
 
 __all__ = (
 	# Common Header
@@ -29,4 +39,13 @@ __all__ = (
 	'Upgrade',
 	'Via',
 	'Warning',
+	# Content Header
+	'ContentDigest',
+	'ContentDisposition',
+	'ContentDPR',
+	'ContentEncoding',
+	'ContentLanguage',
+	'ContentLength',
+	'ReprContentDigest',
+	'WantContentDigest',
 )
