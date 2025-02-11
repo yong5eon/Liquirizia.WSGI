@@ -142,7 +142,7 @@ def ParseRange(range, maxlen=0):
 	Yield (start, end) ranges parsed from a HTTP Range header. Skip
 	unsatisfiable ranges. The end index is non-inclusive.
 	"""
-	if range[:6] != 'bytes=':
+	if range[:6] != 'bytes ':
 		return
 
 	ranges = [r.split('-', 1) for r in range[6:].split(',') if '-' in r]
