@@ -28,8 +28,11 @@ from .Content import (
 	ContentType,
 	ETag,
 	LastModified,
-	ReprContentDigest,
+	ReprDigest,
+	Trailer,
+	TransferEncoding,
 	WantContentDigest,
+	WantReprDigest,
 )
 
 __all__ = (
@@ -60,6 +63,9 @@ __all__ = (
 	'ContentType',
 	'ETag',
 	'LastModified',
-	'ReprContentDigest',
+	'ReprDigest',
+	'Trailer',
+	'TransferEncoding',
 	'WantContentDigest',
+	'WantReprDigest',
 )

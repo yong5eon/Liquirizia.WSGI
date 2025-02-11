@@ -44,8 +44,11 @@ __all__ = (
 	'ContentType'
 	'ETag',
 	'LastModified',
-	'ReprContentDigest',
+	'ReprDigest',
+	'Trailer',
+	'TransferEncoding',
 	'WantContentDigest',
+	'WantReprDigest',
 )
 
 
@@ -148,13 +151,31 @@ class LastModified(Header):
 	def dt(self): self.__datetime__
 
 
-class ReprContentDigest(HeaderAsParameters):
+class ReprDigest(HeaderAsParameters):
+	def __init__(self, value):
+		super().__init__(value, sep=',')
+		return
+	
+
+class Trailer(Header):
+	def __init__(self, value):
+		super().__init__(value)
+		return
+	
+
+class TransferEncoding(HeaderAsList):
 	def __init__(self, value):
 		super().__init__(value, sep=',')
 		return
 
 
 class WantContentDigest(HeaderAsParameters):
+	def __init__(self, value):
+		super().__init__(value, sep=',')
+		return
+
+
+class WantReprDigest(HeaderAsParameters):
 	def __init__(self, value):
 		super().__init__(value, sep=',')
 		return
