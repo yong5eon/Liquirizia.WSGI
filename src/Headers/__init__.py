@@ -34,9 +34,28 @@ from .Content import (
 	WantContentDigest,
 	WantReprDigest,
 )
+from .Request import (
+	AcceptLanguage,
+	AltUsed,
+	Authorization,
+	DeviceMemory,
+	DNT,
+	Downlink,
+	DPR,
+	EarlyData,
+	ECT,
+	Forwarded,
+	From,
+	Host,
+	IfMatch,
+	IfModifiedSince,
+	IfNoneMatch,
+	IfRange,
+	IfUnmodifiedSince,
+)
 
 __all__ = (
-	# Common Header
+	# Common Headers
 	'Accept',
 	'AcceptEncoding',
 	'CacheControl',
@@ -49,7 +68,7 @@ __all__ = (
 	'Upgrade',
 	'Via',
 	'Warning',
-	# Content Header
+	# Content Headers
 	'ContentDigest',
 	'ContentDisposition',
 	'ContentDPR',
@@ -68,4 +87,22 @@ __all__ = (
 	'TransferEncoding',
 	'WantContentDigest',
 	'WantReprDigest',
+	# Request Headers
+	'AcceptLanguage',
+	'AltUsed',
+	'Authorization',
+	'DeviceMemory',
+	'DNT',
+	'Downlink',
+	'DPR',
+	'EarlyData',
+	'ECT',
+	'Forwarded',
+	'From',
+	'Host',
+	'IfMatch',
+	'IfModifiedSince',
+	'IfNoneMatch',
+	'IfRange',
+	'IfUnmodifiedSince',
 )
