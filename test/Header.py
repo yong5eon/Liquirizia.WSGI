@@ -321,11 +321,81 @@ class TestHeader(Case):
 		ASSERT_IS_EQUAL(int(str(_)), o)
 		return
 
+	@Parameterized(
+		{'i': '/', 'o': '/'},
+	)
+	@Order(25)
+	def testContentLocation(self, i, o):
+		_ = ContentLocation(i)
+		ASSERT_IS_EQUAL(str(_), o)
+		return
+
+
+	@Parameterized(
+		{'i': 'bytes 200-1000/67589', 'o': {'unit':'bytes','offset':200,'end':1000,'size':67589}},
+	)
+	@Order(26)
+	def testContentRange(self, i, o):
+		_ = ContentRange(i)
+		ASSERT_IS_EQUAL(_.unit, o['unit'])
+		ASSERT_IS_EQUAL(_.offset, o['offset'])
+		ASSERT_IS_EQUAL(_.end, o['end'])
+		ASSERT_IS_EQUAL(_.size, o['size'])
+		return
+
+	@Parameterized(
+		{'i': 'a; b; c', 'o': ['a','b','c']},
+	)
+	@Order(27)
+	def testContentSecurityPolicy(self, i, o):
+		_ = ContentSecurityPolicy(i)
+		ASSERT_IS_EQUAL([str(h) for h in _], o)
+		return
+
+	@Parameterized(
+		{'i': 'a; b; c', 'o': ['a','b','c']},
+	)
+	@Order(28)
+	def testContentSecurityPolicyReportOnly(self, i, o):
+		_ = ContentSecurityPolicyReportOnly(i)
+		ASSERT_IS_EQUAL([str(h) for h in _], o)
+		return
+
+	@Parameterized(
+		{'i': 'application/json; charset=utf-8', 'o': {'value':'application/json','charset':'utf-8','boundary':None}},
+		{'i': 'multipart/form-data; boundary=BoundaryString', 'o': {'value':'multipart/form-data','charset':None,'boundary':'BoundaryString'}},
+	)
+	@Order(29)
+	def testContentType(self, i, o):
+		_ = ContentType(i)
+		ASSERT_IS_EQUAL(_.value, o['value'])
+		ASSERT_IS_EQUAL(_.charset, o['charset'])
+		ASSERT_IS_EQUAL(_.boundary, o['boundary'])
+		return
+
+	@Parameterized(
+		{'i': 'W/"0815"', 'o': '0815'},
+		{'i': '"33a64df551425fcc55e4d42a148795d9f25f89d4"', 'o': '33a64df551425fcc55e4d42a148795d9f25f89d4'},
+	)
+	@Order(30)
+	def testETag(self, i, o):
+		_ = ETag(i)
+		ASSERT_IS_EQUAL(_.etag, o)
+		return
+
+	@Parameterized(
+		{'i': 'Tue, 11 Feb 2025 18:00:40 GMT', 'o': 'Tue, 11 Feb 2025 18:00:40 GMT' },
+	)
+	@Order(31)
+	def testLastModified(self, i, o):
+		_ = LastModified(i)
+		ASSERT_IS_EQUAL(str(_), o)
+		return
 
 	@Parameterized(
 		{'i': 'sha-256=10, sha=3', 'o': {'sha-256': '10', 'sha': '3'}},
 	)
-	@Order(28)
+	@Order(35)
 	def testReprContentDigest(self, i, o):
 		_ = ReprContentDigest(i)
 		ASSERT_IS_EQUAL(dict(_), o)
@@ -335,7 +405,7 @@ class TestHeader(Case):
 	@Parameterized(
 		{'i': 'sha-256=10, sha=3', 'o': {'sha-256': '10', 'sha': '3'}},
 	)
-	@Order(29)
+	@Order(36)
 	def testWantContentDigest(self, i, o):
 		_ = WantContentDigest(i)
 		ASSERT_IS_EQUAL(dict(_), o)
