@@ -330,7 +330,6 @@ class TestHeader(Case):
 		ASSERT_IS_EQUAL(str(_), o)
 		return
 
-
 	@Parameterized(
 		{'i': 'bytes 200-1000/67589', 'o': {'unit':'bytes','offset':200,'end':1000,'size':67589}},
 	)
@@ -435,5 +434,88 @@ class TestHeader(Case):
 	def testWantReprDigest(self, i, o):
 		_ = WantReprDigest(i)
 		ASSERT_IS_EQUAL(dict(_), o)
+		return
+
+	@Parameterized(
+		{
+			'i': 'ko, en;q=1.0, *;q=0.5',
+			'o': [
+				{'language': 'ko', 'q': 1.0},
+				{'language': 'en', 'q': 1.0},
+				{'language': '*', 'q': 0.5},
+			]
+		},
+	)
+	@Order(37)
+	def testAcceptLanguage(self, i, o):
+		_ = AcceptLanguage(i)
+		for i, n in enumerate(_):
+			ASSERT_IS_EQUAL(n.language, o[i]['language'])
+			ASSERT_IS_EQUAL(n.q, o[i]['q'])
+		return
+
+	@Parameterized(
+		{'i': 'example.com', 'o': {'host': 'example.com', 'port': None}},
+		{'i': 'example.com:3333', 'o': {'host': 'example.com', 'port': 3333}},
+	)
+	@Order(38)
+	def testAltUsed(self, i, o):
+		_ = AltUsed(i)
+		ASSERT_IS_EQUAL(_.host, o['host'])
+		ASSERT_IS_EQUAL(_.port, o['port'])
+		return
+
+	@Parameterized(
+		{'i': 'Basic YWxhZGRpbjpvcGVuc2VzYW1l', 'o': {'scheme': 'Basic', 'credentials': 'YWxhZGRpbjpvcGVuc2VzYW1l', 'params': {}}},
+		{'i': 'Digest username="abc", password="def"', 'o': {'scheme': 'Digest', 'credentials': None, 'params': {'username':'abc','password':'def'}}},
+	)
+	@Order(39)
+	def testAuthorization(self, i, o):
+		_ = Authorization(i)
+		ASSERT_IS_EQUAL(_.scheme, o['scheme'])
+		ASSERT_IS_EQUAL(_.credentials, o['credentials'])
+		ASSERT_IS_EQUAL(_.parameters, o['params'])
+		return
+
+	@Parameterized(
+		{'i': '128', 'o': '128'},
+	)
+	@Order(40)
+	def testDeviceMemory(self, i, o):
+		_ = DeviceMemory(i)
+		ASSERT_IS_EQUAL(str(_), o)
+		return
+
+	@Parameterized(
+		{'i': 'by=1;for=2;host=3;proto=4', 'o': {'by':'1','for':'2','host':'3','proto':'4'}},
+	)
+	@Order(41)
+	def testForwarded(self, i, o):
+		_ = Forwarded(i)
+		ASSERT_IS_EQUAL(dict(_), o)
+		return
+
+	@Parameterized(
+		{'i': 'a, b, c', 'o': ['a','b','c']},
+		{'i': '"bfc13a64729c4290ef5b2c2730249c88ca92d82d"', 'o': ['bfc13a64729c4290ef5b2c2730249c88ca92d82d']},
+		{'i': '"67ab43", "54ed21", "7892dd"', 'o': ['67ab43','54ed21','7892dd']},
+		{'i': '*', 'o': ['*']},
+	)
+	@Order(42)
+	def testIfMatch(self, i, o):
+		_ = IfMatch(i)
+		ASSERT_IS_EQUAL([str(h) for h in _], o)
+		return
+
+	@Parameterized(
+		{'i': 'a, b, c', 'o': ['a','b','c']},
+		{'i': '"bfc13a64729c4290ef5b2c2730249c88ca92d82d"', 'o': ['bfc13a64729c4290ef5b2c2730249c88ca92d82d']},
+		{'i': '"67ab43", "54ed21", "7892dd"', 'o': ['67ab43','54ed21','7892dd']},
+		{'i': '*', 'o': ['*']},
+	)
+	@Order(43)
+	def testIfNoneMatch(self, i, o):
+		_ = IfNoneMatch(i)
+		ASSERT_IS_EQUAL([str(h) for h in _], o)
 		return
 
