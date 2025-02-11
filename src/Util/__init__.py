@@ -9,6 +9,10 @@ from .Header import (
 	ParseHeader,
 	ParseRange,
 )
+from .Date import (
+	ToDate,
+	ToDatetime,
+)
 
 from email.utils import parsedate_tz
 from time import timezone, mktime
@@ -22,6 +26,9 @@ __all__ = (
 	'VersionToString',
 	'DateToTimestamp',
 	'HeadersToMap',
+	# Date
+	'ToDate',
+	'ToDatetime',
 )
 
 
