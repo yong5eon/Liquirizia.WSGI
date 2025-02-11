@@ -395,19 +395,45 @@ class TestHeader(Case):
 	@Parameterized(
 		{'i': 'sha-256=10, sha=3', 'o': {'sha-256': '10', 'sha': '3'}},
 	)
-	@Order(35)
-	def testReprContentDigest(self, i, o):
-		_ = ReprContentDigest(i)
+	@Order(32)
+	def testReprDigest(self, i, o):
+		_ = ReprDigest(i)
 		ASSERT_IS_EQUAL(dict(_), o)
 		return
 
+	@Parameterized(
+		{'i': 'X-Event', 'o': 'X-Event'},
+	)
+	@Order(33)
+	def testTrailer(self, i, o):
+		_ = Trailer(i)
+		ASSERT_IS_EQUAL(str(_), o)
+		return
+
+	@Parameterized(
+		{'i': 'a, b, c', 'o': ['a','b','c']},
+	)
+	@Order(34)
+	def testTransferEncoding(self, i, o):
+		_ = TransferEncoding(i)
+		ASSERT_IS_EQUAL([str(h) for h in _], o)
+		return
+
+	@Parameterized(
+		{'i': 'sha-256=10, sha=3', 'o': {'sha-256': '10', 'sha': '3'}},
+	)
+	@Order(35)
+	def testReprContentDigest(self, i, o):
+		_ = WantContentDigest(i)
+		ASSERT_IS_EQUAL(dict(_), o)
+		return
 
 	@Parameterized(
 		{'i': 'sha-256=10, sha=3', 'o': {'sha-256': '10', 'sha': '3'}},
 	)
 	@Order(36)
-	def testWantContentDigest(self, i, o):
-		_ = WantContentDigest(i)
+	def testWantReprDigest(self, i, o):
+		_ = WantReprDigest(i)
 		ASSERT_IS_EQUAL(dict(_), o)
 		return
 
