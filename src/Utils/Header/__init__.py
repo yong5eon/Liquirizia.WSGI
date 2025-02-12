@@ -10,6 +10,7 @@ from ..Parse import (
 	ParseParameter,
 	ParseParameters,
 	ParseList,
+	ParseJSON,
 )
 from .Common import (
 	Accept,
@@ -461,9 +462,27 @@ def ParseRequestHeader(k: str, v: str) -> Any:
 		'X_FORWARDED_FOR': ParseList(),
 		'X_FORWARDED_HOST': ParseString(),
 		'X_FORWARDED_PROTO': ParseString(),
-		# Response Headers
 		# CORS Headers
+		'ACCESS_CONTROL_ALLOW_CREDENTIALS': ParseBoolean(true='true'),
+		'ACCESS_CONTROL_ALLOW_HEADERS': ParseList(),
+		'ACCESS_CONTROL_ALLOW_METHODS': ParseList(),
+		'ACCESS_CONTROL_ALLOW_ORIGIN': ParseString(),
+		'ACCESS_CONTROL_EXPOSE_HEADERS': ParseList(),
+		'ACCESS_CONTROL_MAX_AGE': ParseInteger(),
+		'ACCESS_CONTROL_REQUEST_HEADERS': ParseList(),
+		'ACCESS_CONTROL_REQUEST_METHOD': ParseString(),
 		# WebSocket Headers
+		'SEC_WEBSOCKET_ACCEPT': ParseString(),
+		'SEC_WEBSOCKET_EXTENSIONS': ParseList(sep=';'),
+		'SEC_WEBSOCKET_KEY': ParseString(),
+		'SEC_WEBSOCKET_PROTOCOL': ParseList(),
+		'SEC_WEBSOCKET_VERSION': ParseString(),
 		# None Classified Headers
+		'ATTRIBUTION_REPORTING_ELIGIBLE': ParseString(),
+		'ATTRIBUTION_REPORTING_REGISTER_SOURCE': ParseJSON(),
+		'ATTRIBUTION_REPORTING_TRIGGER': ParseJSON(),
 	}.get(k.replace('-','_').upper(), ParseString())
-	return parse(v)
+	try:
+		return parse(v)
+	except:
+		return v
