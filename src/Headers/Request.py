@@ -82,6 +82,7 @@ __all__ = (
 	'IfNoneMatch',
 	'IfRange',
 	'IfUnmodifiedSince',
+	'MaxForwards'
 )
 
 
@@ -221,4 +222,11 @@ class IfUnmodifiedSince(Header):
 		except:
 			self.datetime = None
 		return
+
+
+class MaxForwards(Header):
+	def __init__(self, value):
+		super().__init__(value)
+		return
+
 
