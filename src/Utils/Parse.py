@@ -18,6 +18,7 @@
 #   - Token
 
 from datetime import datetime
+from json import loads
 from abc import ABC, abstractmethod
 from typing import Dict, Tuple, List, Any, Optional
 
@@ -32,6 +33,7 @@ __all__ = (
 	'ParseParameters',
 	'ParseList',
 	'ParseDate',
+	'ParseJSON',
 )
 
 class Parse(ABC):
@@ -140,3 +142,7 @@ class ParseList(Parse):
 			_.append(self.fetch(self.strip(token)))
 		return _
 
+class ParseJSON(Parse):
+	"""JSON(JavaScriptObjectNotation) Parser Class"""
+	def __call__(self, value: str) -> Dict[str, Any]:
+		return loads(self.strip(value))
