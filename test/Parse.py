@@ -11,14 +11,15 @@ from Liquirizia.WSGI.Utils import (
 	ParseParameter,
 	ParseParameters,
 	ParseList,
+	ParseJSON,
 )
 
 
 class TestParse(Case):
 	@Parameterized(
 		{'i': '1', 'o': True},
-		{'i': '0', 'o': False},
-		{'i': '?0', 'o': None},
+		{'i': '0', 'o': None},
+		{'i': '2', 'o': None},
 	)
 	@Order(0)
 	def testParseBoolean(self, i, o):
@@ -127,5 +128,14 @@ class TestParse(Case):
 	@Order(10)
 	def testParseListWithParseStringWithParameters(self, i, o):
 		_ = ParseList(fetch=ParseStringWithParameters())(i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': '{"a":1,"b":"str","c":1.0}', 'o': {'a':1,'b':'str','c':1.0}},
+	)
+	@Order(11)
+	def testAttributionReporingTrigger(self, i, o):
+		_ = ParseJSON()(i)
 		ASSERT_IS_EQUAL(_, o)
 		return

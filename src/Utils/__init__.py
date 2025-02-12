@@ -11,6 +11,7 @@ from .Parse import (
 	ParseParameter,
 	ParseParameters,
 	ParseList,
+	ParseJSON,
 )
 from .URL import (
 	ParseURL,
@@ -44,6 +45,7 @@ __all__ = (
 	'ParseParameter',
 	'ParseParameters',
 	'ParseList',
+	'ParseJSON',
 	# QueryString
 	'ParseURL',
 	'ToQueryString',
