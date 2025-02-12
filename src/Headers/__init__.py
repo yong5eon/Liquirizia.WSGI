@@ -52,6 +52,7 @@ from .Request import (
 	IfNoneMatch,
 	IfRange,
 	IfUnmodifiedSince,
+	MaxForwards,
 )
 
 __all__ = (
@@ -105,4 +106,5 @@ __all__ = (
 	'IfNoneMatch',
 	'IfRange',
 	'IfUnmodifiedSince',
+	'MaxForwards',
 )
