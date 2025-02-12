@@ -84,11 +84,9 @@ class Application(object):
 
 			for k, v in env.items():
 				if k[0:5] == 'HTTP_':
-					k=ToHeader(k[5:])
-					k=self.config.toHeaderName(k)
-					headers[k] = v
+					headers[k[5:]] = v
 				if k in ['CONTENT_TYPE', 'CONTENT_LENGTH'] and v:
-					headers[ToHeader(k)] = v
+					headers[k] = v
 
 			if env['REQUEST_METHOD'] == 'OPTIONS':
 				runner = RouteOptions()
