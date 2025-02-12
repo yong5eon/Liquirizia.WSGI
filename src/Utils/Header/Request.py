@@ -72,7 +72,9 @@ from ..Parse import (
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Union
+from http.cookies import SimpleCookie
+from re import findall
+from typing import List, Tuple, Union
 
 __all__ = (
 	'AcceptLanguage',
@@ -88,6 +90,10 @@ __all__ = (
 	'ParseProxyAuthorization',
 	'Range',
 	'ParseRange',
+	'SecCHUA',
+	'ParseSecCHUA',
+	'SecCHUAFullVersion',
+	'ParseSecCHUAFullVersion',
 	'TE',
 	'ParseTE',
 )
@@ -135,22 +141,48 @@ class ParseAuthorization(Parse):
 			_.scheme = self.strip(ts[0])
 			_.credentials = None
 			_.parameters = {}
-			for token in self.strip(ts[1]):
+			for token in self.strip(ts[1]).split(','):
 				k, v = self.strip(token).split('=')
-				self.parameters[self.strip(k)] = self.strip(v)
+				_.parameters[self.strip(k)] = self.strip(v)
 		else:
-			self.scheme = self.strip(ts[0])
-			self.credentials = self.strip(ts[1])
-			self.parameters = {}
-		return
+			_.scheme = self.strip(ts[0])
+			_.credentials = self.strip(ts[1])
+			_.parameters = {}
+		return _
+
 
 @dataclass
-class Cookie(object): pass
+class Cookie(object):
+	name = None
+	value = None
+	expires = None
+	path = None
+	domain = None
+	secure = None
+	http = None
+	version = None
+	maxage = None
+	comment = None
 class ParseCookie(Parse):
 	def __call__(self, value: str) -> List[Cookie]:
-		# TODO : parse cookie
-		return value
-	
+		_ = []
+		c = SimpleCookie()
+		c.load(value)
+		for k, v in c.items():
+			o = Cookie()
+			o.name=k
+			o.value=v.value
+			o.expires=v['expires']
+			o.path=v['path']
+			o.domain=v['domain']
+			o.secure=v['secure']
+			o.http=v['httponly']
+			o.version=v['version']
+			o.maxage=v['max-age']
+			o.comment=v['comment']
+			_.append(o)
+		return _
+
 
 class ParseIfRange(Parse):
 	def __call__(self, value: str) -> Union[datetime, str]:
@@ -168,37 +200,70 @@ class ParseProxyAuthorization(Parse):
 	def __call__(self, value: str) -> ProxyAuthorization:
 		_ = ProxyAuthorization()
 		ts = self.strip(value).split(' ', maxsplit=1)
-		self.scheme = self.strip(ts[0])
-		self.credentials = self.strip(ts[1])
-		return
+		_.scheme = self.strip(ts[0])
+		_.credentials = self.strip(ts[1])
+		return _
 
 
 @dataclass
 class Range(object):
-	unit: str = None
 	start: int = None
 	end: int = None
 	suffixLength: int = None
 class ParseRange(Parse):
-	def __call__(self, value: str) -> List[Range]:
+	def __call__(self, value: str) -> Tuple[str, List[Range]]:
+		unit, ranges = self.strip(value).split('=', maxsplit=1)
 		__ = []
-		_ = ParseList()(value)
+		_ = ParseList()(ranges)
 		for token in _:
 			__.append(self.__parse__(self.strip(token)))
-		return __
+		return unit, __
 	def __parse__(self, range: str) -> Range:
 		_ = Range()
-		unit, range = range.split(' ')
-		_.unit = self.strip(unit)
 		offset, end = range.split('-')
 		if not offset:	# bytes=-100 : last 100 bytes
-			_.suffixLength = end
+			_.suffixLength = int(self.strip(end))
 		elif not end:	# bytes=100- : all but the first 99 bytes
-			_.start = offset
+			_.start = int(self.strip(offset))
 		else:	# bytes=100-200 : bytes 100-200 (inclusive)
-			_.start = offset
-			_.end = end
+			_.start = int(self.strip(offset))
+			_.end = int(self.strip(end))
 		return _
+	
+
+@dataclass
+class SecCHUA(object):
+	brand: str = None
+	significantVersion: str = None
+class ParseSecCHUA(Parse):
+	def __call__(self, value: str) -> List[SecCHUA]:
+		_ = []
+		pattern = r'"([^"]+)";v="([^"]+)"'
+		matches = findall(pattern, value)
+		for brand, version in matches:
+			o = SecCHUA()
+			o.brand = self.strip(brand)
+			o.significantVersion = self.strip(version)
+			_.append(o)
+		return _
+
+
+@dataclass
+class SecCHUAFullVersion(object):
+	brand: str = None
+	fullVersion: str = None
+class ParseSecCHUAFullVersion(Parse):
+	def __call__(self, value: str) -> List[SecCHUAFullVersion]:
+		_ = []
+		pattern = r'"([^"]+)";v="([^"]+)"'
+		matches = findall(pattern, value)
+		for brand, version in matches:
+			o = SecCHUAFullVersion()
+			o.brand = self.strip(brand)
+			o.fullVersion = self.strip(version)
+			_.append(o)
+		return _
+
 
 @dataclass
 class TE(object):
