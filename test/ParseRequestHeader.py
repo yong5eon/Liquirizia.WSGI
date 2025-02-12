@@ -8,18 +8,6 @@ from datetime import datetime
 
 class TestParseRequestHeader(Case):
 	# Common Headers
-	# - ACCEPT : ParseAccept()
-	# - ACCEPT_ENCODING : ParseAcceptEncoding()
-	# - CACHE_CONTROL : ParseCacheControl()
-	# - CONNECTION : ParseString()
-	# - DATE : ParseDate()
-	# - KEEP_ALIVE : ParseParameters()
-	# - LINK : ParseLink()
-	# - PRAGMA : ParseString()
-	# - PRIORITY : ParsePriority()
-	# - UPGRADE : ParseUpgrade()
-	# - VIA : ParseVia()
-	# - WARNING : ParseString()
 	@Parameterized(
 		{
 			'i': 'application/json, application/x-www-form-urlencoded; q=0.6, application/xml; q=0.7',
@@ -217,24 +205,6 @@ class TestParseRequestHeader(Case):
 		return
 
 	# Content Headers
-	# - CONTENT_DIGEST: ParseParameters()
-	# - CONTENT_DISPOSISION: ParseStringWithParameters()
-	# - CONTENT_DPR: ParseInteger()
-	# - CONTENT_ENCODING: ParseList()
-	# - CONTENT_LANGUAGE: ParseList()
-	# - CONTENT_LENGTH: ParseInteger()
-	# - CONTENT_LOCATION: ParseString()
-	# - CONTENT_RANGE: ParseContentRange()
-	# - CONTENT_SECURITY_POLICY: ParseParameters(sep=';', paramsep=' ')
-	# - CONTENT_SECURITY_POLICY_REPORT_ONLY: ParseParameters(sep=';', paramsep=' ')
-	# - CONTENT_TYPE: ParseContentType()
-	# - ETAG: ParseETag()
-	# - LAST_MODIFIED: ParseDate()
-	# - REPR_DIGEST: ParseParameters()
-	# - TRAILER: ParseString()
-	# - TRANSFER_ENCODING: ParseList()
-	# - WANT_CONTENT_DIGEST: ParseParameters()
-	# - WANT_REPR_DIGEST: ParseParameters()
 	@Parameterized(
 		{'i': 'sha-256=10, sha=3', 'o': {'sha-256': '10', 'sha': '3'}},
 	)
@@ -414,61 +384,6 @@ class TestParseRequestHeader(Case):
 		return
 
 	# Request Headers	
-	# - ACCEPT_LANGUAGE: ParseAcceptLanguage()
-	# - ALT_USED: ParseAltUsed()
-	# - AUTHORIZATION: ParseAuthorization()
-	# - COOKIE: ParseCookie()
-	# - DEVICE_MEMORY: ParseFloat()
-	# - DNT: ParseInteger()
-	# - DOWNLINK: ParseFloat()
-	# - DPR: ParseFloat()
-	# - EARLY_DATA: ParseInteger()
-	# - ECT: ParseString()
-	# - EXPECT: ParseString()
-	# - FORWARDED: ParseList(fetch=ParseParameters(sep=';'))
-	# - FROM: ParseString()
-	# - HOST: ParseString()
-	# - IF_MATCH: ParseList()
-	# - IF_MODIFIED_SINCE: ParseDate()
-	# - IF_NONE_MATCH: ParseList()
-	# - IF_RANGE: ParseIfRange()
-	# - IF_UNMODIFIED_SINCE: ParseDate()
-	# - MAX_FORWARDS: ParseInteger()
-	# - ORIGIN: ParseString()
-	# - PROXY_AUTHORIZATION: ParseProxyAuthorization()
-	# - RANGE: ParseRange()
-	# - REFERER: ParseString()
-	# - RTT: ParseFloat()
-	# - SAVE_DATA: ParseString()
-	# - SEC_BROWSING_TOPICS: ParseString()
-	# - SEC_CH_PREFERS_COLOR_SCHEME: ParseString()
-	# - SEC_CH_PREFERS_REDUCED_MOTION: ParseString()
-	# - SEC_CH_PREFERS_REDUCED_TRANSPARENCY: ParseString()
-	# - SEC_CH_UA: ParseList()
-	# - SEC_CH_UA_ARCH: ParseString()
-	# - SEC_CH_UA_BITNESS: ParseInteger()
-	# - SEC_CH_UA_FULL_VERSION: ParseString()
-	# - SEC_CH_UA_FULL_VERSION_LIST: ParseList()
-	# - SEC_CH_UA_MOBILE: ParseBoolean(true='?1')
-	# - SEC_CH_UA_MODEL: ParseString()
-	# - SEC_CH_UA_PLATFORM: ParseString()
-	# - SEC_CH_UA_PLATFORM_VERSION: ParseString()
-	# - SEC_FETCH_DEST: ParseString()
-	# - SEC_FETCH_MODE: ParseString()
-	# - SEC_FETCH_SITE: ParseString()
-	# - SEC_FETCH_USER: ParseString()
-	# - SEC_GPC: ParseBoolean(true='1')
-	# - SEC_PURPOSE: ParseString()
-	# - SERVICE_WORKER: ParseString()
-	# - SERVICE_WORKER_NAVIGATION_PRELAOD: ParseString()
-	# - TE: ParseTE()
-	# - UPGRADE_INSECURE_REQUESTS: ParseBoolean(true='1')
-	# - USER_AGENT: ParseString()
-	# - VIEWPORT_WIDTH: ParseInteger()
-	# - WIDTH: ParseInteger()
-	# - X_FORWARDED_FOR: ParseList()
-	# - X_FORWARDED_HOST: ParseString()
-	# - X_FORWARDED_PROTO: ParseString()
 	@Parameterized(
 		{
 			'i': 'ko, en;q=1.0, *;q=0.5',
@@ -1048,5 +963,166 @@ class TestParseRequestHeader(Case):
 	@Order(354)
 	def testXForwardedProto(self, i, o):
 		_ = ParseRequestHeader('X-Forwarded-Proto', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	# CORS Headers
+	@Parameterized(
+		{'i': 'true', 'o': True},
+		{'i': 'false', 'o': None},
+	)
+	@Order(401)
+	def testAccessControlAllowCredentials(self, i, o):
+		_ = ParseRequestHeader('Access-Control-Allow-Credentials', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': 'X-Custom-Header, Upgrade-Insecure-Requests', 'o': ['X-Custom-Header', 'Upgrade-Insecure-Requests']},
+		{'i': 'Accept', 'o': ['Accept']},
+	)
+	@Order(402)
+	def testAccessControlAllowHeaders(self, i, o):
+		_ = ParseRequestHeader('Access-Control-Allow-Headers', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+	
+	@Parameterized(
+		{'i': 'GET', 'o': ['GET']},
+		{'i': 'GET, POST, PUT, DELETE', 'o': ['GET','POST','PUT','DELETE']},
+	)
+	@Order(403)
+	def testAccessControlAllowMethods(self, i, o):
+		_ = ParseRequestHeader('Access-Control-Allow-Methods', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': '*', 'o': '*'},
+		{'i': 'https://developer.mozilla.org', 'o': 'https://developer.mozilla.org'},
+	)
+	@Order(404)
+	def testAccessControlAllowOrigin(self, i, o):
+		_ = ParseRequestHeader('Access-Control-Allow-Origin', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': 'Content-Encoding, Kuma-Revision', 'o': ['Content-Encoding','Kuma-Revision']},
+		{'i': 'Content-Encoding', 'o': ['Content-Encoding']},
+		{'i': '*', 'o': ['*']},
+	)
+	@Order(405)
+	def testAccessControlExposeHeaders(self, i, o):
+		_ = ParseRequestHeader('Access-Control-Expose-Headers', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': '600', 'o': 600},
+	)
+	@Order(406)
+	def testAccessControlMaxAge(self, i, o):
+		_ = ParseRequestHeader('Access-Control-Max-Age', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': 'Content-Type, Content-Encoding', 'o': ['Content-Type', 'Content-Encoding']},
+		{'i': 'Content-Type', 'o': ['Content-Type']},
+	)
+	@Order(407)
+	def testAccessControlRequestHeaders(self, i, o):
+		_ = ParseRequestHeader('Access-Control-Request-Headers', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': 'GET', 'o': 'GET'},
+		{'i': 'POST', 'o': 'POST'},
+		{'i': 'PUT', 'o': 'PUT'},
+		{'i': 'DELETE', 'o': 'DELETE'},
+	)
+	@Order(408)
+	def testAccessControlRequestMethod(self, i, o):
+		_ = ParseRequestHeader('Access-Control-Request-Method', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+	
+	# WebSocket Headers
+	@Parameterized(
+		{'i': 's3pPLMBiTxaQ9kYGzzhZRbK+xOo=', 'o': 's3pPLMBiTxaQ9kYGzzhZRbK+xOo='},
+	)
+	@Order(501)
+	def testSecWebSocketAccept(self, i, o):
+		_ = ParseRequestHeader('Sec-WebSocket-Accept', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': 'permessage-deflate; client_max_window_bits', 'o': ['permessage-deflate','client_max_window_bits']},
+	)
+	@Order(502)
+	def testSecWebSocketExtensions(self, i, o):
+		_ = ParseRequestHeader('Sec-WebSocket-Extensions', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': 'dGhlIHNhbXBsZSBub25jZQ==', 'o': 'dGhlIHNhbXBsZSBub25jZQ=='},
+	)
+	@Order(503)
+	def testSecWebSocketKey(self, i, o):
+		_ = ParseRequestHeader('Sec-WebSocket-Key', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': 'soap, wamp', 'o': ['soap','wamp']},
+		{'i': 'soap', 'o': ['soap']},
+		{'i': 'wamp', 'o': ['wamp']},
+	)
+	@Order(504)
+	def testSecWebSocketProtocol(self, i, o):
+		_ = ParseRequestHeader('Sec-WebSocket-Protocol', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': '13', 'o': '13'},
+	)
+	@Order(505)
+	def testWebSocketVersion(self, i, o):
+		_ = ParseRequestHeader('Sec-WebSocket-Version', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+	
+	# None Classified Headers
+	@Parameterized(
+		{'i': 'event-source', 'o': 'event-source'},
+		{'i': 'navigation-source', 'o': 'navigation-source'},
+		{'i': 'trigger', 'o': 'trigger'},
+	)
+	@Order(601)
+	def testAttributionReportingEligible(self, i, o):
+		_ = ParseRequestHeader('ATTRIBUTION_REPORTING_ELIGIBLE', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': '{"a":1,"b":"str","c":1.0}', 'o': {'a':1,'b':'str','c':1.0}},
+	)
+	@Order(602)
+	def testAttributionReportingRegisterSource(self, i, o):
+		_ = ParseRequestHeader('ATTRIBUTION_REPORTING_REGISTER_SOURCE', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': '{"a":1,"b":"str","c":1.0}', 'o': {'a':1,'b':'str','c':1.0}},
+	)
+	@Order(603)
+	def testAttributionReporingTrigger(self, i, o):
+		_ = ParseRequestHeader('ATTRIBUTION_REPORTING_TRIGGER', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
