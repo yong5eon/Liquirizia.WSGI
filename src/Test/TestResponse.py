@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from ..Util import ToHeaderName
+from ..Utils import ToHeader
 
 from .Sender import Sender
 
@@ -28,12 +28,7 @@ class TestResponse(object):
 		self.message = sender.message
 		self.headers = {}
 		for k, v in sender.headers:
-			args, kwargs = parse_header(v)
-			self.headers[ToHeaderName(k)] = {
-				'expr': str(v),
-				'args': args.split(','),
-				'kwargs': kwargs
-			}
+			self.headers[k] = str(v) 
 		if self.header('Transfer-Encoding') == 'chunked':
 			buffer = bytes()
 			buf = BytesIO(sender.buffer)
@@ -90,7 +85,7 @@ class TestResponseStream(TestResponse):
 		self.headers = {}
 		for k, v in sender.headers:
 			args, kwargs = parse_header(v)
-			self.headers[ToHeaderName(k)] = {
+			self.headers[ToHeader(k)] = {
 				'expr': str(v),
 				'args': args.split(','),
 				'kwargs': kwargs

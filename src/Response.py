@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from .Cookie import Cookie
-from .Util import ToHeaderName
 
 from http.cookies import SimpleCookie
 from cgi import parse_header
@@ -51,20 +50,14 @@ class Response(object):
 
 	def header(self, key: str, value=None):
 		if value is not None:
-			# TODO : according to value, use other parse methods
-			args, kwargs = parse_header(str(value))
-			self.props[ToHeaderName(key)] = {
-				'expr': str(value),
-				'args': args.split(','),
-				'kwargs': kwargs
-			}
+			self.props[key] = value 
 		else:
 			if key not in self.props:
 				return None
-			return self.props[key]['expr']
+			return self.props[key]
 
 	def headers(self):
-		headers = [(key, value['expr']) for key, value in self.props.items()]
+		headers = [(key, value) for key, value in self.props.items()]
 
 		cookies = SimpleCookie()
 

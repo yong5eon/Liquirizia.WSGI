@@ -14,7 +14,7 @@ from ..Responses import (
 	ResponseNotModified,
 	ResponseNotFound,
 )
-from ..Util import DateToTimestamp, ParseRange
+from ..Utils import DateToTimestamp
 
 from Liquirizia.FileSystemObject import Connection
 from re import compile

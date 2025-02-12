@@ -17,7 +17,7 @@ from ..Responses import (
 	ResponseNotModified,
 )
 
-from ..Util import DateToTimestamp, ParseRange
+from ..Utils import DateToTimestamp
 
 from email.utils import formatdate
 from mimetypes import guess_type

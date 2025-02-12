@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .Cookie import Cookie
-from .Util import ToHeaderName, ParseHeader
+from .Utils import ParseRequestHeader
 
 from http.cookies import SimpleCookie
 from urllib.parse import parse_qs, unquote, urlencode
@@ -98,7 +98,7 @@ class Request(object):
 					)
 			else:
 				# TODO : according to value, use other parse methods. User-Agent, Accept-Language, ...
-				self.props[key] = ParseHeader(str(value))
+				self.props[key] = ParseRequestHeader(key, str(value))
 				return
 		else:
 			if key not in self.props.keys():

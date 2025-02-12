@@ -40,7 +40,7 @@ from .Errors import (
 	MethodNotAllowedError,
 	NotFoundError,
 )
-from .Util import ToHeaderName
+from .Utils import ToHeader
 
 from .Handler import Handler
 
@@ -84,11 +84,11 @@ class Application(object):
 
 			for k, v in env.items():
 				if k[0:5] == 'HTTP_':
-					k=ToHeaderName(k[5:])
+					k=ToHeader(k[5:])
 					k=self.config.toHeaderName(k)
 					headers[k] = v
 				if k in ['CONTENT_TYPE', 'CONTENT_LENGTH'] and v:
-					headers[ToHeaderName(k)] = v
+					headers[ToHeader(k)] = v
 
 			if env['REQUEST_METHOD'] == 'OPTIONS':
 				runner = RouteOptions()
