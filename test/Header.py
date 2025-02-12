@@ -124,7 +124,7 @@ class TestHeader(Case):
 
 	@Parameterized(
 		{
-			'i': 'no-cache, no-store, must-revalidate',
+			'i': 'no-cache, no-store',
 			'o': [
 				{'directive': 'no-cache', 'seconds': None},
 				{'directive': 'no-store', 'seconds': None},
@@ -132,7 +132,7 @@ class TestHeader(Case):
 			]
 		},
 		{
-			'i': 'public, max-age=31536000',
+			'i': 'no-cache, max-age=31536000',
 			'o': [
 				{'directive': 'public', 'seconds': None},
 				{'directive': 'max-age', 'seconds': 31536000},
