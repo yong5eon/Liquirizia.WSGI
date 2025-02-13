@@ -17,8 +17,8 @@ from .Common import (
 	ParseAccept,
 	AcceptEncoding,
 	ParseAcceptEncoding,
-	RequestCacheControl,
-	ParseRequestCacheControl,
+	CacheControl,
+	ParseCacheControl,
 	KeepAlive,
 	ParseKeepAlive,
 	Link,
@@ -61,13 +61,36 @@ from .Request import (
 	TE,
 	ParseTE,
 )
+from .Response import (
+	ExpectCT,
+	ParseExpectCT,
+	NoVarySearch,
+	ParseNoVarySearch,
+	PermissionsPolicy,
+	ParsePermissionsPolicy,
+	ProxyAuthenticate,
+	ParseProxyAuthenticate,
+	Refresh,
+	ParseRefresh,
+	ParseRetryAfter,
+	ServerTiming,
+	ParseServerTiming,
+	StrictTransportSecurity,
+	ParseStrictTransportSecurity,
+	WWWAuthenticate,
+	ParseWWWAuthenticate,
+	RobotsTag,
+	ParseXRobotsTag,
+	XSSProtection,
+	ParseXXSSProtection,
+)
 
 from typing import Any
 
 __all__ = (
 	'ToENV',
 	'ToHeader',
-	'ParseRequestHeader',
+	'ParseHeader',
 )
 
 def ToENV(key: str) -> str:
@@ -301,7 +324,7 @@ def ToHeader(key: str) -> str:
 		'PROXY_AUTHORIZATION': 'Proxy-Authorization',
 		'RANGE': 'Range',
 		'REFERER': 'Referer',
-		'REFERER_POLICY': 'Referer-Policy',
+		'REFERRER_POLICY': 'Referrer-Policy',
 		'REFRESH': 'Refresh',
 		'REPORT_TO': 'Report-To',
 		'REPORTING_ENDPOINT': 'Reporting-Endpoint',
@@ -372,12 +395,12 @@ def ToHeader(key: str) -> str:
 	}.get(key, key) # TODO: replace _ to - and make uppper token's first character
 
 
-def ParseRequestHeader(k: str, v: str) -> Any:
+def ParseHeader(k: str, v: str) -> Any:
 	parse = {
 		# Common Headers
 		'ACCEPT': ParseAccept(),
 		'ACCEPT_ENCODING': ParseAcceptEncoding(),
-		'CACHE_CONTROL' : ParseRequestCacheControl(),
+		'CACHE_CONTROL' : ParseCacheControl(),
 		'CONNECTION': ParseString(),
 		'DATE': ParseDate(),
 		'KEEP_ALIVE': ParseKeepAlive(),
@@ -462,6 +485,53 @@ def ParseRequestHeader(k: str, v: str) -> Any:
 		'X_FORWARDED_FOR': ParseList(),
 		'X_FORWARDED_HOST': ParseString(),
 		'X_FORWARDED_PROTO': ParseString(),
+		# Response Headers
+		'ACCEPT_CH': ParseList(),
+		'ACCEPT_PATCH': ParseList(fetch=ParseStringWithParameters()),
+		'ACCEPT_POST': ParseList(),
+		'ACCEPT_RANGES': ParseString(),
+		'AGE': ParseInteger(),
+		'ALLOW': ParseList(),
+		'ALT_SVC': ParseParameters(sep=';'),
+		'CLEAR_SITE_DATA': ParseList(),
+		'CRITICAL_CH': ParseList(),
+		'CROSS_ORIGIN_EMBEDDER_POLICY': ParseString(),
+		'CROSS_ORIGIN_OPENER_POLICY': ParseString(),
+		'CROSS_ORIGIN_RESOURCE_POLICY': ParseString(),
+		'EXPECT_CT': ParseExpectCT(),
+		'EXPIRES': ParseDate(),
+		'LOCATION': ParseString(),
+		'NEL': ParseJSON(),
+		'NO_VARY_SEARCH': ParseNoVarySearch(),
+		'OBSERVE_BROWSING_TOPICS': ParseBoolean(true='?1'),
+		'ORIGIN_AGENT_CLUSTER': ParseBoolean(true='?1'),
+		'PERMISSIONS_POLICY': ParsePermissionsPolicy(),
+		'PROXY_AUTHENTICATE': ParseProxyAuthenticate(),
+		'REFERRER_POLICY': ParseList(),
+		'REFRESH': ParseRefresh(),
+		'REPORT_TO': ParseString(), # TODO : ParseList(fetch=ParseJSON())
+		'REPORTING_ENDPOINTS': ParseParameters(),
+		'RETRY_AFTER': ParseRetryAfter(),
+		'SERVER': ParseString(),
+		'SERVER_TIMING': ParseServerTiming(),
+		'SERVICE_WORKER_ALLOWED': ParseString(),
+		# 'SET_COOKIE': ParseSetCookie(), # TODO: implement ParseSetCookie
+		'SET_LOGIN': ParseString(),
+		'SOURCEMAP': ParseString(),
+		'SPECULATION_RULES': ParseList(),
+		'STRICT_TRANSPORT_SECURITY': ParseStrictTransportSecurity(),
+		'SUPPORTS_LOADING_MODE': ParseString(),
+		'TIMING_ALLOW_ORIGIN': ParseList(),
+		'TK': ParseString(),
+		'VARY': ParseList(),
+		'WWW_AUTHENTICATE': ParseWWWAuthenticate(),
+		'X_CONTENT_TYPE_OPTIONS': ParseString(),
+		'X_DNS_PREFETCH_CONTROL': ParseBoolean(true='on', false='off'),
+		'X_FRAME_OPTIONS': ParseString(),
+		'X_PERMITTED_CROSS_DOMAIN_POLICIES': ParseString(),
+		'X_POWERED_BY': ParseString(),
+		'X_ROBOTS_TAG': ParseXRobotsTag(),
+		'X_XSS_PROTECTION': ParseXXSSProtection(), 
 		# CORS Headers
 		'ACCESS_CONTROL_ALLOW_CREDENTIALS': ParseBoolean(true='true'),
 		'ACCESS_CONTROL_ALLOW_HEADERS': ParseList(),

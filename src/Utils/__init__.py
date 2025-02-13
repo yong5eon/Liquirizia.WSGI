@@ -20,7 +20,7 @@ from .URL import (
 from .Header import (
 	ToENV,
 	ToHeader,
-	ParseRequestHeader,
+	ParseHeader,
 )
 from .Date import (
 	ToDate,
@@ -52,7 +52,7 @@ __all__ = (
 	# Header
 	'ToENV',
 	'ToHeader',
-	'ParseRequestHeader',
+	'ParseHeader',
 	# Date
 	'ToDate',
 	'ToDatetime',

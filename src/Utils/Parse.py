@@ -41,11 +41,12 @@ class Parse(ABC):
 	@abstractmethod
 	def __call__(self, value: str):
 		raise NotImplementedError('{} must be implemented __call__'.format(self.__class__.__name__))
-	def strip(self, value: str):
+	def strip(self, value: str, prefix: str = '"', postfix: str = '"'):
 		value = value.strip()
-		if len(value):
-			if value[0] == '"': value = value[1:]
-			if value[-1:] == '"': value = value[:-1]
+		if len(value) and prefix:
+			if value[0] == prefix: value = value[1:]
+		if len(value) and postfix:
+			if value[-1:] == postfix: value = value[:-1]
 		return value
 
 
@@ -139,6 +140,7 @@ class ParseList(Parse):
 	def __call__(self, value: str) -> List[Any]:
 		_ = []
 		for token in value.split(sep=self.sep):
+			if not token: continue
 			_.append(self.fetch(self.strip(token)))
 		return _
 

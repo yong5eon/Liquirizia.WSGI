@@ -37,8 +37,8 @@ __all__ = (
 	'ParseAccept',
 	'AcceptEncoding',
 	'ParseAcceptEncoding',
-	'RequestCacheControl',
-	'ParseRequestCacheControl',
+	'CacheControl',
+	'ParseCacheControl',
 	'KeepAlive',
 	'ParseKeepAlive',
 	'Link',
@@ -94,7 +94,7 @@ class ParseAcceptEncoding(Parse):
 
 
 @dataclass
-class RequestCacheControl(object):
+class CacheControl(object):
 	noCache: bool = None
 	noStore: bool = None
 	maxAge: int = None
@@ -102,10 +102,19 @@ class RequestCacheControl(object):
 	minFresh: int = None
 	noTransform: bool = None
 	onlyIfCached: bool = None
-class ParseRequestCacheControl(Parse):
-	def __call__(self, value: str) -> RequestCacheControl:
+	shareMaxAge: int = None
+	mustRevalidate: bool = None
+	proxyRevalidate: bool = None
+	private: bool = None
+	public: bool = None
+	mustUnderstand: bool = None
+	immutable: bool = None
+	stableWhileRevalidate: int = None
+	stableIfError: int = None
+class ParseCacheControl(Parse):
+	def __call__(self, value: str) -> CacheControl:
 		_ = ParseParameters()(value)
-		o = RequestCacheControl()
+		o = CacheControl()
 		if 'no-cache' in _.keys(): o.noCache = True
 		if 'no-store' in _.keys(): o.noStore = True
 		if 'max-age' in _.keys(): o.maxAge = int(self.strip(_['max-age']))
@@ -113,6 +122,15 @@ class ParseRequestCacheControl(Parse):
 		if 'min-fresh' in _.keys(): o.minFresh = int(self.strip(_['max-fresh']))
 		if 'no-transform' in _.keys(): o.noTransform = True
 		if 'only-if-cached' in _.keys(): o.onlyIfCached = True
+		if 's-maxage' in _.keys(): o.shareMaxAge = int(self.strip(_['s-maxage']))
+		if 'must-revalidate' in _.keys(): o.mustRevalidate = True
+		if 'proxy-revalidate' in _.keys(): o.proxyRevalidate = True
+		if 'private' in _.keys(): o.private = True
+		if 'public' in _.keys(): o.public = True
+		if 'must-understand' in _.keys(): o.mustUnderstand = True
+		if 'immutable' in _.keys(): o.immutable = True
+		if 'stable-while-revalidate' in _.keys(): o.stableWhileRevalidate = int(self.strip(_['stable-while-revalidate']))
+		if 'stable-if-error' in _.keys(): o.stableIfError = int(self.strip(_['stable-if-error']))
 		return o
 	
 
