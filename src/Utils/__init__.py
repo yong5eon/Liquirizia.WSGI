@@ -1,18 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from .Parse import (
-	Parse,
-	ParseBoolean,
-	ParseString,
-	ParseStringWithParameters,
-	ParseInteger,
-	ParseFloat,
-	ParseDate,
-	ParseParameter,
-	ParseParameters,
-	ParseList,
-	ParseJSON,
-)
 from .URL import (
 	ParseURL,
 	ToQueryString,
@@ -34,18 +21,6 @@ __all__ = (
 	# Common
 	'VersionToString'
 	'DateToTimestamp',
-	# Parse,
-	'Parse',
-	'ParseBoolean',
-	'ParseString',
-	'ParseStringWithParameters',
-	'ParseInteger',
-	'ParseFloat',
-	'ParseDate',
-	'ParseParameter',
-	'ParseParameters',
-	'ParseList',
-	'ParseJSON',
 	# QueryString
 	'ParseURL',
 	'ToQueryString',

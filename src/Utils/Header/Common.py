@@ -1,64 +1,29 @@
 # -*- coding: utf-8 -*-
-#
-# Common Headers
-# - ACCEPT : ParseAccept()
-# - ACCEPT_ENCODING : ParseAcceptEncoding()
-# - CACHE_CONTROL : ParseCacheControl()
-# - CONNECTION : ParseString()
-# - DATE : ParseDate()
-# - KEEP_ALIVE : ParseParameters()
-# - LINK : ParseLink()
-# - PRAGMA : ParseString()
-# - PRIORITY : ParsePriority()
-# - UPGRADE : ParseUpgrade()
-# - VIA : ParseVia()
-# - WARNING : ParseString()
 
-from ..Parse import (
+from .Parse import (
 	Parse,
-	ParseBoolean,
-	ParseString,
 	ParseStringWithParameters,
-	ParseInteger,
-	ParseFloat,
-	ParseDate,
-	ParseParameter,
 	ParseParameters,
 	ParseList,
 )
+from ...Headers import *
 
-from dataclasses import dataclass
-from datetime import datetime
 from re import split
 from typing import List
 
 __all__ = (
-	'Accept',
 	'ParseAccept',
-	'AcceptEncoding',
 	'ParseAcceptEncoding',
-	'CacheControl',
 	'ParseCacheControl',
-	'KeepAlive',
 	'ParseKeepAlive',
-	'Link',
 	'ParseLink',
-	'Priority',
 	'ParsePriority',
-	'Upgrade',
 	'ParseUpgrade',
-	'Via',
 	'ParseVia',
-	'Warning',
 	'ParseWarning',
 )
 
-@dataclass
-class Accept(object):
-	type: str = None
-	mimetype: str = None
-	subtype: str = None
-	q: float = None
+
 class ParseAccept(Parse):
 	def __call__(self, value: str) -> List[Accept]:
 		__ = []
@@ -75,10 +40,6 @@ class ParseAccept(Parse):
 		return __
 
 
-@dataclass
-class AcceptEncoding(object):
-	compression: str = None
-	q: float = 1.0
 class ParseAcceptEncoding(Parse):
 	def __call__(self, value: str) -> List[AcceptEncoding]:
 		__ = []
@@ -93,24 +54,6 @@ class ParseAcceptEncoding(Parse):
 		return __
 
 
-@dataclass
-class CacheControl(object):
-	noCache: bool = None
-	noStore: bool = None
-	maxAge: int = None
-	maxStable: int = None
-	minFresh: int = None
-	noTransform: bool = None
-	onlyIfCached: bool = None
-	shareMaxAge: int = None
-	mustRevalidate: bool = None
-	proxyRevalidate: bool = None
-	private: bool = None
-	public: bool = None
-	mustUnderstand: bool = None
-	immutable: bool = None
-	stableWhileRevalidate: int = None
-	stableIfError: int = None
 class ParseCacheControl(Parse):
 	def __call__(self, value: str) -> CacheControl:
 		_ = ParseParameters()(value)
@@ -134,10 +77,6 @@ class ParseCacheControl(Parse):
 		return o
 	
 
-@dataclass
-class KeepAlive(object):
-	timeout: int = None
-	max: int = None
 class ParseKeepAlive(Parse):
 	def __call__(self, value: str) -> KeepAlive:
 		_ = ParseParameters()(value)
@@ -147,11 +86,6 @@ class ParseKeepAlive(Parse):
 		return o
 	
 
-@dataclass
-class Link(object):
-	url: str = None
-	rel: str = None
-	parameters: dict = None
 class ParseLink(Parse):
 	def __call__(self, value: str) -> List[Link]:
 		__ = []
@@ -165,10 +99,6 @@ class ParseLink(Parse):
 		return __
 
 
-@dataclass
-class Priority(object):
-	urgency: int = None
-	incremental: bool = None
 class ParsePriority(Parse):
 	def __call__(self, value: str) -> Priority:
 		_ = ParseParameters()(value)
@@ -178,11 +108,6 @@ class ParsePriority(Parse):
 		return o
 
 
-@dataclass
-class Upgrade(object):
-	protocolstr: str = None
-	protocol: str = None
-	version: str = None
 class ParseUpgrade(Parse):
 	def __call__(self, value: str) -> List[Upgrade]:
 		__ = []
@@ -197,12 +122,6 @@ class ParseUpgrade(Parse):
 		return __
 
 
-@dataclass
-class Via(object):
-	protocol: str = None
-	version: str = None
-	host: str = None
-	port: int = None
 class ParseVia(Parse):
 	def __call__(self, value) -> List[Via]:
 		__ = []
@@ -226,12 +145,6 @@ class ParseVia(Parse):
 		return __
 
 
-@dataclass
-class Warning(object):
-	code: str = None
-	agent: str = None
-	text: str = None
-	date: datetime = None
 class ParseWarning(Parse):
 	def __call__(self, value: str) -> Warning:
 		tokens = split(r' (?=(?:[^"]*"[^"]*")*[^"]*$)', value)

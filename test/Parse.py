@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.Test import *
-from Liquirizia.WSGI.Utils import (
+from Liquirizia.WSGI.Utils.Header.Parse import (
 	ParseBoolean,
 	ParseString,
 	ParseStringWithParameters,

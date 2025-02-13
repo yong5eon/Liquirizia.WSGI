@@ -1,103 +1,32 @@
 # -*- coding: utf-8 -*-
-#
-# Response Headers
-# - ACCEPT_CH: ParseList(),
-# - ACCEPT_PATCH: ParseList(fetch=ParseStringWithParameters()),
-# - ACCEPT_POST: ParseList(),
-# - ACCEPT_RANGES: ParseString(),
-# - AGE: ParseInteger(),
-# - ALLOW: ParseList(),
-# - ALT_SVC: ParseParameters(sep=';'),
-# - CLEAR_SITE_DATA: ParseList(),
-# - CRITICAL_CH: ParseList(),
-# - CROSS_ORIGIN_EMBEDDER_POLICY: ParseString(),
-# - CROSS_ORIGIN_OPENER_POLICY: ParseString(),
-# - CROSS_ORIGIN_RESOURCE_POLICY: ParseString(),
-# - EXPECT_CT: ParseExpectCT(),
-# - EXPIRES: ParseDate(),
-# - LOCATION: ParseString(),
-# - NEL: ParseJSON(),
-# - NO_VARY_SEARCH: ParseNoVarySearch(),
-# - OBSERVE_BROWSING_TOPICS: ParseBoolean(true='?1'),
-# - ORIGIN_AGENT_CLUSTER: ParseBoolean(true='?'),
-# - PERMISSIONS_POLICY: ParsePermissionsPolicy(),
-# - PROXY_AUTHENTICATE: ParseProxyAuthenticate(),
-# - REFERER_POLICY: ParseList(),
-# - REFRESH: ParseRefresh(),
-# - REPORT_TO: ParseJSON(),
-# - REPORTING_ENDPOINTS: ParseParameters(),
-# - RETRY_AFTER: ParseRetryAfter(),
-# - SERVER: ParseString(),
-# - SERVER_TIMING: ParseServerTiming(),
-# - SERVICE_WORKER_ALLOWED: ParseString(),
-# - SET_COOKIE: # TODO,
-# - SET_LOGIN: ParseString(),
-# - SOURCEMAP: ParseString(),
-# - SPECULATION_RULES: ParseList(),
-# - STRICT_TRANSPORT_SECURITY: ParseStrictTransportSecurity(),
-# - SUPPORTS_LOADING_MODE: ParseString(),
-# - TIMING_ALLOW_ORIGIN: ParseList(),
-# - TK: ParseString(),
-# - VARY: ParseList(),
-# - WWW_AUTHENTICATE: ParseWWWAuthenticate(),
-# - X_CONTENT_TYPE_OPTIONS: ParseString(),
-# - X_DNS_PREFETCH_CONTROL: ParseBoolean(true='on', false='off'),
-# - X_FRAME_OPTIONS: ParseString(),
-# - X_PERMITTED_CROSS_DOMAIN_POLICIES: ParseString(),
-# - X_POWERED_BY: ParseString(),
-# - X_ROBOTS_TAG: ParseXRobotsTag(),
-# - X_XSS_PROTECTION: ParseXXSSProtection(), 
 
-from ..Parse import (
+from .Parse import (
 	Parse,
-	ParseBoolean,
-	ParseString,
-	ParseStringWithParameters,
-	ParseInteger,
-	ParseFloat,
-	ParseDate,
 	ParseParameter,
 	ParseParameters,
 	ParseList,
-	ParseJSON,
 )
+from ...Headers import *
 
-from dataclasses import dataclass
 from datetime import datetime
-from re import match, findall
-from json import loads
-from typing import List, Union, Dict
+from re import match
+from typing import List, Union
 
 __all__ = (
-	'ExpectCT',
 	'ParseExpectCT',
-	'NoVarySearch',
 	'ParseNoVarySearch',
-	'PermissionsPolicy',
 	'ParsePermissionsPolicy',
-	'ProxyAuthenticate',
 	'ParseProxyAuthenticate',
-	'Refresh',
 	'ParseRefresh',
 	'ParseRetryAfter',
-	'ServerTiming',
 	'ParseServerTiming',
-	'StrictTransportSecurity',
 	'ParseStrictTransportSecurity',
-	'WWWAuthenticate',
 	'ParseWWWAuthenticate',
-	'RobotsTag',
 	'ParseXRobotsTag',
-	'XSSProtection',
 	'ParseXXSSProtection',
 )
 
 
-@dataclass
-class ExpectCT(object):
-	maxAge: int 
-	reportUri: str = None
-	enforce: bool = None
 class ParseExpectCT(Parse):
 	def __call__(self, value: str) -> ExpectCT:
 		_ = ParseParameters()(value)
@@ -107,11 +36,6 @@ class ParseExpectCT(Parse):
 		return o
 
 
-@dataclass
-class NoVarySearch(object):
-	keyOrder: bool = None
-	params: Union[list,bool] = None
-	excepts: list = None
 class ParseNoVarySearch(Parse):
 	def __call__(self, value: str) -> NoVarySearch:
 		_ = ParseParameters()(value)
@@ -127,10 +51,6 @@ class ParseNoVarySearch(Parse):
 		return o
 
 
-@dataclass
-class PermissionsPolicy(object):
-	policy: str
-	args: list = None
 class ParsePermissionsPolicy(Parse):
 	def __call__(self, value: str) -> List[PermissionsPolicy]:
 		__ = []
@@ -142,11 +62,6 @@ class ParsePermissionsPolicy(Parse):
 		return __
 
 
-@dataclass
-class ProxyAuthenticate(object):
-	scheme: str
-	token68: str = None
-	parameters: dict = None
 class ParseProxyAuthenticate(Parse):
 	def __call__(self, value: str) -> ProxyAuthenticate:
 		scheme, args = self.strip(value).split(' ', maxsplit=1)
@@ -159,10 +74,6 @@ class ParseProxyAuthenticate(Parse):
 		return _
 
 
-@dataclass
-class Refresh(object):
-	time: int
-	url: str = None
 class ParseRefresh(Parse):
 	def __call__(self, value: str) -> Refresh:
 		m = match(r'(\d+)\s*[;,]?\s*url=(.*)', value)
@@ -183,11 +94,6 @@ class ParseRetryAfter(Parse):
 			return int(self.strip(value))
 
 
-@dataclass
-class ServerTiming(object):
-	name: str
-	duration: float = None
-	description: str = None
 class ParseServerTiming(Parse):
 	def __call__(self, value: str) -> List[ServerTiming]:
 		__ = []
@@ -203,11 +109,6 @@ class ParseServerTiming(Parse):
 		return __
 
 
-@dataclass
-class StrictTransportSecurity(object):
-	maxAge: int
-	includeSubDomains: bool = None
-	preload: bool = None
 class ParseStrictTransportSecurity(Parse):
 	def __call__(self, value: str) -> StrictTransportSecurity:
 		params = ParseParameters(sep=';')(self.strip(value))
@@ -217,11 +118,6 @@ class ParseStrictTransportSecurity(Parse):
 		return o
 
 
-@dataclass
-class WWWAuthenticate(object):
-	scheme: str
-	token68: str = None
-	parameters: dict = None
 class ParseWWWAuthenticate(Parse):
 	def __call__(self, value: str) -> WWWAuthenticate:
 		scheme, args = self.strip(value).split(' ', maxsplit=1)
@@ -234,10 +130,6 @@ class ParseWWWAuthenticate(Parse):
 		return _
 
 
-@dataclass
-class RobotsTag(object):
-	rules: str
-	bot: str = None
 class ParseXRobotsTag(Parse):
 	def __call__(self, value: str) -> RobotsTag:
 		tokens = self.strip(value).split(':', maxsplit=1)
@@ -252,10 +144,6 @@ class ParseXRobotsTag(Parse):
 		return RobotsTag(rules=rules, bot=bot)
 
 
-@dataclass
-class XSSProtection(object):
-	filtering: bool
-	parameters: dict = None
 class ParseXXSSProtection(Parse):
 	def __call__(self, value: str) -> XSSProtection:
 		_ = self.strip(value).split(';')

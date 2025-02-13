@@ -1,56 +1,19 @@
 # -*- coding: utf-8 -*-
-#
-# Content Headers
-# - CONTENT_DIGEST: ParseParameters()
-# - CONTENT_DISPOSISION: ParseStringWithParameters()
-# - CONTENT_DPR: ParseInteger()
-# - CONTENT_ENCODING: ParseList()
-# - CONTENT_LANGUAGE: ParseList()
-# - CONTENT_LENGTH: ParseInteger()
-# - CONTENT_LOCATION: ParseString()
-# - CONTENT_RANGE: ParseContentRange()
-# - CONTENT_SECURITY_POLICY: ParseParameters(sep=';', paramsep=' ')
-# - CONTENT_SECURITY_POLICY_REPORT_ONLY: ParseParameters(sep=';', paramsep=' ')
-# - CONTENT_TYPE: ParseContentType()
-# - ETAG: ParseETag()
-# - LAST_MODIFIED: ParseDate()
-# - REPR_DIGEST: ParseParameters()
-# - TRAILER: ParseString()
-# - TRANSFER_ENCODING: ParseList()
-# - WANT_CONTENT_DIGEST: ParseParameters()
-# - WANT_REPR_DIGEST: ParseParameters()
 
-from ..Parse import (
+from .Parse import (
 	Parse,
-	ParseBoolean,
-	ParseString,
 	ParseStringWithParameters,
-	ParseInteger,
-	ParseFloat,
-	ParseDate,
-	ParseParameter,
-	ParseParameters,
-	ParseList,
 )
 
-from dataclasses import dataclass
+from ...Headers import *
 
 __all__ = (
-	'ContentRange',
 	'ParseContentRange',
-	'ContentType'
 	'ParseContentType',
-	'ETag',
 	'ParseETag',
 )
 
 
-@dataclass
-class ContentRange(object):
-	unit: str = None
-	start: int = None
-	end: int = None
-	size: int = None
 class ParseContentRange(Parse):
 	def __call__(self, value: str) -> ContentRange:
 		o = ContentRange()
@@ -68,11 +31,6 @@ class ParseContentRange(Parse):
 		return o
 
 
-@dataclass
-class ContentType(object):
-	type: str = None
-	charset: str = None
-	boundary: str = None
 class ParseContentType(Parse):
 	def __call__(self, value: str) -> ContentType:
 		o = ContentType()
@@ -83,10 +41,6 @@ class ParseContentType(Parse):
 		return o
 
 
-@dataclass
-class ETag(object):
-	weakvalidator: bool = None
-	etag: str = None
 class ParseETag(Parse):
 	def __call__(self, value: str) -> ETag:
 		o = ETag()
