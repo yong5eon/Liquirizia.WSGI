@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from .Cookie import Cookie
 from .Utils import ParseHeader
 
-from http.cookies import SimpleCookie
 from urllib.parse import parse_qs, unquote, urlencode
-
 from uuid import uuid4
+from typing import Any
 
 __all__ = (
 	'Request'
@@ -75,15 +73,14 @@ class Request(object):
 	def __str__(self):
 		return '{} {}'.format(self.method, self.path)
 
-	def header(self, key: str, value=None):
-		key = key.replace('-','_').upper()
+	def header(self, key: str, value: Any = None):
 		if value is not None:
-			self.props[key] = ParseHeader(key, str(value))
+			self.props[key] = value 
 			return
 		else:
 			if key not in self.props.keys():
 				return None
-			return self.props[key]
+			return ParseHeader(key, str(self.props[key]))
 
 	def headers(self):
 		return [(key, value) for key, value in self.props.items()]
@@ -121,7 +118,9 @@ class Request(object):
 
 	@property
 	def size(self):
-		return self.header('Content-Length')
+		_ = self.header('Content-Length')
+		if not _: return 0
+		return _
 
 	@property
 	def format(self):
