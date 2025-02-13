@@ -84,9 +84,13 @@ class Application(object):
 
 			for k, v in env.items():
 				if k[0:5] == 'HTTP_':
-					headers[k[5:]] = v
+					k = ToHeader(k[5:])
+					k = self.config.toHeaderName(k)
+					headers[k] = v
 					continue
 				if k in ['CONTENT_TYPE', 'CONTENT_LENGTH'] and v:
+					k = ToHeader(k)
+					k = self.config.toHeaderName(k)
 					headers[k] = v
 					continue
 
