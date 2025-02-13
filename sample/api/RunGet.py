@@ -42,7 +42,7 @@ __all__ = (
 	),
 	header=Validator(
 		IsDictionary(
-			IsRequiredIn('X-Token', error=BadRequestError('헤더에 토큰(X-Token)이 필요합니다'))
+			IsRequiredIn('X_TOKEN', error=BadRequestError('헤더에 토큰(X-Token)이 필요합니다'))
 		)
 	),
 	qs=Validator(
