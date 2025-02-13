@@ -62,7 +62,9 @@ class RouteRequest(Route, RouteRun):
 			buffer = reader.read(request.size)
 			if not buffer:
 				raise BadRequestError('body is empty')
-			body = buffer.decode(request.charset if request.charset else '')
+			body = buffer.decode(request.charset if request.charset else 'utf-8')
+			if not request.format:
+				raise BadRequestError('content-type header is required')
 			if request.format.lower() not in self.bodyParsers.keys():
 				raise UnsupportedMediaTypeError('{} is not supported media type'.format(request.format))
 			parse = self.bodyParsers[request.format]

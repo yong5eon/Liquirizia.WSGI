@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from .Cookie import Cookie
-from .Util import ToHeaderName, ParseHeader
+from .Utils import ParseHeader
 
-from http.cookies import SimpleCookie
 from urllib.parse import parse_qs, unquote, urlencode
-
 from uuid import uuid4
+from typing import Any
 
 __all__ = (
 	'Request'
@@ -47,7 +45,6 @@ class Request(object):
 					v[i] = o if len(o) else None
 				self.args[k] = v
 		self.props = {}
-		self.cookies = {}
 		for k, v in headers.items() if headers else []:
 			self.header(k, v)
 		if body:
@@ -69,77 +66,37 @@ class Request(object):
 			'method': self.method,
 			'uri': self.path,
 			'queryString': self.args,
-			'version': self.version,
 			'headers': self.props,
-			'cookies': self.cookies,
 			'body': self.body,
 		})
 
 	def __str__(self):
 		return '{} {}'.format(self.method, self.path)
 
-	def header(self, key: str, value=None):
+	def header(self, key: str, value: Any = None):
 		if value is not None:
-			if key == 'Cookie':
-				c = SimpleCookie()
-				c.load(value)
-				for k, v in c.items():
-					self.cookies[k] = Cookie(
-						name=k,
-						value=v.value,
-						expires=v['expires'],
-						path=v['path'],
-						domain=v['domain'],
-						secure=v['secure'],
-						http=v['httponly'],
-						version=v['version'],
-						max=v['max-age'],
-						comment=v['comment']
-					)
-			else:
-				# TODO : according to value, use other parse methods. User-Agent, Accept-Language, ...
-				self.props[key] = ParseHeader(str(value))
-				return
+			self.props[key] = value 
+			return
 		else:
 			if key not in self.props.keys():
 				return None
-			return self.props[key]['expr']
+			return ParseHeader(key, str(self.props[key]))
 
 	def headers(self):
-		headers = [(key, value['expr']) for key, value in self.props.items()]
-
-		cookies = SimpleCookie()
-
-		for name, cookie in self.cookies.items():
-			cookies[name] = cookie.value
-			if cookie.expires:
-				cookies[name]['expires'] = cookie.expires
-			if cookie.path:
-				cookies[name]['path'] = cookie.path
-			if cookie.domain:
-				cookies[name]['domain'] = cookie.domain
-			if cookie.secure:
-				cookies[name]['secure'] = cookie.secure
-			if cookie.http:
-				cookies[name]['httponly'] = cookie.http
-			if cookie.version:
-				cookies[name]['version'] = cookie.version
-			if cookie.max:
-				cookies[name]['max-age'] = cookie.max
-			if cookie.comment:
-				cookies[name]['comment'] = cookie.comment
-
-		for name, cookie in cookies.items():
-			headers.append(('Cookie', cookie.OutputString()))
-
-		return headers
+		return [(key, value) for key, value in self.props.items()]
 	
 	@property
 	def remoteAddress(self):
-		if 'X-Forwarded-For' in self.props.keys():
-			return self.props['X-Forwarded-For']['args'][0][0]
-		if 'X-Real-IP' in self.props.keys():
-			return self.props['X-Real-IP']['args'][0][0]
+		_ = self.header('X-Real-IP')
+		if _:
+			return _
+		_ = self.header('X-Forwarded-For')
+		if _:
+			return _[0]
+		_ = self.header('Forwarded')
+		if _:
+			if 'For' in _[0]: return _[0]['For']
+			if 'for' in _[0]: return _[0]['for']
 		return self.address
 	
 	@property
@@ -161,49 +118,62 @@ class Request(object):
 
 	@property
 	def size(self):
-		if 'Content-Length' not in self.props.keys():
-			return 0
-		return int(self.props['Content-Length']['expr'])
+		_ = self.header('Content-Length')
+		if not _: return 0
+		return _
 
 	@property
 	def format(self):
-		if 'Content-Type' not in self.props.keys():
-			return None
-		return self.props['Content-Type']['args'][0][0]
+		_ = self.header('Content-Type')
+		if not _: return None
+		return _.type
 
 	@property
 	def charset(self):
-		if 'Content-Type' not in self.props.keys():
-			return None
-		if not self.props['Content-Type']['args'][0][1]:
-			return None
-		keys = {}
-		for key in self.props['Content-Type']['args'][0][1].keys():
-			keys[key.lower()] = key
-		if 'charset' not in keys.keys():
-			return None
-		return self.props['Content-Type']['args'][0][1][keys['charset']][0]
+		_ = self.header('Content-Type')
+		if not _: return None
+		return _.charset
 
 	@property
 	def remote(self):
-		if 'X-Forwarded-For' in self.props.keys():
+		_ = self.header('X-Real-IP')
+		if _:
 			return '{}({}):{}'.format(
-				self.props['X-Forwarded-For']['args'][0][0],
+				_,
 				self.address,
 				self.port,
 			)
-		if 'X-Real-IP' in self.props.keys():
+		_ = self.header('X-Forwarded-For')
+		if _:
 			return '{}({}):{}'.format(
-				self.props['X-Real-IP']['args'][0][0],
+				_,
 				self.address,
 				self.port,
 			)
+		_ = self.header('Forwarded')
+		if _:
+			if 'For' in _[0]:
+				return '{}({}):{}'.format(
+					_[0]['For'],
+					self.address,
+					self.port,
+				)
+			if 'for' in _[0]:
+				return '{}({}):{}'.format(
+					_[0]['for'],
+					self.address,
+					self.port,
+				)
 		return '{}:{}'.format(self.address, self.port)
 
 	@property
 	def scheme(self):
-		if 'X-Forwarded-Proto' in self.props.keys():
-			return self.props['X-Forwarded-Proto']['expr']
+		_ = self.header('X-Forwarded-Proto')
+		if _: return _
+		_ = self.header('Forwarded')
+		if _:
+			if 'Proto' in _[0]: return _[0]['Proto']
+			if 'proto' in _[0]: return _[0]['proto']
 		return 'HTTP'
 
 	@property

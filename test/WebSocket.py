@@ -63,13 +63,13 @@ class TestWebSocket(Case):
 			uri='*'
 		)
 		ASSERT_IS_EQUAL(response.status, 204)
-		ASSERT_IS_EQUAL('GET' in response.header('Allow').split(', '), True)
+		ASSERT_TRUE('GET' in response.header('Allow'))
 		response = _.request(
 			method='OPTIONS',
 			uri='/ws'
 		)
 		ASSERT_IS_EQUAL(response.status, 204)
-		ASSERT_IS_EQUAL('GET' in response.header('Allow').split(', '), True)
+		ASSERT_TRUE('GET' in response.header('Allow'))
 		return
 
 	@Order(1)

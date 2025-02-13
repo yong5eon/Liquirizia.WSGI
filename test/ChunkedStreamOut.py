@@ -56,13 +56,13 @@ class TestGetChunkedStream(Case):
 			uri='*'
 		)
 		ASSERT_IS_EQUAL(response.status, 204)
-		ASSERT_IS_EQUAL('GET' in response.header('Allow').split(', '), True)
+		ASSERT_TRUE('GET' in response.header('Allow'))
 		response = _.request(
 			method='OPTIONS',
 			uri='/stream/chunked'
 		)
 		ASSERT_IS_EQUAL(response.status, 204)
-		ASSERT_IS_EQUAL('GET' in response.header('Allow').split(', '), True)
+		ASSERT_TRUE('GET' in response.header('Allow'))
 		return
 
 	@Order(1)
@@ -86,6 +86,6 @@ class TestGetChunkedStream(Case):
 			cb=cb,
 		)
 		ASSERT_IS_EQUAL(response.status, 200)
-		ASSERT_IS_EQUAL(response.header('Transfer-Encoding'), 'chunked')
+		ASSERT_TRUE('chunked' in response.header('Transfer-Encoding'))
 		ASSERT_IS_EQUAL(cb.output, b'0123456789')
 		return

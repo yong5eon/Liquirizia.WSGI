@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
+from .Utils.Header import ParseHeader
 from .Cookie import Cookie
-from .Util import ToHeaderName
-
 from http.cookies import SimpleCookie
-from cgi import parse_header
 from email.utils import formatdate
 from time import time
+from typing import Any
 
 __all__ = (
 	'Response'
@@ -49,22 +48,17 @@ class Response(object):
 			self.message,
 		)
 
-	def header(self, key: str, value=None):
+	def header(self, key: str, value: Any = None):
 		if value is not None:
-			# TODO : according to value, use other parse methods
-			args, kwargs = parse_header(str(value))
-			self.props[ToHeaderName(key)] = {
-				'expr': str(value),
-				'args': args.split(','),
-				'kwargs': kwargs
-			}
+			self.props[key] = value
 		else:
 			if key not in self.props:
 				return None
-			return self.props[key]['expr']
+			# TODO : Parse Response Header
+			return ParseHeader(key, self.props[key])
 
 	def headers(self):
-		headers = [(key, value['expr']) for key, value in self.props.items()]
+		headers = [(key, str(value)) for key, value in self.props.items()]
 
 		cookies = SimpleCookie()
 
@@ -111,21 +105,17 @@ class Response(object):
 	def size(self):
 		if 'Content-Length' not in self.props.keys():
 			return 0
-		return int(self.props['Content-Length']['expr'])
+		return int(self.props['Content-Length'])
 
 	@property
 	def format(self):
-		if 'Content-Type' not in self.props.keys():
-			return None
-		return self.props['Content-Type']['args'][0]
+		_ = self.header('Content-Type')
+		return _.type
 
 	@property
 	def charset(self):
-		if 'Content-Type' not in self.props.keys():
-			return None
-		if 'charset' not in self.props['Content-Type']['kwargs'].keys():
-			return None
-		return self.props['Content-Type']['kwargs']['charset']
+		_ = self.header('Content-Type')
+		return _.charset
 
 	@property
 	def body(self):

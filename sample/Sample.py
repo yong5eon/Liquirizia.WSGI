@@ -36,7 +36,7 @@ FileSystemObjectHelper.Set(
 
 class SampleHandler(Handler):
 	def onRequest(self, request: Request):
-		print('{} - {} - REQUEST BEGIN     - {}'.format(datetime.now().isoformat(), request.id[:16], str(request)))
+		print('{} - {} - REQUEST BEGIN     - {} - {} - {} - {}'.format(datetime.now().isoformat(), request.id[:16], str(request), request.size, request.header('Content-Type'), request.headers()))
 		return request, None
 	def onRequestResponse(self, request: Request, response: Response):
 		print('{} - {} - REQUEST RESPONSE  - {} - {}'.format(datetime.now().isoformat(), request.id[:16], str(response), response.size))

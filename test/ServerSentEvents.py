@@ -45,13 +45,13 @@ class TestGetServerSentEvents(Case):
 			uri='*'
 		)
 		ASSERT_IS_EQUAL(response.status, 204)
-		ASSERT_IS_EQUAL('GET' in response.header('Allow').split(', '), True)
+		ASSERT_TRUE('GET' in response.header('Allow'))
 		response = _.request(
 			method='OPTIONS',
 			uri='/sse'
 		)
 		ASSERT_IS_EQUAL(response.status, 204)
-		ASSERT_IS_EQUAL('GET' in response.header('Allow').split(', '), True)
+		ASSERT_TRUE('GET' in response.header('Allow'))
 		return
 
 	@Order(1)
@@ -62,7 +62,7 @@ class TestGetServerSentEvents(Case):
 			uri='/sse',
 		)
 		ASSERT_IS_EQUAL(response.status, 200)
-		ASSERT_IS_EQUAL(response.header('Content-Type'), 'text/event-stream')
+		ASSERT_IS_EQUAL(response.header('Content-Type').type, 'text/event-stream')
 		for idx, event in enumerate(response.events()):
 			ASSERT_IS_EQUAL(event.data, str(idx))
 			ASSERT_IS_EQUAL(event.id, str(idx))
