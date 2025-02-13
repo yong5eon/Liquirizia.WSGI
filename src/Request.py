@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .Cookie import Cookie
-from .Utils import ParseRequestHeader
+from .Utils import ParseHeader
 
 from http.cookies import SimpleCookie
 from urllib.parse import parse_qs, unquote, urlencode
@@ -76,8 +76,9 @@ class Request(object):
 		return '{} {}'.format(self.method, self.path)
 
 	def header(self, key: str, value=None):
+		key = key.replace('-','_').upper()
 		if value is not None:
-			self.props[key.replace('-','_').upper()] = ParseRequestHeader(key, str(value))
+			self.props[key] = ParseHeader(key, str(value))
 			return
 		else:
 			if key not in self.props.keys():

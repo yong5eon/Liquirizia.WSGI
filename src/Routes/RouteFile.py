@@ -19,6 +19,7 @@ from ..Responses import (
 
 from ..Utils import DateToTimestamp
 
+from datetime import timezone
 from email.utils import formatdate
 from mimetypes import guess_type
 from hashlib import sha1
@@ -94,7 +95,7 @@ class RouteFile(Route, RouteRun):
 			return
 
 		if request.header('If-Modified-Since'):
-			timestamp = DateToTimestamp(request.header('If-Modified-Since'))
+			timestamp = request.header('If-Modified-Since').replace(tzinfo=timezone.utc).timestamp()
 			if timestamp and timestamp >= self.timestamp():
 				response = ResponseNotModified()
 				for k, v in self.headers(request).items():
@@ -106,7 +107,8 @@ class RouteFile(Route, RouteRun):
 
 		offset, size = None, None
 		if request.header('Range'):
-			offset, end = ParseRange(request.header('Range'), self.size())
+			unit, range = request.header('Range')
+			offset, end = range.start, range.end
 			size = end - offset
 		else:
 			size = self.size()

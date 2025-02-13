@@ -17,6 +17,7 @@ from ..Responses import (
 from ..Utils import DateToTimestamp
 
 from Liquirizia.FileSystemObject import Connection
+from datetime import timezone
 from re import compile
 
 __all__ = (
@@ -73,7 +74,7 @@ class RouteFileSystemObject(Route, RouteRun):
 			return
 
 		if request.header('If-Modified-Since'):
-			timestamp = DateToTimestamp(request.header('If-Modified-Since'))
+			timestamp = request.header('If-Modified-Since').replace(tzinfo=timezone.utc).timestamp()
 			if timestamp and timestamp >= self.fso.timestamp(parameters['path']):
 				response = ResponseNotModified()
 				for k, v in self.headers(request).items():

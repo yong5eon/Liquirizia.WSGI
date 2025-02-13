@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from ..Utils import ToHeader
+from ..Utils import ToHeader, ParseHeader
 
 from .Sender import Sender
 
 from Liquirizia.Serializer import SerializerHelper
 
 from io import BytesIO, BufferedReader
-from cgi import parse_header
 
 from typing import Iterable
 
@@ -55,27 +54,25 @@ class TestResponse(object):
 	def header(self, key: str):
 		if key not in self.headers:
 			return None
-		return self.headers[key]['expr']
+		return ParseHeader(key, self.headers[key])
 	
 	@property
 	def size(self):
-		if 'Content-Length' not in self.headers.keys():
-			return 0
-		return int(self.headers['Content-Length']['expr'])
+		_ = self.header('Content-Length')
+		if not _: return 0
+		return _
 
 	@property
 	def format(self):
-		if 'Content-Type' not in self.headers.keys():
-			return None
-		return self.headers['Content-Type']['args'][0]
+		_ = self.header('Content-Type')
+		if not _: return None
+		return _.type
 
 	@property
 	def charset(self):
-		if 'Content-Type' not in self.headers.keys():
-			return None
-		if 'charset' not in self.headers['Content-Type']['kwargs'].keys():
-			return None
-		return self.headers['Content-Type']['kwargs']['charset']
+		_ = self.header('Content-Type')
+		if not _: return None
+		return _.charset
 
 
 class TestResponseStream(TestResponse):
@@ -84,12 +81,7 @@ class TestResponseStream(TestResponse):
 		self.message = sender.message
 		self.headers = {}
 		for k, v in sender.headers:
-			args, kwargs = parse_header(v)
-			self.headers[ToHeader(k)] = {
-				'expr': str(v),
-				'args': args.split(','),
-				'kwargs': kwargs
-			}
+			self.headers[k] = v
 		self.buffer = sender.buffer
 		return
 
@@ -130,12 +122,7 @@ class TestResponseServerSentEvents(TestResponse):
 		self.message = sender.message
 		self.headers = {}
 		for k, v in sender.headers:
-			args, kwargs = parse_header(v)
-			self.headers[ToHeaderName(k)] = {
-				'expr': str(v),
-				'args': args.split(','),
-				'kwargs': kwargs
-			}
+			self.headers[k] = v
 		self.buffer = sender.buffer
 		return
 

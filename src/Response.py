@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .Utils.Header import ParseContentType
+from .Utils.Header import ParseHeader
 from .Cookie import Cookie
 from http.cookies import SimpleCookie
 from email.utils import formatdate
@@ -55,7 +55,7 @@ class Response(object):
 			if key not in self.props:
 				return None
 			# TODO : Parse Response Header
-			return self.props[key]
+			return ParseHeader(key, self.props[key])
 
 	def headers(self):
 		headers = [(key, str(value)) for key, value in self.props.items()]
@@ -105,20 +105,16 @@ class Response(object):
 	def size(self):
 		if 'Content-Length' not in self.props.keys():
 			return 0
-		return self.props['Content-Length']
+		return int(self.props['Content-Length'])
 
 	@property
 	def format(self):
-		if 'Content-Type' not in self.props.keys():
-			return None
-		_ = ParseContentType()(self.props['Content-Type'])
+		_ = self.header('Content-Type')
 		return _.type
 
 	@property
 	def charset(self):
-		if 'Content-Type' not in self.props.keys():
-			return None
-		_ = ParseContentType()(self.props['Content-Type'])
+		_ = self.header('Content-Type')
 		return _.charset
 
 	@property

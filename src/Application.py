@@ -85,8 +85,10 @@ class Application(object):
 			for k, v in env.items():
 				if k[0:5] == 'HTTP_':
 					headers[k[5:]] = v
+					continue
 				if k in ['CONTENT_TYPE', 'CONTENT_LENGTH'] and v:
 					headers[k] = v
+					continue
 
 			if env['REQUEST_METHOD'] == 'OPTIONS':
 				runner = RouteOptions()
