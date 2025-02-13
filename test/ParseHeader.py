@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.Test import *
-from Liquirizia.WSGI.Utils import ParseRequestHeader
+from Liquirizia.WSGI.Utils import ParseHeader
 
 from datetime import datetime
 
 
-class TestParseRequestHeader(Case):
+class TestParseHeader(Case):
 	# Common Headers
 	@Parameterized(
 		{
@@ -20,7 +20,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(101)
 	def testAccept(self, i, o):
-		_ = ParseRequestHeader('ACCEPT', i)
+		_ = ParseHeader('ACCEPT', i)
 		for i, n in enumerate(_):
 			ASSERT_IS_EQUAL(n.type, o[i]['type'])
 			ASSERT_IS_EQUAL(n.mimetype, o[i]['mimetype'])
@@ -40,7 +40,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(102)
 	def testAcceptEncoding(self, i, o):
-		_ = ParseRequestHeader('ACCEPT_ENCODING', i)
+		_ = ParseHeader('ACCEPT_ENCODING', i)
 		for i, n in enumerate(_):
 			ASSERT_IS_EQUAL(n.compression, o[i]['compression'])
 			ASSERT_IS_EQUAL(n.q, o[i]['q'])
@@ -74,7 +74,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(103)
 	def testCacheControl(self, i, o):
-		_ = ParseRequestHeader('CACHE_CONTROL', i)
+		_ = ParseHeader('CACHE_CONTROL', i)
 		ASSERT_IS_EQUAL(_.noCache, o['no-cache'])
 		ASSERT_IS_EQUAL(_.noStore, o['no-store'])
 		ASSERT_IS_EQUAL(_.maxAge, o['max-age'])
@@ -90,7 +90,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(104)
 	def testConnection(self, i, o):
-		_ = ParseRequestHeader('CONNECTION', i)
+		_ = ParseHeader('CONNECTION', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -99,7 +99,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(105)
 	def testDate(self, i, o):
-		_ = ParseRequestHeader('DATE', i)
+		_ = ParseHeader('DATE', i)
 		ASSERT_IS_EQUAL(isinstance(_, datetime), True)
 		return
 
@@ -108,7 +108,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(106)
 	def testKeepAlive(self, i, o):
-		_ = ParseRequestHeader('KEEP_ALIVE', i)
+		_ = ParseHeader('KEEP_ALIVE', i)
 		ASSERT_IS_EQUAL(_.timeout, o['timeout'])
 		ASSERT_IS_EQUAL(_.max, o['max'])
 		return
@@ -126,7 +126,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(107)
 	def testLink(self, i, o):
-		_ = ParseRequestHeader('LINK', i)
+		_ = ParseHeader('LINK', i)
 		for i, n in enumerate(_):
 			ASSERT_IS_EQUAL(n.url, o[i]['reference'])
 			ASSERT_IS_EQUAL(n.rel, o[i]['parameters']['rel'])
@@ -138,7 +138,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(108)
 	def testPragma(self, i, o):
-		_ = ParseRequestHeader('PRAGMA', i)
+		_ = ParseHeader('PRAGMA', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 	
@@ -149,7 +149,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(109)
 	def testPriority(self, i, o):
-		_ = ParseRequestHeader('PRIORITY', i)
+		_ = ParseHeader('PRIORITY', i)
 		ASSERT_IS_EQUAL(_.urgency, o['u'])
 		ASSERT_IS_EQUAL(_.incremental, o['i'])
 		return
@@ -165,7 +165,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(110)
 	def testUpgrade(self, i, o):
-		_ = ParseRequestHeader('UPGRADE', i)
+		_ = ParseHeader('UPGRADE', i)
 		for i, n in enumerate(_):
 			ASSERT_IS_EQUAL(n.protocol, o[i]['protocol'])
 			ASSERT_IS_EQUAL(n.version, o[i]['version'])
@@ -185,7 +185,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(111)
 	def testVia(self, i, o):
-		_ = ParseRequestHeader('VIA', i)
+		_ = ParseHeader('VIA', i)
 		for i, n in enumerate(_):
 			ASSERT_IS_EQUAL(n.protocol, o[i]['protocol'])
 			ASSERT_IS_EQUAL(n.version, o[i]['version'])
@@ -198,7 +198,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(112)
 	def testWarning(self, i, o):
-		_ = ParseRequestHeader('WARNING', i)
+		_ = ParseHeader('WARNING', i)
 		ASSERT_IS_EQUAL(_.code, o['code'])
 		ASSERT_IS_EQUAL(_.agent, o['agent'])
 		ASSERT_IS_EQUAL(_.text, o['text'])
@@ -210,7 +210,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(201)
 	def testContentDigest(self, i, o):
-		_ = ParseRequestHeader('Content-Digest', i)
+		_ = ParseHeader('Content-Digest', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 	
@@ -221,7 +221,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(202)
 	def testContentDisposition(self, i, o):
-		v, params = ParseRequestHeader('Content-Disposition', i)
+		v, params = ParseHeader('Content-Disposition', i)
 		ASSERT_IS_EQUAL(v, o['value'])
 		ASSERT_IS_EQUAL(params, o['params'])
 		return
@@ -231,7 +231,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(203)
 	def testContentDPR(self, i, o):
-		_ = ParseRequestHeader('Content-DPR', i)
+		_ = ParseHeader('Content-DPR', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 	
@@ -240,7 +240,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(204)
 	def testContentEncoding(self, i, o):
-		_ = ParseRequestHeader('Content-Encoding', i)
+		_ = ParseHeader('Content-Encoding', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 	
@@ -249,7 +249,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(205)
 	def testContentLanguage(self, i, o):
-		_ = ParseRequestHeader('Content-Language', i)
+		_ = ParseHeader('Content-Language', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 	
@@ -258,7 +258,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(206)
 	def testContentLength(self, i, o):
-		_ = ParseRequestHeader('Content-Length', i)
+		_ = ParseHeader('Content-Length', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -269,7 +269,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(207)
 	def testContentLocation(self, i, o):
-		_ = ParseRequestHeader('Content-Location', i)
+		_ = ParseHeader('Content-Location', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -278,7 +278,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(208)
 	def testContentRange(self, i, o):
-		_ = ParseRequestHeader('Content-Range', i)
+		_ = ParseHeader('Content-Range', i)
 		ASSERT_IS_EQUAL(_.unit, o['unit'])
 		ASSERT_IS_EQUAL(_.start, o['start'])
 		ASSERT_IS_EQUAL(_.end, o['end'])
@@ -291,7 +291,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(209)
 	def testContentSecurityPolicy(self, i, o):
-		_ = ParseRequestHeader('Content-Security-Policy', i)
+		_ = ParseHeader('Content-Security-Policy', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -301,7 +301,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(210)
 	def testContentSecurityPolicyReportOnly(self, i, o):
-		_ = ParseRequestHeader('Content-Security-Policy-Report-Only', i)
+		_ = ParseHeader('Content-Security-Policy-Report-Only', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -311,7 +311,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(211)
 	def testContentType(self, i, o):
-		_ = ParseRequestHeader('Content-Type', i)
+		_ = ParseHeader('Content-Type', i)
 		ASSERT_IS_EQUAL(_.type, o['type'])
 		ASSERT_IS_EQUAL(_.charset, o['charset'])
 		ASSERT_IS_EQUAL(_.boundary, o['boundary'])
@@ -323,7 +323,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(212)
 	def testETag(self, i, o):
-		_ = ParseRequestHeader('ETag', i)
+		_ = ParseHeader('ETag', i)
 		ASSERT_IS_EQUAL(_.weakvalidator, o['weak'])
 		ASSERT_IS_EQUAL(_.etag, o['etag'])
 		return
@@ -333,7 +333,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(213)
 	def testLastModified(self, i, o):
-		_ = ParseRequestHeader('Last-Modified', i)
+		_ = ParseHeader('Last-Modified', i)
 		ASSERT_IS_EQUAL(isinstance(_, datetime), True)
 		return
 
@@ -342,7 +342,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(214)
 	def testReprDigest(self, i, o):
-		_ = ParseRequestHeader('Repr-Digest', i)
+		_ = ParseHeader('Repr-Digest', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -351,7 +351,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(215)
 	def testTrailer(self, i, o):
-		_ = ParseRequestHeader('Trailer', i)
+		_ = ParseHeader('Trailer', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -361,7 +361,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(216)
 	def testTransferEncoding(self, i, o):
-		_ = ParseRequestHeader('Transfer-Encoding', i)
+		_ = ParseHeader('Transfer-Encoding', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -370,7 +370,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(217)
 	def testWantContentDigest(self, i, o):
-		_ = ParseRequestHeader('Want-Content-Digest', i)
+		_ = ParseHeader('Want-Content-Digest', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -379,7 +379,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(218)
 	def testWantReprDigest(self, i, o):
-		_ = ParseRequestHeader('Want-Repr-Digest', i)
+		_ = ParseHeader('Want-Repr-Digest', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -396,7 +396,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(301)
 	def testAcceptLanguage(self, i, o):
-		_ = ParseRequestHeader('Accept-Language', i)
+		_ = ParseHeader('Accept-Language', i)
 		for i, n in enumerate(_):
 			ASSERT_IS_EQUAL(n.language, o[i]['language'])
 			ASSERT_IS_EQUAL(n.q, o[i]['q'])
@@ -408,7 +408,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(302)
 	def testAltUsed(self, i, o):
-		_ = ParseRequestHeader('Alt-Used', i)
+		_ = ParseHeader('Alt-Used', i)
 		ASSERT_IS_EQUAL(_.host, o['host'])
 		ASSERT_IS_EQUAL(_.port, o['port'])
 		return
@@ -419,7 +419,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(303)
 	def testAuthorization(self, i, o):
-		_ = ParseRequestHeader('Authorization', i)
+		_ = ParseHeader('Authorization', i)
 		ASSERT_IS_EQUAL(_.scheme, o['scheme'])
 		ASSERT_IS_EQUAL(_.credentials, o['credentials'])
 		ASSERT_IS_EQUAL(_.parameters, o['params'])
@@ -437,7 +437,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(304)
 	def testCookie(self, i, o):
-		_ = ParseRequestHeader('Cookie', i)
+		_ = ParseHeader('Cookie', i)
 		for i, n in enumerate(_):
 			ASSERT_IS_EQUAL(n.name, o[i]['name'])
 			ASSERT_IS_EQUAL(n.value, o[i]['value'])
@@ -448,7 +448,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(305)
 	def testDeviceMemory(self, i, o):
-		_ = ParseRequestHeader('Device-Memory', i)
+		_ = ParseHeader('Device-Memory', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -458,7 +458,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(306)
 	def testDNT(self, i, o):
-		_ = ParseRequestHeader('DNT', i)
+		_ = ParseHeader('DNT', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -467,7 +467,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(307)
 	def testDownlink(self, i, o):
-		_ = ParseRequestHeader('Downlink', i)
+		_ = ParseHeader('Downlink', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -476,7 +476,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(308)
 	def testDPR(self, i, o):
-		_ = ParseRequestHeader('DPR', i)
+		_ = ParseHeader('DPR', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -485,7 +485,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(309)
 	def testEarlyData(self, i, o):
-		_ = ParseRequestHeader('Early-Data', i)
+		_ = ParseHeader('Early-Data', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 	
@@ -494,7 +494,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(310)
 	def testECT(self, i, o):
-		_ = ParseRequestHeader('ECT', i)
+		_ = ParseHeader('ECT', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 	
@@ -503,7 +503,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(311)
 	def testExpect(self, i, o):
-		_ = ParseRequestHeader('Expect', i)
+		_ = ParseHeader('Expect', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 	
@@ -513,7 +513,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(312)
 	def testForwarded(self, i, o):
-		_ = ParseRequestHeader('Forwarded', i)
+		_ = ParseHeader('Forwarded', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 	
@@ -523,7 +523,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(313)
 	def testFrom(self, i, o):
-		_ = ParseRequestHeader('From', i)
+		_ = ParseHeader('From', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -532,7 +532,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(314)
 	def testHost(self, i, o):
-		_ = ParseRequestHeader('Host', i)
+		_ = ParseHeader('Host', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -543,7 +543,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(315)
 	def testIfMatch(self, i, o):
-		_ = ParseRequestHeader('If-Match', i)
+		_ = ParseHeader('If-Match', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 	
@@ -552,7 +552,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(316)
 	def testIfModeifiedSince(self, i, o):
-		_ = ParseRequestHeader('If-Modified-Since', i)
+		_ = ParseHeader('If-Modified-Since', i)
 		ASSERT_IS_EQUAL(isinstance(_, datetime), True)
 		return
 
@@ -563,7 +563,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(317)
 	def testIfNoneMatch(self, i, o):
-		_ = ParseRequestHeader('If-None-Match', i)
+		_ = ParseHeader('If-None-Match', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 	
@@ -573,7 +573,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(318)
 	def testIfRange(self, i, o):
-		_ = ParseRequestHeader('If-Range', i)
+		_ = ParseHeader('If-Range', i)
 		if isinstance(o, str): ASSERT_IS_EQUAL(_, o)
 		else: ASSERT_IS_EQUAL(isinstance(_, datetime), True)
 		return
@@ -583,7 +583,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(319)
 	def testIfUnmodeifiedSince(self, i, o):
-		_ = ParseRequestHeader('If-Unmodified-Since', i)
+		_ = ParseHeader('If-Unmodified-Since', i)
 		ASSERT_IS_EQUAL(isinstance(_, datetime), True)
 		return	
 	
@@ -592,7 +592,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(320)
 	def testMaxForwards(self, i, o):
-		_ = ParseRequestHeader('Max-Forwards', i)
+		_ = ParseHeader('Max-Forwards', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 	
@@ -602,7 +602,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(321)
 	def testOrigin(self, i, o):
-		_ = ParseRequestHeader('Origin', i)
+		_ = ParseHeader('Origin', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 	
@@ -612,7 +612,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(322)
 	def testProxyAuthorization(self, i, o):
-		_ = ParseRequestHeader('Proxy-Authorization', i)
+		_ = ParseHeader('Proxy-Authorization', i)
 		ASSERT_IS_EQUAL(_.scheme, o['scheme'])
 		ASSERT_IS_EQUAL(_.credentials, o['credentials'])
 		return
@@ -626,7 +626,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(322)
 	def testRange(self, i, o):
-		unit, ranges = ParseRequestHeader('Range', i)
+		unit, ranges = ParseHeader('Range', i)
 		ASSERT_IS_EQUAL(unit, o['unit'])
 		for i, range in enumerate(ranges):
 			ASSERT_IS_EQUAL(range.start, o['ranges'][i]['start'])
@@ -640,7 +640,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(323)
 	def testReferer(self, i, o):
-		_ = ParseRequestHeader('Referer', i)
+		_ = ParseHeader('Referer', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -649,7 +649,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(324)
 	def testRTT(self, i, o):
-		_ = ParseRequestHeader('RTT', i)
+		_ = ParseHeader('RTT', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 	
@@ -658,7 +658,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(325)
 	def testSaveData(self, i, o):
-		_ = ParseRequestHeader('Save-Data', i)
+		_ = ParseHeader('Save-Data', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -667,7 +667,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(326)
 	def testSecBrowsingTopics(self, i, o):
-		_ = ParseRequestHeader('Sec-Browsing-Topics', i)
+		_ = ParseHeader('Sec-Browsing-Topics', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 	
@@ -676,7 +676,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(327)
 	def testSecCHPrefersColorScheme(self, i, o):
-		_ = ParseRequestHeader('Sec-CH-Prefers-Color-Scheme', i)
+		_ = ParseHeader('Sec-CH-Prefers-Color-Scheme', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -685,7 +685,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(328)
 	def testSecCHPefersReducedMotion(self, i, o):
-		_ = ParseRequestHeader('Sec-CH-Prefers-Reduced-Motion', i)
+		_ = ParseHeader('Sec-CH-Prefers-Reduced-Motion', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -694,7 +694,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(329)
 	def testSecCHPrefersReducedTransparency(self, i, o):
-		_ = ParseRequestHeader('Sec-CH-Prefers-Reduced-Transparency', i)
+		_ = ParseHeader('Sec-CH-Prefers-Reduced-Transparency', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -710,7 +710,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(330)
 	def testSecCHUA(self, i, o):
-		_ = ParseRequestHeader('Sec-CH-UA', i)
+		_ = ParseHeader('Sec-CH-UA', i)
 		for i, n in enumerate(_):
 			ASSERT_IS_EQUAL(n.brand, o[i]['brand'])
 			ASSERT_IS_EQUAL(n.significantVersion, o[i]['significantVersion'])
@@ -722,7 +722,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(331)
 	def testSecCHUAArch(self, i, o):
-		_ = ParseRequestHeader('Sec-CH-UA-Arch', i)
+		_ = ParseHeader('Sec-CH-UA-Arch', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -731,7 +731,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(332)
 	def testSecCHUABitness(self, i, o):
-		_ = ParseRequestHeader('Sec-CH-UA-Bitness', i)
+		_ = ParseHeader('Sec-CH-UA-Bitness', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -740,7 +740,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(333)
 	def testSecCHUAFullVersion(self, i, o):
-		_ = ParseRequestHeader('Sec-CH-UA-Full-Version', i)
+		_ = ParseHeader('Sec-CH-UA-Full-Version', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -756,7 +756,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(334)
 	def testSecCHUAFullVersionList(self, i, o):
-		_ = ParseRequestHeader('Sec-CH-UA-Full-Version-List', i)
+		_ = ParseHeader('Sec-CH-UA-Full-Version-List', i)
 		for i, n in enumerate(_):
 			ASSERT_IS_EQUAL(n.brand, o[i]['brand'])
 			ASSERT_IS_EQUAL(n.fullVersion, o[i]['fullVersion'])
@@ -769,7 +769,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(335)
 	def testSecCHUAMobile(self, i, o):
-		_ = ParseRequestHeader('Sec-CH-UA-Mobile', i)
+		_ = ParseHeader('Sec-CH-UA-Mobile', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -778,7 +778,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(336)
 	def testSecCHUAModel(self, i, o):
-		_ = ParseRequestHeader('Sec-CH-UA-Model', i)
+		_ = ParseHeader('Sec-CH-UA-Model', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -790,7 +790,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(337)
 	def testSecCHPlatform(self, i, o):
-		_ = ParseRequestHeader('Sec-CH-UA-Platform', i)
+		_ = ParseHeader('Sec-CH-UA-Platform', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -799,7 +799,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(338)
 	def testSecCHUAPlatformVersion(self, i, o):
-		_ = ParseRequestHeader('Sec-CH-UA-Platform-Version', i)
+		_ = ParseHeader('Sec-CH-UA-Platform-Version', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 	
@@ -808,7 +808,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(340)
 	def testSecFetchDest(self, i, o):
-		_ = ParseRequestHeader('Sec-Fetch-Dest', i)
+		_ = ParseHeader('Sec-Fetch-Dest', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -817,7 +817,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(341)
 	def testSecFetchMode(self, i, o):
-		_ = ParseRequestHeader('Sec-Fetch-Mode', i)
+		_ = ParseHeader('Sec-Fetch-Mode', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -826,7 +826,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(342)
 	def testSetFetchSite(self, i, o):
-		_ = ParseRequestHeader('Sec-Fetch-Site', i)
+		_ = ParseHeader('Sec-Fetch-Site', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -837,7 +837,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(343)
 	def testSecFetchUser(self, i, o):
-		_ = ParseRequestHeader('Sec-Fetch-User', i)
+		_ = ParseHeader('Sec-Fetch-User', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -847,7 +847,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(344)
 	def testSecGPC(self, i, o):
-		_ = ParseRequestHeader('Sec-GPC', i)
+		_ = ParseHeader('Sec-GPC', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -856,7 +856,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(345)
 	def testSecPurpose(self, i, o):
-		_ = ParseRequestHeader('Sec-Purpose', i)
+		_ = ParseHeader('Sec-Purpose', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -865,7 +865,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(346)
 	def testServiceWorker(self, i, o):
-		_ = ParseRequestHeader('Service-Worker', i)
+		_ = ParseHeader('Service-Worker', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -875,7 +875,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(347)
 	def testServiceWorkerNavigationPreload(self, i, o):
-		_ = ParseRequestHeader('Service-Worker-Navigation-Preload', i)
+		_ = ParseHeader('Service-Worker-Navigation-Preload', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -888,7 +888,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(348)
 	def testTE(self, i, o):
-		_ = ParseRequestHeader('TE', i)
+		_ = ParseHeader('TE', i)
 		for i, n in enumerate(_):
 			ASSERT_IS_EQUAL(n.transferCoding, o[i]['transferCoding'])
 			ASSERT_IS_EQUAL(n.q, o[i]['q'])
@@ -900,7 +900,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(349)
 	def testUpgradeInsecureRequests(self, i, o):
-		_ = ParseRequestHeader('Upgrade-InSecure-Requests', i)
+		_ = ParseHeader('Upgrade-InSecure-Requests', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -915,7 +915,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(350)
 	def testUserAgent(self, i, o):
-		_ = ParseRequestHeader('User-Agent', i)
+		_ = ParseHeader('User-Agent', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -924,7 +924,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(338)
 	def testViewportWidth(self, i, o):
-		_ = ParseRequestHeader('Viewport-Width', i)
+		_ = ParseHeader('Viewport-Width', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -933,7 +933,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(351)
 	def testWidth(self, i, o):
-		_ = ParseRequestHeader('Width', i)
+		_ = ParseHeader('Width', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -943,7 +943,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(352)
 	def testXForwardedFor(self, i, o):
-		_ = ParseRequestHeader('X-Forwarded-For', i)
+		_ = ParseHeader('X-Forwarded-For', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -952,7 +952,7 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(353)
 	def testXForwardedHost(self, i, o):
-		_ = ParseRequestHeader('X-Forwarded-Host', i)
+		_ = ParseHeader('X-Forwarded-Host', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -962,8 +962,769 @@ class TestParseRequestHeader(Case):
 	)
 	@Order(354)
 	def testXForwardedProto(self, i, o):
-		_ = ParseRequestHeader('X-Forwarded-Proto', i)
+		_ = ParseHeader('X-Forwarded-Proto', i)
 		ASSERT_IS_EQUAL(_, o)
+		return
+
+	# Response Headers
+	@Parameterized(
+		{'i': 'Viewport-Width, Width', 'o': ['Viewport-Width', 'Width']},
+	)
+	@Order(401)
+	def testAcceptCH(self, i, o):
+		_ = ParseHeader('Accept-CH', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': 'application/json', 'o': [('application/json',{})]},
+		{'i': 'application/json, text/plain', 'o': [('application/json',{}),('text/plain',{})]},
+		{'i': 'text/plain;charset=utf-8', 'o': [('text/plain',{'charset':'utf-8'})]},
+	)
+	@Order(402)
+	def testAcceptPatch(self, i, o):
+		_ = ParseHeader('Accept-Patch', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': 'application/json, text/plain', 'o': ['application/json','text/plain']},
+		{'i': 'image/webp', 'o': ['image/webp']},
+		{'i': '*/*', 'o': ['*/*']},
+	)
+	@Order(403)
+	def testAcceptPost(self, i, o):
+		_ = ParseHeader('Accept-Post', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': 'bytes', 'o': 'bytes'},
+		{'i': 'none', 'o': 'none'},
+	)
+	@Order(404)
+	def testAcceptRanges(self, i, o):
+		_ = ParseHeader('Accept-Ranges', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': '24', 'o': 24},
+	)
+	@Order(405)
+	def testAge(self, i, o):
+		_ = ParseHeader('Age', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+	
+	@Parameterized(
+		{'i': 'GET, POST, HEAD', 'o': ['GET', 'POST', 'HEAD']},
+	)
+	@Order(406)
+	def testAllow(self, i, o):
+		_ = ParseHeader('Allow', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+	
+	@Parameterized(
+		{'i': 'h2=":443"; ma=2592000;', 'o': {'h2':':443','ma':'2592000'}},
+		{'i': 'h2=":443"; ma=2592000; persist=1', 'o': {'h2':':443','ma':'2592000','persist':'1'}},
+		{'i': 'h2="alt.example.com:443"; h3=":443"', 'o': {'h2':'alt.example.com:443','h3':':443'}},
+		{'i': 'h3-25=":443"; ma=3600; h2=":443"; ma=3600', 'o': {'h3-25':':443','h2':':443','ma':'3600'}},
+	)
+	@Order(407)
+	def testAltSvc(self, i, o):
+		_ = ParseHeader('Alt-Svc', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': '"cache"', 'o': ['cache']},
+		{'i': '"cache", "cookies"', 'o': ['cache','cookies']},
+		{'i': '"*"', 'o': ['*']},
+	)
+	@Order(408)
+	def testClearSiteData(self, i, o):
+		_ = ParseHeader('Clear-Site-Data', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': 'Sec-CH-Prefers-Reduced-Motion', 'o': ['Sec-CH-Prefers-Reduced-Motion']},
+	)
+	@Order(409)
+	def testCiriticalCH(self, i, o):
+		_ = ParseHeader('Critical-CH', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': 'unsafe-none', 'o': 'unsafe-none'},
+		{'i': 'require-corp', 'o': 'require-corp'},
+		{'i': 'credentialless', 'o': 'credentialless'},
+	)
+	@Order(410)
+	def testCrossOriginEmbedderPolicy(self, i, o):
+		_ = ParseHeader('Cross-Origin-Embedder-Policy', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': 'unsafe-none', 'o': 'unsafe-none'},
+		{'i': 'require-corp', 'o': 'require-corp'},
+		{'i': 'credentialless', 'o': 'credentialless'},
+	)
+	@Order(411)
+	def testCrossOriginOpenerPolicy(self, i, o):
+		_ = ParseHeader('Cross-Origin-Opener-Policy', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': 'unsafe-none', 'o': 'unsafe-none'},
+		{'i': 'require-corp', 'o': 'require-corp'},
+		{'i': 'credentialless', 'o': 'credentialless'},
+	)
+	@Order(412)
+	def testCrossOriginResourcePolicy(self, i, o):
+		_ = ParseHeader('Cross-Origin-Resource-Policy', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': 'max-age=86400, enforce, report-uri="https://foo.example.com/report"', 'o': {
+			'maxAge': 86400,
+			'enforce': True,
+			'reportUri': 'https://foo.example.com/report',
+		}},
+	)
+	@Order(413)
+	def testExpectCT(self, i, o):
+		_ = ParseHeader('Expect-CT', i)
+		ASSERT_IS_EQUAL(_.maxAge, o['maxAge'])
+		ASSERT_IS_EQUAL(_.enforce, o['enforce'])
+		ASSERT_IS_EQUAL(_.reportUri, o['reportUri'])
+		return
+
+	@Parameterized(
+		{'i': 'Wed, 21 Oct 2015 07:28:00 GMT', 'o': datetime.now()},
+	)
+	@Order(414)
+	def testExpires(self, i, o):
+		_ = ParseHeader('Expires', i)
+		ASSERT_IS_EQUAL(isinstance(_, datetime), True)
+		return
+	
+	@Parameterized(
+		{'i': '/index.html', 'o': '/index.html'},
+	)
+	@Order(415)
+	def testLocation(self, i, o):
+		_ = ParseHeader('Expires', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{
+			'i': '{ "report_to": "name_of_reporting_group", "max_age": 12345, "include_subdomains": false, "success_fraction": 0.0, "failure_fraction": 1.0 }',
+			'o': {
+				'report_to': 'name_of_reporting_group',
+				'max_age': 12345,
+				'include_subdomains': False,
+				'success_fraction': 0.0,
+				'failure_fraction': 1.0,
+			}
+		},
+	)
+	@Order(416)
+	def testNEL(self, i, o):
+		_ = ParseHeader('NEL', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+	
+	@Parameterized(
+		{
+			'i': 'key-order',
+			'o': {
+				'keyOrder': True,
+				'params': None,
+				'excepts': None,
+			}
+		},
+		{
+			'i': 'params=("id")',
+			'o': {
+				'keyOrder': None,
+				'params': ['id'],
+				'excepts': None,
+			}
+		},
+		{
+			'i': 'params=("id" "order" "lang")',
+			'o': {
+				'keyOrder': None,
+				'params': ['id','order','lang'],
+				'excepts': None,
+			}
+		},
+		{
+			'i': 'params',
+			'o': {
+				'keyOrder': None,
+				'params': True,
+				'excepts': None,
+			}
+		},
+		{
+			'i': 'params, except=("id")',
+			'o': {
+				'keyOrder': None,
+				'params': True,
+				'excepts': ['id'],
+			}
+		},
+	)
+	@Order(417)
+	def testNoVarySearch(self, i, o):
+		_ = ParseHeader('No-Vary-Search', i)
+		ASSERT_IS_EQUAL(_.keyOrder, o['keyOrder'])
+		ASSERT_IS_EQUAL(_.params, o['params'])
+		ASSERT_IS_EQUAL(_.excepts, o['excepts'])
+		return
+	
+	@Parameterized(
+		{'i': '?1', 'o': True},
+		{'i': '?0', 'o': None},
+		{'i': '1', 'o': None},
+		{'i': '0', 'o': None},
+	)
+	@Order(418)
+	def testObserveBrowsingTopics(self, i, o):
+		_ = ParseHeader('Observe-Browsing-Topics', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': '?1', 'o': True},
+		{'i': '?0', 'o': None},
+		{'i': '1', 'o': None},
+		{'i': '0', 'o': None},
+	)
+	@Order(419)
+	def testOriginAgentCluster(self, i, o):
+		_ = ParseHeader('Origin-Agent-Cluster', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{
+			'i': 'picture-in-picture=(), geolocation=(self https://example.com/), camera=*',
+			'o': [
+				{'policy': 'picture-in-picture', 'args':[]},
+				{'policy': 'geolocation', 'args':['self','https://example.com/']},
+				{'policy': 'camera', 'args':['*']},
+			],
+		},
+		{
+			'i': 'picture-in-picture=()',
+			'o': [
+				{'policy': 'picture-in-picture', 'args':[]},
+			],
+		},
+		{
+			'i': 'geolocation=(self https://example.com/)',
+			'o': [
+				{'policy': 'geolocation', 'args':['self','https://example.com/']},
+			], 
+		},
+		{
+			'i': 'camera=*',
+			'o': [
+				{'policy': 'camera', 'args':['*']},
+			],
+		},
+	)
+	@Order(420)
+	def testPermissionsPolicy(self, i, o):
+		_ = ParseHeader('Permissions-Policy', i)
+		for i, n in enumerate(_):
+			ASSERT_IS_EQUAL(n.policy, o[i]['policy'])
+			ASSERT_IS_EQUAL(n.args, o[i]['args'])
+		return
+	
+	@Parameterized(
+		{
+			'i': 'Basic realm="Dev", charset="UTF-8"',
+			'o': {
+				'scheme': 'Basic',
+				'token68': None,
+				'parameters': {
+					'realm': 'Dev',
+					'charset': 'UTF-8'
+				}
+			},
+		},
+		{
+			'i': 'Simple token68',
+			'o': {
+				'scheme': 'Simple',
+				'token68': 'token68',
+				'parameters': None, 
+			},
+		},
+
+	)
+	@Order(421)
+	def testProxyAuthenticate(self, i, o):
+		_ = ParseHeader('Proxy-Authenticate', i)
+		ASSERT_IS_EQUAL(_.scheme, o['scheme'])
+		ASSERT_IS_EQUAL(_.token68, o['token68'])
+		ASSERT_IS_EQUAL(_.parameters, o['parameters'])
+		return
+
+	@Parameterized(
+		{'i': 'strict-origin-when-cross-origin', 'o':['strict-origin-when-cross-origin']},
+		{'i': 'strict-origin-when-cross-origin, origin-when-cross-origin', 'o':['strict-origin-when-cross-origin','origin-when-cross-origin']},
+	)
+	@Order(422)
+	def testReferrerPolicy(self, i, o):
+		_ = ParseHeader('Referrer-Policy', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': '5', 'o':{'time': 5,'url': None}},
+		{'i': '5; url=https://example.com/', 'o':{'time': 5,'url': 'https://example.com/'}},
+	)
+	@Order(423)
+	def testRefresh(self, i, o):
+		_ = ParseHeader('Refresh', i)
+		ASSERT_IS_EQUAL(_.time, o['time'])
+		ASSERT_IS_EQUAL(_.url, o['url'])
+		return
+
+	# TODO: REPORT_TO: ParseJSON()
+	@Parameterized(
+		{
+			'i': '{"group": "csp-endpoints", "max_age": 10886400, "endpoints": [{"url": "https://example.com/reports" },{ "url": "https://backup.com/reports"}]}', 
+			'o': '{"group": "csp-endpoints", "max_age": 10886400, "endpoints": [{"url": "https://example.com/reports" },{ "url": "https://backup.com/reports"}]}'
+		},
+		{
+			'i': '{"group": "csp-endpoints", "max_age": 10886400, "endpoints": [ { "url": "https://example.com/reports" }, { "url": "https://backup.com/reports" }]},{"a":"b"}', 
+			'o': '{"group": "csp-endpoints", "max_age": 10886400, "endpoints": [ { "url": "https://example.com/reports" }, { "url": "https://backup.com/reports" }]},{"a":"b"}', 
+		},
+	)
+	@Order(424)
+	def testReportTo(self, i, o):
+		_ = ParseHeader('Report-To', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{
+			'i': 'csp-endpoint="https://example.com/csp-reports"', 
+			'o': {
+				'csp-endpoint': 'https://example.com/csp-reports'
+			},
+		},
+		{
+			'i': 'csp-endpoint="https://example.com/csp-reports", permissions-endpoint="https://example.com/permissions-policy-reports"', 
+			'o': {
+				'csp-endpoint': 'https://example.com/csp-reports',
+				'permissions-endpoint': 'https://example.com/permissions-policy-reports',
+			},
+		},
+	)
+	@Order(425)
+	def testReportingEndpoints(self, i, o):
+		_ = ParseHeader('Reporting-Endpoints', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{
+			'i': 'Wed, 21 Oct 2015 07:28:00 GMT', 
+			'o': datetime.now(),
+		},
+		{
+			'i': '120', 
+			'o': 120,
+		},
+	)
+	@Order(426)
+	def testRetryAfter(self, i, o):
+		_ = ParseHeader('Retry-After', i)
+		if isinstance(o, int):
+			ASSERT_IS_EQUAL(_, o)
+		else:
+			ASSERT_IS_EQUAL(isinstance(_, datetime), True)
+		return
+	
+	@Parameterized(
+		{
+			'i': 'Apache/2.4.1 (Unix)', 
+			'o': 'Apache/2.4.1 (Unix)'
+		},
+	)
+	@Order(427)
+	def testServer(self, i, o):
+		_ = ParseHeader('Server', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{
+			'i': 'missedCache', 
+			'o': [{
+				'name': 'missedCache',
+				'duration': None,
+				'description': None,
+			}],
+		},
+		{
+			'i': 'cpu;dur=2.4', 
+			'o': [{
+				'name': 'cpu',
+				'duration': 2.4,
+				'description': None,
+			}],
+		},
+		{
+			'i': 'cache;desc="Cache Read";dur=23.2', 
+			'o': [{
+				'name': 'cache',
+				'duration': 23.2,
+				'description': 'Cache Read',
+			}],
+		},
+		{
+			'i': 'db;dur=53, app;dur=47.2', 
+			'o': [
+				{
+					'name': 'db',
+					'duration': 53,
+					'description': None,
+				},
+				{
+					'name': 'app',
+					'duration': 47.2,
+					'description': None,
+				},
+			],
+		},
+	)
+	@Order(428)
+	def testServerTiming(self, i, o):
+		_ = ParseHeader('Server-Timing', i)
+		for i, st in enumerate(_):
+			ASSERT_IS_EQUAL(st.name, o[i]['name'])
+			ASSERT_IS_EQUAL(st.duration, o[i]['duration'])
+			ASSERT_IS_EQUAL(st.description, o[i]['description'])
+		return
+	
+	@Parameterized(
+		{
+			'i': 'a', 
+			'o': 'a'
+		},
+	)
+	@Order(429)
+	def testServiceWorkerAllowed(self, i, o):
+		_ = ParseHeader('Service-Worker-Allowed', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+	
+	# - SET_COOKIE: # TODO,
+	@Parameterized(
+		{
+			'i': 'a', 
+			'o': 'a'
+		},
+	)
+	@Order(430)
+	def testSetCookie(self, i, o):
+		_ = ParseHeader('Set-Cookie', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{
+			'i': 'logged-in', 
+			'o': 'logged-in'
+		},
+	)
+	@Order(431)
+	def testSetLogin(self, i, o):
+		_ = ParseHeader('Set-Login', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{
+			'i': '/path/to/file.js.map', 
+			'o': '/path/to/file.js.map'
+		},
+	)
+	@Order(432)
+	def testSourceMap(self, i, o):
+		_ = ParseHeader('SourceMap', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{
+			'i': '"/rules/prefetch.json"', 
+			'o': ['/rules/prefetch.json']
+		},
+		{
+			'i': '"/rules/prefetch.json","/rules/prerender.json"', 
+			'o': ['/rules/prefetch.json','/rules/prerender.json']
+		},
+	)
+	@Order(433)
+	def testSpeculationRules(self, i, o):
+		_ = ParseHeader('Speculation-Rules', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+	
+	@Parameterized(
+		{
+			'i': 'max-age=31536000; includeSubDomains', 
+			'o': {
+				'maxAge': 31536000,
+				'includeSubDomains': True,
+				'preload': None
+			}
+		},
+		{
+			'i': 'max-age=63072000; includeSubDomains; preload', 
+			'o': {
+				'maxAge': 63072000,
+				'includeSubDomains': True,
+				'preload': True
+			}
+		},
+	)
+	@Order(434)
+	def testStrictTransportSecurity(self, i, o):
+		_ = ParseHeader('Strict-Transport-Security', i)
+		ASSERT_IS_EQUAL(_.maxAge, o['maxAge'])
+		ASSERT_IS_EQUAL(_.includeSubDomains, o['includeSubDomains'])
+		ASSERT_IS_EQUAL(_.preload, o['preload'])
+		return
+	
+	@Parameterized(
+		{
+			'i': 'fenced-frame', 
+			'o': 'fenced-frame'
+		},
+	)
+	@Order(435)
+	def testSupportsLoadingMode(self, i, o):
+		_ = ParseHeader('Supports-Loading-Mode', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{
+			'i': '*', 
+			'o': ['*']
+		},
+		{
+			'i': 'https://developer.mozilla.org', 
+			'o': ['https://developer.mozilla.org']
+		},
+		{
+			'i': '*, https://developer.mozilla.org', 
+			'o': ['*', 'https://developer.mozilla.org']
+		},
+	)
+	@Order(436)
+	def testTimingAllowOrigin(self, i, o):
+		_ = ParseHeader('Timing-Allow-Origin', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': '!', 'o': '!'},
+		{'i': '?', 'o': '?'},
+		{'i': 'G', 'o': 'G'},
+		{'i': 'N', 'o': 'N'},
+		{'i': 'T', 'o': 'T'},
+		{'i': 'C', 'o': 'C'},
+		{'i': 'P', 'o': 'P'},
+		{'i': 'D', 'o': 'D'},
+		{'i': 'U', 'o': 'U'},
+	)
+	@Order(437)
+	def testTk(self, i, o):
+		_ = ParseHeader('Tk', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{
+			'i': '*', 
+			'o': ['*']
+		},
+		{
+			'i': 'Accept', 
+			'o': ['Accept']
+		},
+		{
+			'i': '*, Accept', 
+			'o': ['*', 'Accept']
+		},
+	)
+	@Order(438)
+	def testVary(self, i, o):
+		_ = ParseHeader('Vary', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{
+			'i': 'Basic realm="Dev", charset="UTF-8"',
+			'o': {
+				'scheme': 'Basic',
+				'token68': None,
+				'parameters': {
+					'realm': 'Dev',
+					'charset': 'UTF-8'
+				}
+			},
+		},
+		{
+			'i': 'Basic YWxhZGRpbjpvcGVuc2VzYW1l',
+			'o': {
+				'scheme': 'Basic',
+				'token68': 'YWxhZGRpbjpvcGVuc2VzYW1l',
+				'parameters': None, 
+			},
+		},
+
+	)
+	@Order(439)
+	def testWWWAuthenticate(self, i, o):
+		_ = ParseHeader('WWW-Authenticate', i)
+		ASSERT_IS_EQUAL(_.scheme, o['scheme'])
+		ASSERT_IS_EQUAL(_.token68, o['token68'])
+		ASSERT_IS_EQUAL(_.parameters, o['parameters'])
+		return
+
+	@Parameterized(
+		{'i': 'nosniff', 'o': 'nosniff'},
+	)
+	@Order(440)
+	def testXContentTypeOptions(self, i, o):
+		_ = ParseHeader('X-Content-Type-Options', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': 'on', 'o': True},
+		{'i': 'off', 'o': False},
+		{'i': '1', 'o': None},
+		{'i': '0', 'o': None},
+	)
+	@Order(441)
+	def testXDNSPrefetchControl(self, i, o):
+		_ = ParseHeader('X-DNS-Prefetch-Control', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': 'DENY', 'o': 'DENY'},
+		{'i': 'SAMEORIGIN', 'o': 'SAMEORIGIN'},
+		{'i': 'ALLOW-FROM https://example.com', 'o': 'ALLOW-FROM https://example.com'},
+	)
+	@Order(442)
+	def testXFrameOptions(self, i, o):
+		_ = ParseHeader('X-Frame-Options', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{'i': 'none', 'o': 'none'},
+	)
+	@Order(443)
+	def testXPermittedCrossDomainPolicies(self, i, o):
+		_ = ParseHeader('X-Permitted-Cross-Domain-Policies', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+	
+	@Parameterized(
+		{'i': 'Liquirizia.WSGI', 'o': 'Liquirizia.WSGI'},
+	)
+	@Order(444)
+	def testXPermittedCrossDomainPolicies(self, i, o):
+		_ = ParseHeader('X-Powered-By', i)
+		ASSERT_IS_EQUAL(_, o)
+		return
+
+	@Parameterized(
+		{
+			'i': 'BadBot: noindex, nofollow',
+			'o': {
+					'rules': ['noindex','nofollow'],
+					'bot': 'BadBot',
+			}
+		},
+		{
+			'i': 'noindex, nofollow',
+			'o': {
+					'rules': ['noindex','nofollow'],
+					'bot': None,
+			}
+		},
+	)
+	@Order(445)
+	def testXRobotsTag(self, i, o):
+		_ = ParseHeader('X-Robots-Tag', i)
+		ASSERT_IS_EQUAL(_.rules, o['rules'])
+		ASSERT_IS_EQUAL(_.bot, o['bot'])
+		return
+
+	# - X_XSS_PROTECTION: ParseXXSSProtection(), 
+	@Parameterized(
+		{
+			'i': '0',
+			'o': {
+				'filtering': False,
+				'parameters': None,
+			}
+		},
+		{
+			'i': '1',
+			'o': {
+				'filtering': True,
+				'parameters': None,
+			}
+		},
+		{
+			'i': '1; mode=block',
+			'o': {
+				'filtering': True,
+				'parameters': {
+					'mode': 'block'
+				},
+			}
+		},
+		{
+			'i': '1; report=https://example.com/report/to',
+			'o': {
+				'filtering': True,
+				'parameters': {
+					'report': 'https://example.com/report/to'
+				},
+			}
+		},
+	)
+	@Order(446)
+	def testXXSSProtection(self, i, o):
+		_ = ParseHeader('X-XSS-Protection', i)
+		ASSERT_IS_EQUAL(_.filtering, o['filtering'])
+		ASSERT_IS_EQUAL(_.parameters, o['parameters'])
 		return
 
 	# CORS Headers
@@ -971,9 +1732,9 @@ class TestParseRequestHeader(Case):
 		{'i': 'true', 'o': True},
 		{'i': 'false', 'o': None},
 	)
-	@Order(401)
+	@Order(501)
 	def testAccessControlAllowCredentials(self, i, o):
-		_ = ParseRequestHeader('Access-Control-Allow-Credentials', i)
+		_ = ParseHeader('Access-Control-Allow-Credentials', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -981,9 +1742,9 @@ class TestParseRequestHeader(Case):
 		{'i': 'X-Custom-Header, Upgrade-Insecure-Requests', 'o': ['X-Custom-Header', 'Upgrade-Insecure-Requests']},
 		{'i': 'Accept', 'o': ['Accept']},
 	)
-	@Order(402)
+	@Order(502)
 	def testAccessControlAllowHeaders(self, i, o):
-		_ = ParseRequestHeader('Access-Control-Allow-Headers', i)
+		_ = ParseHeader('Access-Control-Allow-Headers', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 	
@@ -991,9 +1752,9 @@ class TestParseRequestHeader(Case):
 		{'i': 'GET', 'o': ['GET']},
 		{'i': 'GET, POST, PUT, DELETE', 'o': ['GET','POST','PUT','DELETE']},
 	)
-	@Order(403)
+	@Order(503)
 	def testAccessControlAllowMethods(self, i, o):
-		_ = ParseRequestHeader('Access-Control-Allow-Methods', i)
+		_ = ParseHeader('Access-Control-Allow-Methods', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -1001,9 +1762,9 @@ class TestParseRequestHeader(Case):
 		{'i': '*', 'o': '*'},
 		{'i': 'https://developer.mozilla.org', 'o': 'https://developer.mozilla.org'},
 	)
-	@Order(404)
+	@Order(504)
 	def testAccessControlAllowOrigin(self, i, o):
-		_ = ParseRequestHeader('Access-Control-Allow-Origin', i)
+		_ = ParseHeader('Access-Control-Allow-Origin', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -1012,18 +1773,18 @@ class TestParseRequestHeader(Case):
 		{'i': 'Content-Encoding', 'o': ['Content-Encoding']},
 		{'i': '*', 'o': ['*']},
 	)
-	@Order(405)
+	@Order(505)
 	def testAccessControlExposeHeaders(self, i, o):
-		_ = ParseRequestHeader('Access-Control-Expose-Headers', i)
+		_ = ParseHeader('Access-Control-Expose-Headers', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
 	@Parameterized(
 		{'i': '600', 'o': 600},
 	)
-	@Order(406)
+	@Order(506)
 	def testAccessControlMaxAge(self, i, o):
-		_ = ParseRequestHeader('Access-Control-Max-Age', i)
+		_ = ParseHeader('Access-Control-Max-Age', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -1031,9 +1792,9 @@ class TestParseRequestHeader(Case):
 		{'i': 'Content-Type, Content-Encoding', 'o': ['Content-Type', 'Content-Encoding']},
 		{'i': 'Content-Type', 'o': ['Content-Type']},
 	)
-	@Order(407)
+	@Order(507)
 	def testAccessControlRequestHeaders(self, i, o):
-		_ = ParseRequestHeader('Access-Control-Request-Headers', i)
+		_ = ParseHeader('Access-Control-Request-Headers', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -1043,9 +1804,9 @@ class TestParseRequestHeader(Case):
 		{'i': 'PUT', 'o': 'PUT'},
 		{'i': 'DELETE', 'o': 'DELETE'},
 	)
-	@Order(408)
+	@Order(508)
 	def testAccessControlRequestMethod(self, i, o):
-		_ = ParseRequestHeader('Access-Control-Request-Method', i)
+		_ = ParseHeader('Access-Control-Request-Method', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 	
@@ -1053,27 +1814,27 @@ class TestParseRequestHeader(Case):
 	@Parameterized(
 		{'i': 's3pPLMBiTxaQ9kYGzzhZRbK+xOo=', 'o': 's3pPLMBiTxaQ9kYGzzhZRbK+xOo='},
 	)
-	@Order(501)
+	@Order(601)
 	def testSecWebSocketAccept(self, i, o):
-		_ = ParseRequestHeader('Sec-WebSocket-Accept', i)
+		_ = ParseHeader('Sec-WebSocket-Accept', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
 	@Parameterized(
 		{'i': 'permessage-deflate; client_max_window_bits', 'o': ['permessage-deflate','client_max_window_bits']},
 	)
-	@Order(502)
+	@Order(602)
 	def testSecWebSocketExtensions(self, i, o):
-		_ = ParseRequestHeader('Sec-WebSocket-Extensions', i)
+		_ = ParseHeader('Sec-WebSocket-Extensions', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
 	@Parameterized(
 		{'i': 'dGhlIHNhbXBsZSBub25jZQ==', 'o': 'dGhlIHNhbXBsZSBub25jZQ=='},
 	)
-	@Order(503)
+	@Order(603)
 	def testSecWebSocketKey(self, i, o):
-		_ = ParseRequestHeader('Sec-WebSocket-Key', i)
+		_ = ParseHeader('Sec-WebSocket-Key', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
@@ -1082,18 +1843,18 @@ class TestParseRequestHeader(Case):
 		{'i': 'soap', 'o': ['soap']},
 		{'i': 'wamp', 'o': ['wamp']},
 	)
-	@Order(504)
+	@Order(604)
 	def testSecWebSocketProtocol(self, i, o):
-		_ = ParseRequestHeader('Sec-WebSocket-Protocol', i)
+		_ = ParseHeader('Sec-WebSocket-Protocol', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
 	@Parameterized(
 		{'i': '13', 'o': '13'},
 	)
-	@Order(505)
+	@Order(605)
 	def testWebSocketVersion(self, i, o):
-		_ = ParseRequestHeader('Sec-WebSocket-Version', i)
+		_ = ParseHeader('Sec-WebSocket-Version', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 	
@@ -1103,26 +1864,26 @@ class TestParseRequestHeader(Case):
 		{'i': 'navigation-source', 'o': 'navigation-source'},
 		{'i': 'trigger', 'o': 'trigger'},
 	)
-	@Order(601)
+	@Order(901)
 	def testAttributionReportingEligible(self, i, o):
-		_ = ParseRequestHeader('ATTRIBUTION_REPORTING_ELIGIBLE', i)
+		_ = ParseHeader('ATTRIBUTION_REPORTING_ELIGIBLE', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
 	@Parameterized(
 		{'i': '{"a":1,"b":"str","c":1.0}', 'o': {'a':1,'b':'str','c':1.0}},
 	)
-	@Order(602)
+	@Order(902)
 	def testAttributionReportingRegisterSource(self, i, o):
-		_ = ParseRequestHeader('ATTRIBUTION_REPORTING_REGISTER_SOURCE', i)
+		_ = ParseHeader('ATTRIBUTION_REPORTING_REGISTER_SOURCE', i)
 		ASSERT_IS_EQUAL(_, o)
 		return
 
 	@Parameterized(
 		{'i': '{"a":1,"b":"str","c":1.0}', 'o': {'a':1,'b':'str','c':1.0}},
 	)
-	@Order(603)
+	@Order(903)
 	def testAttributionReporingTrigger(self, i, o):
-		_ = ParseRequestHeader('ATTRIBUTION_REPORTING_TRIGGER', i)
+		_ = ParseHeader('ATTRIBUTION_REPORTING_TRIGGER', i)
 		ASSERT_IS_EQUAL(_, o)
 		return

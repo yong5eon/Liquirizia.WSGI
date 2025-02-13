@@ -44,17 +44,17 @@ class TestDelete(Case):
 			uri='*'
 		)
 		ASSERT_IS_EQUAL(response.status, 204)
-		ASSERT_IS_EQUAL('DELETE' in response.header('Allow').split(', '), True)
+		ASSERT_TRUE('DELETE' in response.header('Allow'))
 		response = _.request(
 			method='OPTIONS',
 			uri='/'
 		)
 		ASSERT_IS_EQUAL(response.status, 204)
-		ASSERT_IS_EQUAL('DELETE' in response.header('Allow').split(', '), True)
-		ASSERT_IS_EQUAL('DELETE' in response.header('Access-Control-Allow-Methods').split(', '), True)
-		headers = response.header('Access-Control-Allow-Headers').split(', ').sort()
-		others = 'Content-Type, Content-Length'.split(', ').sort()
-		ASSERT_IS_EQUAL(headers, others)
+		ASSERT_TRUE('DELETE' in response.header('Allow'))
+		ASSERT_TRUE('DELETE' in response.header('Access-Control-Allow-Methods'))
+		headers = response.header('Access-Control-Allow-Headers')
+		others = ['Content-Type','Content-Length']
+		for other in others: ASSERT_TRUE(other in headers)
 		return
 
 	@Parameterized(
@@ -72,9 +72,9 @@ class TestDelete(Case):
 			charset='utf-8',
 		)
 		ASSERT_IS_EQUAL(response.status, 200)
-		headers = response.header('Access-Control-Allow-Headers').split(', ').sort()
-		others = 'Content-Type, Content-Length'.split(', ').sort()
-		ASSERT_IS_EQUAL(headers, others)
+		headers = response.header('Access-Control-Allow-Headers')
+		others = ['Content-Type','Content-Length']
+		for other in others: ASSERT_TRUE(other in headers)
 		ASSERT_IS_EQUAL(response.body['qs'], qs)
 		ASSERT_IS_EQUAL(response.body['body'], body)
 		return

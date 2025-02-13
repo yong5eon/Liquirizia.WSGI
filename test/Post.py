@@ -44,17 +44,18 @@ class TestPost(Case):
 			uri='*'
 		)
 		ASSERT_IS_EQUAL(response.status, 204)
-		ASSERT_IS_EQUAL('POST' in response.header('Allow').split(', '), True)
+		ASSERT_IS_EQUAL('POST' in response.header('Allow'), True)
 		response = _.request(
 			method='OPTIONS',
 			uri='/'
 		)
 		ASSERT_IS_EQUAL(response.status, 204)
-		ASSERT_IS_EQUAL('POST' in response.header('Allow').split(', '), True)
-		ASSERT_IS_EQUAL('POST' in response.header('Access-Control-Allow-Methods').split(', '), True)
-		headers = response.header('Access-Control-Allow-Headers').split(', ').sort()
-		others = 'Content-Type, Content-Length'.split(', ').sort()
-		ASSERT_IS_EQUAL(headers, others)
+		ASSERT_IS_EQUAL('POST' in response.header('Allow'), True)
+		ASSERT_IS_EQUAL('POST' in response.header('Access-Control-Allow-Methods'), True)
+		headers = response.header('Access-Control-Allow-Headers')
+		others = ['Content-Type', 'Content-Length']
+		for other in others:
+			ASSERT_IS_EQUAL(other in headers, True)
 		return
 
 	@Parameterized(
@@ -72,9 +73,10 @@ class TestPost(Case):
 			charset='utf-8',
 		)
 		ASSERT_IS_EQUAL(response.status, 200)
-		headers = response.header('Access-Control-Allow-Headers').split(', ').sort()
-		others = 'Content-Type, Content-Length'.split(', ').sort()
-		ASSERT_IS_EQUAL(headers, others)
+		headers = response.header('Access-Control-Allow-Headers')
+		others = ['Content-Type', 'Content-Length']
+		for other in others:
+			ASSERT_IS_EQUAL(other in headers, True)
 		ASSERT_IS_EQUAL(response.body['qs'], qs)
 		ASSERT_IS_EQUAL(response.body['body'], body)
 		return
