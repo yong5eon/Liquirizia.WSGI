@@ -26,6 +26,7 @@ from .Request import (
 	SecCHUA,
 	SecCHUAFullVersion,
 	TE,
+	UserAgent,
 )
 from .Response import (
 	ExpectCT,
@@ -65,6 +66,7 @@ __all__ = (
 	'SecCHUA',
 	'SecCHUAFullVersion',
 	'TE',
+	'UserAgent',
 	# Reponse Headers
 	'ExpectCT',
 	'NoVarySearch',
