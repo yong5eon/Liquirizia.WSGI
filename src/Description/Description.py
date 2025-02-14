@@ -129,38 +129,39 @@ class DescriptionRequestAuth(object):
 class Description(object):
 	def __init__(
 		self,
-		description: str,
 		summary: str,
-		responses: Optional[Union[DescriptionResponse,Sequence[DescriptionResponse]]] = None,
-		parameter: Optional[Union[DescriptionRequestParameter,Sequence[DescriptionRequestParameter]]] = None,
-		header: Optional[Union[DescriptionRequestHeader,Sequence[DescriptionRequestHeader]]] = None,
+		description: str,
+		parameters: Optional[Union[DescriptionRequestParameter,Sequence[DescriptionRequestParameter]]] = None,
+		headers: Optional[Union[DescriptionRequestHeader,Sequence[DescriptionRequestHeader]]] = None,
 		qs: Optional[Union[DescriptionRequestQueryString,Sequence[DescriptionRequestQueryString]]] = None,
 		body: DescriptionRequestBodyProperties = None,
+		responses: Optional[Union[DescriptionResponse,Sequence[DescriptionResponse]]] = None,
 		auth: DescriptionRequestAuth = None,
 		tags: Optional[Union[str, Sequence[str]]] = None,
 	):
-		self.description = description
 		self.summary = summary
-		self.tags = tags
-		if self.tags:
-			if isinstance(self.tags, str):
-				self.tags = [self.tags]
+		self.description = description
 		self.responses = responses
 		if self.responses:
 			if not isinstance(self.responses, Sequence):
 				self.responses = [self.responses]
-		self.parameter = parameter
-		if self.parameter:
-			if not isinstance(self.parameter, Sequence):
-				self.parameter = [self.parameter]
-		self.header = header
-		if self.header:
-			if not isinstance(self.header, Sequence):
-				self.header = [self.header]
+		self.parameters = parameters
+		if self.parameters:
+			if not isinstance(self.parameters, Sequence):
+				self.parameters = [self.parameters]
+		self.headers = headers
+		if self.headers:
+			if not isinstance(self.headers, Sequence):
+				self.headers = [self.headers]
 		self.qs = qs
 		if self.qs:
 			if not isinstance(self.qs, Sequence):
 				self.qs = [self.qs]
 		self.body = body
+		self.responses = responses
 		self.auth = auth
+		self.tags = tags
+		if self.tags:
+			if isinstance(self.tags, str):
+				self.tags = [self.tags]
 		return
