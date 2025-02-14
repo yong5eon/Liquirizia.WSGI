@@ -12,6 +12,7 @@ __all__ = (
 	'SecCHUA',
 	'SecCHUAFullVersion',
 	'TE',
+	'UserAgent',
 )
 
 
@@ -86,3 +87,14 @@ class TE(object):
 	"""TE(Transfer Encoding) Class for TE Header"""
 	transferCoding: str = None
 	q: float = 1.0
+
+
+@dataclass
+class UserAgent(object):
+	product: str
+	version: str
+	comment: str
+	system: str = None
+	platform: str = None
+	platformDetails: str = None
+	extensions: list = None
