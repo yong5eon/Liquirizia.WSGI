@@ -39,6 +39,7 @@ from .Request import (
 	ParseSecCHUA,
 	ParseSecCHUAFullVersion,
 	ParseTE,
+	ParseUserAgent,
 )
 from .Response import (
 	ParseExpectCT,
@@ -448,7 +449,7 @@ def ParseHeader(k: str, v: str) -> Any:
 		'SERVICE_WORKER_NAVIGATION_PRELOAD': ParseString(),
 		'TE': ParseTE(),
 		'UPGRADE_INSECURE_REQUESTS': ParseBoolean(true='1'),
-		'USER_AGENT': ParseString(),
+		'USER_AGENT': ParseUserAgent(),
 		'VIEWPORT_WIDTH': ParseInteger(),
 		'WIDTH': ParseInteger(),
 		'X_FORWARDED_FOR': ParseList(),

@@ -9,7 +9,7 @@ from ...Headers import *
 
 from datetime import datetime
 from http.cookies import SimpleCookie
-from re import findall
+from re import findall, compile
 from typing import List, Tuple, Union
 
 __all__ = (
@@ -23,6 +23,7 @@ __all__ = (
 	'ParseSecCHUA',
 	'ParseSecCHUAFullVersion',
 	'ParseTE',
+	'ParseUserAgent',
 )
 
 
@@ -164,3 +165,35 @@ class ParseTE(Parse):
 			__.append(o)
 		__ = sorted(__, key=lambda x: x.q, reverse=True)
 		return __
+
+
+class ParseUserAgent(Parse):
+	UA = compile(r'(?P<product>[\w\.]+)/(?P<version>[\d\.]+) (?P<comment>.+)')
+	COMMENT = compile(r'\((?P<system>[^)]+)\) (?P<platform>\S+)(?: \((?P<platform_details>[^)]+)\))? (?P<extensions>.+)')
+
+	def __call__(self, value: str) -> UserAgent:
+		ua = self.UA.match(self.strip(value))
+		product = self.strip(ua.group('product'))
+		version = self.strip(ua.group('version'))
+		comment = self.strip(ua.group('comment'))
+		try:
+			cmt = self.COMMENT.match(comment)
+			system = self.strip(cmt.group('system'))
+			platform = self.strip(cmt.group('platform'))
+			platformDetails = self.strip(cmt.group('platform_details')) if cmt.group('platform_details') else None
+			extensions = [self.strip(extension) for extension in cmt.group('extensions').split(' ')]
+			return UserAgent(
+				product=product,
+				version=version,
+				comment=comment,
+				system=system,
+				platform=platform,
+				platformDetails=platformDetails,
+				extensions=extensions,
+			)
+		except:
+			return UserAgent(
+				product=product,
+				version=version,
+				comment=comment,
+			)
