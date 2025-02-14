@@ -8,8 +8,8 @@ from Liquirizia.WSGI import (
 		CORS,
 )
 
-from Liquirizia.WSGI import Request, RequestProperties, Response, Error
-from Liquirizia.WSGI.Properties import RequestRunner
+from Liquirizia.WSGI import Request, Response, Error
+from Liquirizia.WSGI.Properties import RequestRunner, RequestProperties
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 

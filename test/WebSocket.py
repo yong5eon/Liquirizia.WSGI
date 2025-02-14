@@ -13,11 +13,10 @@ from Liquirizia.WSGI import (
 	CORS,
 	Handler,
 	Error,
-	RequestProperties,
 	Request,
 	Response,
 )
-from Liquirizia.WSGI.Properties import RequestWebSocketRunner
+from Liquirizia.WSGI.Properties import RequestWebSocketRunner, RequestProperties
 from Liquirizia.WSGI.Responses import *
 
 from Liquirizia.WSGI.Extends import WebSocket

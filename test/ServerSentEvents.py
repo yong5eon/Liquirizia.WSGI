@@ -7,10 +7,9 @@ from Liquirizia.WSGI import (
 	Application, 
 	Configuration,
 	CORS,
-	RequestProperties,
 	Request,
 )
-from Liquirizia.WSGI.Properties import RequestServerSentEventsRunner
+from Liquirizia.WSGI.Properties import RequestServerSentEventsRunner, RequestProperties
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Extends import ServerSentEvents
 

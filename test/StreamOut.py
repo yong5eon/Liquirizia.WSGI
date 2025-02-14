@@ -13,13 +13,12 @@ from Liquirizia.WSGI import (
 	CORS,
 	Handler,
 	Error,
-	RequestProperties,
 	Request,
 	Response,
 	RequestReader,
 	ResponseWriter,
 )
-from Liquirizia.WSGI.Properties import RequestStreamRunner
+from Liquirizia.WSGI.Properties import RequestStreamRunner, RequestProperties
 from Liquirizia.WSGI.Responses import *
 
 from traceback import format_tb
