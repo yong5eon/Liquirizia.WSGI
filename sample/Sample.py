@@ -44,10 +44,10 @@ class SampleHandler(Handler):
 			request.header('Content-Type'),
 			request.size,
 		))
-		print('PROTOCOL  : {}'.format(request.protocol if request.protocol else None))
-		print('PLATFORM  : {}'.format(request.platform.upper() if request.platform else None))
-		print('DEVICE    : {}'.format(request.device.upper() if request.device else None))
-		print('IS MOBILE : {}'.format(request.isMobile))
+		print('Protocol - {}'.format(request.protocol if request.protocol else None))
+		print('Platform - {}'.format(request.platform.upper() if request.platform else None))
+		print('Device - {}'.format(request.device.upper() if request.device else None))
+		print('Is-Mobile - {}'.format(request.isMobile))
 		for k, _ in request.headers():
 			print('{} - {}'.format(k, request.header(k)))
 		return request, None
