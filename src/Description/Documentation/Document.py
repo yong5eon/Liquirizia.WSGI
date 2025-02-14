@@ -73,7 +73,7 @@ class Path(Documentation):
 		id: str = None,
 	):
 		parameters = []
-		for parameter in description.parameter if description.parameter else []:
+		for parameter in description.parameters if description.parameters else []:
 			parameters.append({
 					'name': parameter.name,
 					'in': 'path',
@@ -89,7 +89,7 @@ class Path(Documentation):
 					'required': parameter.required,
 					'deprecated': parameter.deprecated,
 				})
-		for header in description.header if description.header else []:
+		for header in description.headers if description.headers else []:
 			parameters.append({
 					'name': header.name,
 					'in': 'header',
