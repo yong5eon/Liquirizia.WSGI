@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from Liquirizia.WSGI import Request, RequestProperties
-from Liquirizia.WSGI.Properties import RequestRunner
+from Liquirizia.WSGI.Properties import RequestProperties, RequestRunner
+from Liquirizia.WSGI import Request
 from Liquirizia.WSGI.Responses import *
 
 from Liquirizia.WSGI import Router
-from Liquirizia.WSGI.Documentation import Information, Contact
+from Liquirizia.WSGI.Description import Descriptor, Information, Contact
 
 __all__ = (
 	'RunGetDocument'
@@ -21,7 +21,7 @@ class RunGet(RequestRunner):
 		return
 
 	def run(self):
-		return ResponseJSON(Router().toDocument(info=Information(
+		return ResponseJSON(Descriptor().toDocument(info=Information(
 			title='Liquirizia WSGI Sample API Document',
 			version=open('VERSION').read(),
 			summary='Liquirizia WSGI Sample API Document',

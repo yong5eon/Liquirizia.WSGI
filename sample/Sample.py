@@ -12,7 +12,6 @@ from Liquirizia.WSGI import (
 )
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Filters import RequestFilters
-from Liquirizia.WSGI.Documentation import Information, Contact
 
 from Liquirizia.FileSystemObject import Helper as FileSystemObjectHelper
 from Liquirizia.FileSystemObject.Implements.FileSystem import (
@@ -132,8 +131,9 @@ from swagger_ui import supported_list
 sys.modules['swagger_ui.handlers.Liquirizia'] = DocumentHandler
 supported_list.append('Liquirizia')
 
-from Liquirizia.WSGI import Application, Configuration, Router
-from Liquirizia.WSGI.Documentation import (
+from Liquirizia.WSGI import Application, Configuration
+from Liquirizia.WSGI.Description import (
+	Descriptor,
 	Information,
 	Contact,
 )
@@ -141,7 +141,7 @@ from swagger_ui import api_doc
 
 api_doc(
 	aps,
-	config=Router().toDocument(
+	config=Descriptor().toDocument(
 		info=Information(
 			title='Liquirizia.WSGI Sample API',
 			version='0.1.0',

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from Liquirizia.WSGI import Request, RequestProperties
-from Liquirizia.WSGI.Properties import RequestRunner
+from Liquirizia.WSGI.Properties import RequestProperties, RequestRunner
+from Liquirizia.WSGI import Request
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import BadRequestError
 from Liquirizia.WSGI.Description import *
@@ -14,6 +14,140 @@ __all__ = (
 	'RunDelete'
 )
 
+
+@RequestDescription(
+	summary='POST 동작 샘플 ',
+	description='POST 동작 샘플',
+	tags='RequestRunner',
+	parameters=(
+		DescriptionRequestParameter(
+			name='a',
+			description='동작의 상수 a 값, a 는 100 보다 커야함',
+			type=PropertyType.Integer,
+			min=100,
+			required=True,
+		),
+		DescriptionRequestParameter(
+			name='b',
+			description='동작의 상수 b 값, b 는 100 보다 커야함',
+			min=100,
+			type=PropertyType.Number,
+			required=True,
+		),
+	),
+	headers=(
+		DescriptionRequestHeader(
+			name='X-Token',
+			description='인증을 위한 토큰',
+			type=PropertyType.String,
+			required=True,
+		),
+	),
+	qs=(
+		DescriptionRequestQueryString(
+			name='a',
+			description='동작의 상수 a 값, a 는 5 보다 커야함',
+			type=PropertyType.Integer,
+			min=5,
+			required=True,
+		),
+		DescriptionRequestQueryString(
+			name='b',
+			description='동작의 상수 b 값, b 는 10 보다 커야함',
+			type=PropertyType.Number,
+			min=10,
+			required=True,
+		),
+		DescriptionRequestQueryString(
+			name='c',
+			description='동작의 상수 c 값',
+			type=PropertyType.String,
+			default='',
+			required=False,
+		)
+	),
+	body=DescriptionRequestBodyProperties(
+		content=(
+			DescriptionRequestBody(
+				format='application/json',
+				content=Object(
+					properties=ObjectProperties(
+						a=Integer(description='함수의 3차원 상수 a'),
+						b=Number(description='함수의 3차원 상수 b'),
+					)
+				),
+				example={
+					'a': 0,
+					'b': 0,
+				},
+			),
+			DescriptionRequestBody(
+				format='application/x-www-form',
+				content=Object(
+					properties=ObjectProperties(
+						a=Integer(description='함수의 3차원 상수 a'),
+						b=Number(description='함수의 3차원 상수 b'),
+					)
+				),
+				example='a=0&b=0',
+			),
+		),
+		description='요청 본문'
+	),
+	responses=(
+		DescriptionResponse(
+			status=200,
+			description='완료',
+			body=DescriptionResponseBody(
+				format='application/json',
+				content=Object(
+					properties=ObjectProperties(
+						status=Integer(description='상태'),
+						message=String(description='메세지'),
+						data=Object(
+							properties=ObjectProperties(
+								message=String(description='응답 스트링 에코'),
+								res=Number(description='실행 결과'),
+							),
+							description='데이터',
+						)
+					),
+					description='응답',
+				),
+				example={
+					'status': 200,
+					'message': 'OK',
+					'data': {
+						'message': 'message',
+						'res': 0.0,
+					},
+				}
+			),
+			headers=DescriptionResponseHeader(
+				name='X-Refresh-Token',
+				description='리프레시 토큰',
+				type=PropertyType.String,
+			)
+		),
+		DescriptionResponse(
+			status=400,
+			description='잘못된 요청',
+			body=DescriptionResponseBody(
+				format='application/json',
+				content=Object(
+					properties=ObjectProperties(
+						reason=String(description='원인'),
+						trace=String(description='오류 발생 장소'),
+					)
+				),
+				example={
+					'reason': '원인',
+					'trace': '트래이스',
+				},
+			)
+		)
+	),
+)
 @RequestProperties(
 	method='DELETE',
 	url='/api/run/:a/:b',
@@ -89,139 +223,6 @@ __all__ = (
 					)
 				),
 			}),
-		),
-	),
-	description=Description(
-		description='POST 동작 샘플',
-		summary='POST 동작 샘플 ',
-		tags='RequestRunner',
-		responses=(
-			DescriptionResponse(
-				status=200,
-				description='완료',
-				body=DescriptionResponseBody(
-					format='application/json',
-					content=Object(
-						properties=ObjectProperties(
-							status=Integer(description='상태'),
-							message=String(description='메세지'),
-							data=Object(
-								properties=ObjectProperties(
-									message=String(description='응답 스트링 에코'),
-									res=Number(description='실행 결과'),
-								),
-								description='데이터',
-							)
-						),
-						description='응답',
-					),
-					example={
-						'status': 200,
-						'message': 'OK',
-						'data': {
-							'message': 'message',
-							'res': 0.0,
-						},
-					}
-				),
-				headers=DescriptionResponseHeader(
-					name='X-Refresh-Token',
-					description='리프레시 토큰',
-					type=PropertyType.String,
-				)
-			),
-			DescriptionResponse(
-				status=400,
-				description='잘못된 요청',
-				body=DescriptionResponseBody(
-					format='application/json',
-					content=Object(
-						properties=ObjectProperties(
-							reason=String(description='원인'),
-							trace=String(description='오류 발생 장소'),
-						)
-					),
-					example={
-						'reason': '원인',
-						'trace': '트래이스',
-					},
-				)
-			)
-		),
-		parameter=(
-			DescriptionRequestParameter(
-				name='a',
-				description='동작의 상수 a 값, a 는 100 보다 커야함',
-				type=PropertyType.Integer,
-				min=100,
-				required=True,
-			),
-			DescriptionRequestParameter(
-				name='b',
-				description='동작의 상수 b 값, b 는 100 보다 커야함',
-				min=100,
-				type=PropertyType.Number,
-				required=True,
-			),
-		),
-		header=(
-			DescriptionRequestHeader(
-				name='X-Token',
-				description='인증을 위한 토큰',
-				type=PropertyType.String,
-				required=True,
-			),
-		),
-		qs=(
-			DescriptionRequestQueryString(
-				name='a',
-				description='동작의 상수 a 값, a 는 5 보다 커야함',
-				type=PropertyType.Integer,
-				min=5,
-				required=True,
-			),
-			DescriptionRequestQueryString(
-				name='b',
-				description='동작의 상수 b 값, b 는 10 보다 커야함',
-				type=PropertyType.Number,
-				min=10,
-				required=True,
-			),
-			DescriptionRequestQueryString(
-				name='c',
-				description='동작의 상수 c 값',
-				type=PropertyType.String,
-				default='',
-				required=False,
-			)
-		),
-		body=DescriptionRequestBodyProperties(
-			content=(
-				DescriptionRequestBody(
-					format='application/json',
-					content=Object(
-						properties=ObjectProperties(
-							a=Integer(description='함수의 3차원 상수 a'),
-							b=Number(description='함수의 3차원 상수 b'),
-						)
-					),
-					example={
-						'a': 0,
-						'b': 0,
-					},
-				),
-				DescriptionRequestBody(
-					format='application/x-www-form',
-					content=Object(
-						properties=ObjectProperties(
-							a=Integer(description='함수의 3차원 상수 a'),
-							b=Number(description='함수의 3차원 상수 b'),
-						)
-					),
-					example='a=0&b=0',
-				),
-			),
-			description='요청 본문'
 		),
 	),
 )
