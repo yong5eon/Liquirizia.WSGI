@@ -905,18 +905,101 @@ class TestParseHeader(Case):
 		return
 
 	@Parameterized(
-		{'i': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0', 'o': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'},
-		{'i': 'Mozilla/5.0 (Macintosh; Intel Mac OS X x.y; rv:42.0) Gecko/20100101 Firefox/42.0', 'o': 'Mozilla/5.0 (Macintosh; Intel Mac OS X x.y; rv:42.0) Gecko/20100101 Firefox/42.0'},
-		{'i': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36', 'o': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36'},
-		{'i': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36 OPR/38.0.2220.41', 'o': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36 OPR/38.0.2220.41'},
-		{'i': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59', 'o': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59'},
-		{'i': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Mobile/15E148 Safari/604.1', 'o': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Mobile/15E148 Safari/604.1'},
-		{'i': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', 'o': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'},
+		{
+			'i': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0', 
+			'o': {
+				'product': 'Mozilla',
+				'version': '5.0',
+				'comment': '(Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
+				'system': 'Windows NT 6.1; Win64; x64; rv:47.0',
+				'platform': 'Gecko/20100101',
+				'platformDetails': None,
+				'extensions': ['Firefox/47.0']
+			}
+		},
+		{
+			'i': 'Mozilla/5.0 (Macintosh; Intel Mac OS X x.y; rv:42.0) Gecko/20100101 Firefox/42.0',
+			'o': {
+				'product': 'Mozilla',
+				'version': '5.0',
+				'comment': '(Macintosh; Intel Mac OS X x.y; rv:42.0) Gecko/20100101 Firefox/42.0',
+				'system': 'Macintosh; Intel Mac OS X x.y; rv:42.0',
+				'platform': 'Gecko/20100101',
+				'platformDetails': None,
+				'extensions': ['Firefox/42.0']
+			}
+		},
+		{
+			'i': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36',
+			'o': {
+				'product': 'Mozilla',
+				'version': '5.0',
+				'comment': '(X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36',
+				'system': 'X11; Linux x86_64',
+				'platform': 'AppleWebKit/537.36',
+				'platformDetails': 'KHTML, like Gecko',
+				'extensions': ['Chrome/51.0.2704.103','Safari/537.36']
+			}
+		},
+		{
+			'i': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36 OPR/38.0.2220.41',
+			'o': {
+				'product': 'Mozilla',
+				'version': '5.0',
+				'comment': '(X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36 OPR/38.0.2220.41',
+				'system': 'X11; Linux x86_64',
+				'platform': 'AppleWebKit/537.36',
+				'platformDetails': 'KHTML, like Gecko',
+				'extensions': ['Chrome/51.0.2704.106','Safari/537.36','OPR/38.0.2220.41']
+			}
+		},
+		{
+			'i': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59',
+			'o': {
+				'product': 'Mozilla',
+				'version': '5.0',
+				'comment': '(Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59',
+				'system': 'Windows NT 10.0; Win64; x64',
+				'platform': 'AppleWebKit/537.36',
+				'platformDetails': 'KHTML, like Gecko',
+				'extensions': ['Chrome/91.0.4472.124','Safari/537.36','Edg/91.0.864.59']
+			}
+		},
+		{
+			'i': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Mobile/15E148 Safari/604.1',
+			'o': {
+				'product': 'Mozilla',
+				'version': '5.0',
+				'comment': '(iPhone; CPU iPhone OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Mobile/15E148 Safari/604.1',
+				'system': 'iPhone; CPU iPhone OS 13_5_1 like Mac OS X',
+				'platform': 'AppleWebKit/605.1.15',
+				'platformDetails': 'KHTML, like Gecko',
+				'extensions': ['Version/13.1.1','Mobile/15E148','Safari/604.1']
+			}
+		},
+		{
+			'i': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+			'o': {
+				'product': 'Mozilla',
+				'version': '5.0',
+				'comment': '(compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+				'system': None,
+				'platform': None,
+				'platformDetails': None,
+				'extensions': None
+			}
+		},
 	)
 	@Order(350)
 	def testUserAgent(self, i, o):
 		_ = ParseHeader('User-Agent', i)
-		ASSERT_IS_EQUAL(_, o)
+		ASSERT_IS_EQUAL(_.product, o['product'])
+		ASSERT_IS_EQUAL(_.version, o['version'])
+		ASSERT_IS_EQUAL(_.comment, o['comment'])
+		ASSERT_IS_EQUAL(_.system, o['system'])
+		ASSERT_IS_EQUAL(_.platform, o['platform'])
+		ASSERT_IS_EQUAL(_.platformDetails, o['platformDetails'])
+		ASSERT_IS_EQUAL(_.extensions, o['extensions'])
 		return
 
 	@Parameterized(
