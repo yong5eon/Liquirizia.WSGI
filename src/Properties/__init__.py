@@ -18,7 +18,6 @@ from ..Parser import (
 	JavaScriptObjectNotationParser,
 )
 from ..CORS import CORS
-from ..Description import Description
 
 from Liquirizia.Validator import Validator
 
@@ -55,7 +54,6 @@ class RequestProperties(object):
 		onRequest: RequestFilter = None,
 		onResponse : ResponseFilter = None,
 		cors: CORS = CORS(),
-		description: Description = None,
 	):
 		self.method = method
 		self.url = url
@@ -67,7 +65,6 @@ class RequestProperties(object):
 		self.onRequest = onRequest
 		self.onResponse = onResponse
 		self.cors = cors
-		self.description = description
 		return
 	
 	def __call__(self, obj: Type[Union[RequestRunner,RequestStreamRunner,RequestServerSentEventsRunner,RequestWebSocketRunner]]):
