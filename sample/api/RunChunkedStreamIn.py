@@ -20,10 +20,10 @@ __all__ = (
 	description='클라이언트에서 스트림으로 입력한 값을 그대로 반환',
 	tags='RequestStreamRunner',
 	responses=(
-		DescriptionResponse(
+		Response(
 			status=200,
 			description='완료',
-			body=DescriptionResponseBody(
+			content=Content(
 				format='*/*',
 			),
 		),

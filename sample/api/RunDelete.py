@@ -19,58 +19,46 @@ __all__ = (
 	summary='POST 동작 샘플 ',
 	description='POST 동작 샘플',
 	tags='RequestRunner',
-	parameters=(
-		DescriptionRequestParameter(
-			name='a',
+	parameters={
+		'a': Integer(
 			description='동작의 상수 a 값, a 는 100 보다 커야함',
-			type=PropertyType.Integer,
 			min=100,
 			required=True,
 		),
-		DescriptionRequestParameter(
-			name='b',
+		'b': Number(
 			description='동작의 상수 b 값, b 는 100 보다 커야함',
 			min=100,
-			type=PropertyType.Number,
 			required=True,
 		),
-	),
-	headers=(
-		DescriptionRequestHeader(
-			name='X-Token',
+	},
+	headers={
+		'X-Token': String(
 			description='인증을 위한 토큰',
-			type=PropertyType.String,
 			required=True,
 		),
-	),
-	qs=(
-		DescriptionRequestQueryString(
-			name='a',
+	},
+	qs={
+		'a': Integer(
 			description='동작의 상수 a 값, a 는 5 보다 커야함',
-			type=PropertyType.Integer,
 			min=5,
 			required=True,
 		),
-		DescriptionRequestQueryString(
-			name='b',
+		'b': Number(
 			description='동작의 상수 b 값, b 는 10 보다 커야함',
-			type=PropertyType.Number,
 			min=10,
 			required=True,
 		),
-		DescriptionRequestQueryString(
-			name='c',
+		'c': String(
 			description='동작의 상수 c 값',
-			type=PropertyType.String,
 			default='',
 			required=False,
 		)
-	),
-	body=DescriptionRequestBodyProperties(
+	},
+	body=Body(
 		content=(
-			DescriptionRequestBody(
+			Content(
 				format='application/json',
-				content=Object(
+				schema=Object(
 					properties=ObjectProperties(
 						a=Integer(description='함수의 3차원 상수 a'),
 						b=Number(description='함수의 3차원 상수 b'),
@@ -81,9 +69,9 @@ __all__ = (
 					'b': 0,
 				},
 			),
-			DescriptionRequestBody(
+			Content(
 				format='application/x-www-form',
-				content=Object(
+				schema=Object(
 					properties=ObjectProperties(
 						a=Integer(description='함수의 3차원 상수 a'),
 						b=Number(description='함수의 3차원 상수 b'),
@@ -95,12 +83,12 @@ __all__ = (
 		description='요청 본문'
 	),
 	responses=(
-		DescriptionResponse(
+		Response(
 			status=200,
 			description='완료',
-			body=DescriptionResponseBody(
+			content=Content(
 				format='application/json',
-				content=Object(
+				schema=Object(
 					properties=ObjectProperties(
 						status=Integer(description='상태'),
 						message=String(description='메세지'),
@@ -123,18 +111,18 @@ __all__ = (
 					},
 				}
 			),
-			headers=DescriptionResponseHeader(
-				name='X-Refresh-Token',
-				description='리프레시 토큰',
-				type=PropertyType.String,
-			)
+			headers={
+				'X-Refresh-Token': String(
+					description='리프레시 토큰',
+				)
+			}
 		),
-		DescriptionResponse(
+		Response(
 			status=400,
 			description='잘못된 요청',
-			body=DescriptionResponseBody(
+			content=Content(
 				format='application/json',
-				content=Object(
+				schema=Object(
 					properties=ObjectProperties(
 						reason=String(description='원인'),
 						trace=String(description='오류 발생 장소'),

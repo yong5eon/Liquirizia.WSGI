@@ -21,10 +21,10 @@ __all__ = (
 	description='1초 간격으로 0에서 9까지 송출',
 	tags='RequestStreamRunner',
 	responses=(
-		DescriptionResponse(
+		Response(
 			status=200,
 			description='완료',
-			body=DescriptionResponseBody(
+			content=Content(
 				format='text/plain',
 				example='0123456789',
 			),

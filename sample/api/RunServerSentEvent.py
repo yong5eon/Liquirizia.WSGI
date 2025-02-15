@@ -23,10 +23,10 @@ __all__ = (
 	description='1초 간격으로 0에서 1000사이의 랜덤한 숫자를 송출',
 	tags='RequestServerSentEventsRunner',
 	responses=(
-		DescriptionResponse(
+		Response(
 			status=200,
 			description='완료',
-			body=DescriptionResponseBody(
+			content=Content(
 				format='text/event-stream',
 				example='data:1\ndata:2\ndata:3\n',
 			),

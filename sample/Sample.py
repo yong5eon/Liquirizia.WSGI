@@ -12,6 +12,7 @@ from Liquirizia.WSGI import (
 )
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Filters import RequestFilters
+from Liquirizia.WSGI.Description import Descriptor, Information, Contact
 
 from Liquirizia.FileSystemObject import Helper as FileSystemObjectHelper
 from Liquirizia.FileSystemObject.Implements.FileSystem import (
@@ -120,6 +121,20 @@ aps = Application(
 	)
 )
 
+descriptor = Descriptor(
+	info=Information(
+		title='Liquirizia.WSGI Sample API',
+		version='0.1.0',
+		summary='Sample API Document',
+		description='Sample API',
+		contact=Contact(
+			name='Heo Yongseon',
+			url='https://github.com/yong5eon/Liquirizia.WSGI',
+			email='contact@email.com'
+		)
+	)
+)
+
 aps.load(path='sample/api')
 
 # apply swagger-ui
@@ -141,19 +156,7 @@ from swagger_ui import api_doc
 
 api_doc(
 	aps,
-	config=Descriptor().toDocument(
-		info=Information(
-			title='Liquirizia.WSGI Sample API',
-			version='0.1.0',
-			summary='Sample API Document',
-			description='Sample API',
-			contact=Contact(
-				name='Heo Yongseon',
-				url='https://github.com/yong5eon/Liquirizia.WSGI',
-				email='contact@email.com'
-			)
-		)
-	),
+	config=Descriptor().toDocument(),
 	url_prefix='/doc',
 	title='Liquirizia.WSGI Sample API',
 )

@@ -15,7 +15,7 @@ __all__ = (
 	description='소켓으로 받은 요청을 그대로 송출',
 	tags='RequestWebSocketRunner',
 	responses=(
-		DescriptionResponse(
+		Response(
 			status=101,
 			description='프로토콜 전환',
 		),

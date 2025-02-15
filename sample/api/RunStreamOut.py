@@ -15,10 +15,10 @@ __all__ = (
 	summary='출력 스트림 샘플',
 	tags='RequestStreamRunner',
 	responses=(
-		DescriptionResponse(
+		Response(
 			status=200,
 			description='완료',
-			body=DescriptionResponseBody(
+			content=Content(
 				format='text/plain',
 				example='0123456789',
 			),
