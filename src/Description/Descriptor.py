@@ -22,7 +22,9 @@ __all__ = (
 
 
 class Descriptor(Singleton):
-	def __init__(self):
+	def __init__(self, info: Information, version: str = '3.1.0'):
+		self.infomation = info
+		self.version = version
 		self.maps = {}
 		self.authes = {}
 		return
@@ -52,7 +54,7 @@ class Descriptor(Singleton):
 				self.authes[description.auth.name] = fmt
 		return self
 
-	def toDocument(self, info: Information, version: str = '3.1.0'):
+	def toDocument(self):
 		ORDER = {
 			'OPTIONS': '00',
 			'CONNECT': '11',
@@ -69,4 +71,4 @@ class Descriptor(Singleton):
 		for k, _ in self.maps.items():
 			maps[k] = OrderedDict(sorted(self.maps[k].items(), key=lambda _: ORDER.get(_[0].upper(), '99')))
 		maps = OrderedDict(sorted(self.maps.items(), key=lambda _: _[0]))
-		return Document(info=info, version=version, routes=maps, authenticates=self.authes)
+		return Document(info=self.infomation, version=self.version, routes=maps, authenticates=self.authes)

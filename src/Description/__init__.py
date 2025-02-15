@@ -1,31 +1,29 @@
 # -*- coding: utf-8 -*-
 
-from .Description import (
-	Description,
-	DescriptionRequestParameter,
-	DescriptionRequestHeader,
-	DescriptionRequestQueryString,
-	DescriptionRequestBody,
-	DescriptionRequestBodyProperties,
-	DescriptionRequestAuth,
-	DescriptionResponse,
-	DescriptionResponseHeader,
-	DescriptionResponseBody,
-	DescriptionResponseBodyExample,
-	Property,
-	PropertyType,
-	Value,
-	ValueType,
-	Object,
-	ObjectProperties,
+from ..Properties import (
+	RequestRunner,
+	RequestStreamRunner,
+	RequestServerSentEventsRunner,
+	RequestWebSocketRunner,
 )
-from .Model import (
+from .Types import (
+	Value,
 	Boolean,
 	Integer,
 	Number,
 	String,
 	Array,
+	Object,
+	ObjectProperties,
 )
+from .Description import (
+	Description,
+	Content,
+	Body,
+	Auth,
+	Response,
+)
+from .Descriptor import Descriptor
 from .Auth import (
 	OAuth2Password,
 	OAuth2Implict,
@@ -38,49 +36,35 @@ from .Auth import (
 	TLS,
 	OpenIdConnect,
 )
-
-from .Descriptor import Descriptor
 from .Documentation import (
 	Information,
 	Contact,
+	Document,
+	Path,
 )
 
-from ..Properties import (
-	RequestRunner,
-	RequestStreamRunner,
-	RequestServerSentEventsRunner,
-	RequestWebSocketRunner,
-)
-
-from typing import Type, Union, Optional, Sequence
+from typing import Type, Union, Optional, Sequence, Dict
 
 __all__ = (
-	## Description
-	'Description',
-	'DescriptionRequestParameter',
-	'DescriptionRequestHeader',
-	'DescriptionRequestQueryString',
-	'DescriptionRequestBody',
-	'DescriptionRequestBodyProperties',
-	'DescriptionRequestAuth',
-	'DescriptionResponse',
-	'DescriptionResponseHeader',
-	'DescriptionResponseBody',
-	'DescriptionResponseBodyExample',
-	# Property
-	'Property',
-	'PropertyType',
-	# Model
-	'Value',
-	'ValueType',
-	'Object',
-	'ObjectProperties',
+	# Decorator
+	'RequestDescription',
+	# Descriptor
+	'Descriptor',
+	# Types
 	'Boolean',
 	'Integer',
 	'Number',
 	'String',
 	'Array',
-	# Auth
+	'Object',
+	'ObjectProperties',
+	# Description
+	'Description',
+	'Content',
+	'Body',
+	'Auth',
+	'Response',
+	# Authorization
 	'OAuth2Password',
 	'OAuth2Implict',
 	'OAuth2Credentials',
@@ -91,13 +75,11 @@ __all__ = (
 	'KeyCookie',
 	'TLS',
 	'OpenIdConnect',
-	# Descriptor
-	'Descriptor',
 	# Documentation
 	'Information',
 	'Contact',
-	# Decorator
-	'RequestDescription',
+	'Path',
+	'Document',
 )
 
 
@@ -106,12 +88,12 @@ class RequestDescription(object):
 		self,
 		summary: str,
 		description: str,
-		parameters: Optional[Union[DescriptionRequestParameter,Sequence[DescriptionRequestParameter]]] = None,
-		headers: Optional[Union[DescriptionRequestHeader,Sequence[DescriptionRequestHeader]]] = None,
-		qs: Optional[Union[DescriptionRequestQueryString,Sequence[DescriptionRequestQueryString]]] = None,
-		body: DescriptionRequestBodyProperties = None,
-		responses: Optional[Union[DescriptionResponse,Sequence[DescriptionResponse]]] = None,
-		auth: DescriptionRequestAuth = None,
+		parameters: Optional[Dict[str, Value]] = None,
+		headers: Optional[Dict[str, Value]] = None,
+		qs: Optional[Dict[str, Value]] = None,
+		body: Body = None,
+		responses: Optional[Union[Response,Sequence[Response]]] = None,
+		auth: Auth = None,
 		tags: Optional[Union[str, Sequence[str]]] = None,
 	):
 		self.description = Description(
@@ -126,7 +108,14 @@ class RequestDescription(object):
 			tags=tags
 		)
 		return
-	def __call__(self, obj: Type[Union[RequestRunner,RequestStreamRunner,RequestServerSentEventsRunner,RequestWebSocketRunner]]):
+	def __call__(
+		self,
+		obj: Type[Union[
+			RequestRunner,
+			RequestStreamRunner,
+			RequestServerSentEventsRunner,
+			RequestWebSocketRunner
+		]]):
 		descriptor = Descriptor()
 		descriptor.add(
 			obj=obj,

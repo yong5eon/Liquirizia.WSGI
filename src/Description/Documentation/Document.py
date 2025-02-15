@@ -8,10 +8,10 @@ from .Information import (
 
 from ..Description import (
 	Description,
-	DescriptionResponse,
-	DescriptionResponseBody,
-	DescriptionResponseHeader,
+	Response as ResponseDescription,
+	Body as BodyDescription,
 )
+from ..Types import Value
 
 from uuid import uuid4
 
@@ -24,43 +24,42 @@ __all__ = (
 
 
 class ResponseHeader(Documentation):
-	def __init__(self, header: DescriptionResponseHeader):
+	def __init__(self, header: Value):
 		super().__init__(
-			description=header.description,
+			description=header['description'] if 'header' in header.keys() else None,
 			schema={
-				'type': header.type,
-				'format': header.format,
-				'minimum': header.min,
-				'maximum': header.max,
-				'default': header.default,
-				'enum': header.ins,
+				'type': str(header['type']) if 'type' in header.keys() else None,
+				'format': header['format'] if 'format' in header.keys() else None,
+				'minimum': header['min'] if 'min' in header.keys() else None,
+				'maximum': header['max'] if 'max' in header.keys() else None,
+				'default': header['default'] if 'default' in header.keys() else None,
+				'enum': header['enum'] if 'enum' in header.keys() else None,
 			},
-			required=header.required,
-			deprecated=header.deprecated,
+			required=header['required'] if 'required' in header.keys() else None,
+			deprecated=header['deprecated'] if 'deprecated' in header.keys() else None,
 		)
 		return
 	
 class ResponseBody(Documentation):
 	def __init__(
 		self,
-		body: DescriptionResponseBody
+		body: BodyDescription
 	):
 		super().__init__(
-			schema=body.content,
-			example=body.example,
+			schema=body.schema,
 		)
 		return
 
 
 class Response(Documentation):
-	def __init__(self, response: DescriptionResponse):
+	def __init__(self, response: ResponseDescription):
 		super().__init__(
 			description=response.description,
 			content={
-				body.format: ResponseBody(body) for body in response.body
-			} if response.body else {},
+				content.format: ResponseBody(content) for content in response.content
+			} if response.content else {},
 			headers={
-				header.name: ResponseHeader(header) for header in response.headers
+				k: ResponseHeader(v) for k, v in response.headers.items()
 			} if response.headers else {},
 		)
 		return
@@ -73,54 +72,54 @@ class Path(Documentation):
 		id: str = None,
 	):
 		parameters = []
-		for parameter in description.parameters if description.parameters else []:
+		for k, v in description.parameters.items() if description.parameters else []:
 			parameters.append({
-					'name': parameter.name,
-					'in': 'path',
-					'description': parameter.description,
-					'schema': {
-						'type': parameter.type,
-						'format': parameter.format,
-						'minimum': parameter.min,
-						'maximum': parameter.max,
-						'default': parameter.default,
-						'enum': parameter.ins,
-					},
-					'required': parameter.required,
-					'deprecated': parameter.deprecated,
-				})
-		for header in description.headers if description.headers else []:
+				'name': k,
+				'in': 'path',
+				'description': v['description'] if 'description' in v.keys() else None,
+				'schema': {
+					'type': v['type'] if 'type' in v.keys() else None,
+					'format': v['format'] if 'format' in v.keys() else None,
+					'minimum': v['min'] if 'min' in v.keys() else None,
+					'maximum': v['max'] if 'max' in v.keys() else None,
+					'default': v['default'] if 'default' in v.keys() else None,
+					'enum': v['enum'] if 'enum' in v.keys() else None,
+				},
+				'required': v['required'] if 'required' in v.keys() else None,
+				'deprecated': v['deprecated'] if 'deprecated' in v.keys() else None,
+			})
+		for k, v in description.headers.items() if description.headers else []:
 			parameters.append({
-					'name': header.name,
-					'in': 'header',
-					'description': header.description,
-					'schema': {
-						'type': header.type,
-						'format': header.format,
-						'minimum': header.min,
-						'maximum': header.max,
-						'default': header.default,
-						'enum': header.ins,
-					},
-					'required': header.required,
-					'deprecated': header.deprecated,
-				})
-		for q in description.qs if description.qs else []:
+				'name': k,
+				'in': 'header',
+				'description': v['description'] if 'description' in v.keys() else None,
+				'schema': {
+					'type': v['type'] if 'type' in v.keys() else None,
+					'format': v['format'] if 'format' in v.keys() else None,
+					'minimum': v['min'] if 'min' in v.keys() else None,
+					'maximum': v['max'] if 'max' in v.keys() else None,
+					'default': v['default'] if 'default' in v.keys() else None,
+					'enum': v['enum'] if 'enum' in v.keys() else None,
+				},
+				'required': v['required'] if 'required' in v.keys() else None,
+				'deprecated': v['deprecated'] if 'deprecated' in v.keys() else None,
+			})
+		for k, v in description.qs.items() if description.qs else []:
 			parameters.append({
-					'name': q.name,
-					'in': 'query',
-					'description': q.description,
-					'schema': {
-						'type': q.type,
-						'format': q.format,
-						'minimum': q.min,
-						'maximum': q.max,
-						'default': q.default,
-						'enum': q.ins,
-					},
-					'required': q.required,
-					'deprecated': q.deprecated,
-				})
+				'name': k,
+				'in': 'query',
+				'description': v['description'] if 'description' in v.keys() else None,
+				'schema': {
+					'type': v['type'] if 'type' in v.keys() else None,
+					'format': v['format'] if 'format' in v.keys() else None,
+					'minimum': v['min'] if 'min' in v.keys() else None,
+					'maximum': v['max'] if 'max' in v.keys() else None,
+					'default': v['default'] if 'default' in v.keys() else None,
+					'enum': v['enum'] if 'enum' in v.keys() else None,
+				},
+				'required': v['required'] if 'required' in v.keys() else None,
+				'deprecated': v['deprecated'] if 'deprecated' in v.keys() else None,
+			})
 		authenticates = []
 		if description.auth:
 			if description.auth.optional:
@@ -137,8 +136,8 @@ class Path(Documentation):
 			parameters=parameters,
 			requestBody={
 				'content': {
-					content.format: {
-						'schema': content.content,
+					content.format : {
+						'schema': content.schema,
 						'example': content.example,
 					} 
 					for content in description.body.content

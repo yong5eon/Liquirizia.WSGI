@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# from collections.abc import Mapping
-
-from enum import  Enum
-
 from typing import Any, Iterator, KeysView, ItemsView, ValuesView, Mapping
 
 __all__ = (
@@ -19,7 +15,7 @@ __all__ = (
 	'OpenIdConnect',
 )
 
-class Auth(Mapping):
+class Authorization(Mapping):
 	def __init__(self, **kwargs):
 		self.__properties__ = kwargs
 		return
@@ -60,7 +56,7 @@ class Auth(Mapping):
 	def get(self, key: object) -> Any:
 		return self.__properties__.get(key)
 
-class OAuth2Password(Auth):
+class OAuth2Password(Authorization):
 	def __init__(
 		self,
 		url: str,
@@ -81,7 +77,7 @@ class OAuth2Password(Auth):
 		)
 		return
 	
-class OAuth2Implict(Auth):
+class OAuth2Implict(Authorization):
 	def __init__(
 		self,
 		url: str,
@@ -102,7 +98,7 @@ class OAuth2Implict(Auth):
 		)
 		return
 
-class OAuth2Credentials(Auth):
+class OAuth2Credentials(Authorization):
 	def __init__(
 		self,
 		url: str,
@@ -123,7 +119,7 @@ class OAuth2Credentials(Auth):
 		)
 		return
 
-class OAuth2Code(Auth):
+class OAuth2Code(Authorization):
 	def __init__(
 		self,
 		url: str,
@@ -146,7 +142,7 @@ class OAuth2Code(Auth):
 		)
 		return
 	
-class HTTP(Auth):
+class HTTP(Authorization):
 	def __init__(
 		self,
 		format: str,
@@ -161,7 +157,7 @@ class HTTP(Auth):
 		)
 		return
 
-class KeyHeader(Auth):
+class KeyHeader(Authorization):
 	def __init__(
 		self,
 		name: str,
@@ -175,7 +171,7 @@ class KeyHeader(Auth):
 		self['in'] = 'header'
 		return
 
-class KeyQuery(Auth):
+class KeyQuery(Authorization):
 	def __init__(
 		self,
 		name: str,
@@ -189,7 +185,7 @@ class KeyQuery(Auth):
 		self['in'] = 'query'
 		return
 
-class KeyCookie(Auth):
+class KeyCookie(Authorization):
 	def __init__(
 		self,
 		name: str,
@@ -203,7 +199,7 @@ class KeyCookie(Auth):
 		self['in'] = 'cookie'
 		return
 
-class TLS(Auth):
+class TLS(Authorization):
 	def __init__(
 		self,
 		description: str = None,
@@ -214,7 +210,7 @@ class TLS(Auth):
 		)
 		return
 	
-class OpenIdConnect(Auth):
+class OpenIdConnect(Authorization):
 	def __init__(
 		self,
 		url: str,

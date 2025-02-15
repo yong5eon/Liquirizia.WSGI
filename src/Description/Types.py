@@ -9,6 +9,7 @@ from typing import Optional, Union, Sequence
 
 __all__ = (
 	'Type',
+	'Value',
 	'Boolean',
 	'Integer',
 	'Number',
@@ -60,6 +61,7 @@ class Model(Mapping):
 	def get(self, key: object) -> Any:
 		return self.__properties__.get(key)
 
+
 class Type(str, Enum):
 	Boolean = 'boolean'
 	Integer = 'integer'
@@ -67,6 +69,7 @@ class Type(str, Enum):
 	String = 'string'
 	Array = 'array'
 	Object = 'object'
+
 
 class Value(Model):
 	def __init__(
@@ -77,7 +80,7 @@ class Value(Model):
 		min: Any = None,
 		max: Any = None,
 		default: Any = None,
-		ins: Optional[Sequence[str]] = None,
+		enum: Optional[Sequence[str]] = None,
 		required: bool = True,
 		deprecated: bool = False,
 
@@ -89,11 +92,12 @@ class Value(Model):
 			minimum=min,
 			maximum=max,
 			default=default,
-			enum=ins,
+			enum=enum,
 			required=required,
 			deprecated=deprecated,
 		)
 		return
+
 
 class Boolean(Value):
 	def __init__(
@@ -113,6 +117,7 @@ class Boolean(Value):
 		)
 		return
 
+
 class Integer(Value):
 	def __init__(
 		self, 
@@ -121,10 +126,9 @@ class Integer(Value):
 		min: Any = None,
 		max: Any = None,
 		default: Any = None,
-		ins: Optional[Sequence[str]] = None,
+		enum: Optional[Sequence[str]] = None,
 		required: bool = True,
 		deprecated: bool = False,
-
 	):
 		super().__init__(
 			type=Type.Integer,
@@ -133,11 +137,12 @@ class Integer(Value):
 			min=min,
 			max=max,
 			default=default,
-			ins=ins,
+			enum=enum,
 			required=required,
 			deprecated=deprecated,
 		)
 		return
+
 
 class Number(Value):
 	def __init__(
@@ -147,7 +152,7 @@ class Number(Value):
 		min: Any = None,
 		max: Any = None,
 		default: Any = None,
-		ins: Optional[Sequence[str]] = None,
+		enum: Optional[Sequence[str]] = None,
 		required: bool = True,
 		deprecated: bool = False,
 
@@ -159,11 +164,12 @@ class Number(Value):
 			min=min,
 			max=max,
 			default=default,
-			ins=ins,
+			enum=enum,
 			required=required,
 			deprecated=deprecated,
 		)
 		return
+
 
 class String(Value):
 	def __init__(
@@ -173,10 +179,9 @@ class String(Value):
 		min: Any = None,
 		max: Any = None,
 		default: Any = None,
-		ins: Optional[Sequence[str]] = None,
+		enum: Optional[Sequence[str]] = None,
 		required: bool = True,
 		deprecated: bool = False,
-
 	):
 		super().__init__(
 			type=Type.String,
@@ -185,11 +190,12 @@ class String(Value):
 			min=min,
 			max=max,
 			default=default,
-			ins=ins,
+			enum=enum,
 			required=required,
 			deprecated=deprecated,
 		)
 		return
+
 
 class ObjectProperties(Model): pass
 class Object(Model):
@@ -208,7 +214,8 @@ class Object(Model):
 			deprecated=deprecated,
 		)
 		return
-	
+
+
 class Array(Model):
 	def __init__(
 		self,
