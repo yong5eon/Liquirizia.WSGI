@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from ..Request import Request
+from .Properties import Properties
 
+from ..Request import Request
 from ..Extends import WebSocket
 
 from abc import ABCMeta, abstractmethod
@@ -13,6 +14,8 @@ __all__ = (
 
 class RequestWebSocketRunner(metaclass=ABCMeta):
 	"""Request WebSocket Runner Interface for Web Socket"""
+
+	__properties__: Properties = None
 
 	@abstractmethod
 	def __init__(self, request: Request):

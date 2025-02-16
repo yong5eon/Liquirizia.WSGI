@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from ..Request import Request
+from .Properties import Properties
 
-from ..RequestReader import RequestReader
+from ..Request import Request
 from ..Extends import ServerSentEvents
 
 from abc import ABCMeta, abstractmethod
@@ -14,6 +14,8 @@ __all__ = (
 
 class RequestServerSentEventsRunner(metaclass=ABCMeta):
 	"""Request Server Sent Events Runner Interface for Stream"""
+
+	__properties__: Properties = None
 
 	@abstractmethod
 	def __init__(self, request: Request):

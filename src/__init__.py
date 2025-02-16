@@ -5,7 +5,6 @@ from .Configuration import Configuration
 
 from .Request import Request
 from .Response import Response
-from .RequestProperties import RequestProperties
 from .RequestReader import RequestReader
 from .ResponseWriter import ResponseWriter
 from .Router import Router
@@ -24,7 +23,6 @@ __all__ = (
 	'Handler',
 	'Request',
 	'Response',
-	'RequestProperties',
 	'RequestReader',
 	'ResponseWriter',
 	'Router',

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from .Properties import Properties
+
 from ..Request import Request
 
 from abc import ABCMeta, abstractmethod
@@ -11,6 +13,8 @@ __all__ = (
 
 class RequestRunner(metaclass=ABCMeta):
 	"""Request Runner Interface"""
+
+	__properties__: Properties = None
 
 	@abstractmethod
 	def __init__(self, request: Request):
