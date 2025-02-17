@@ -4,11 +4,11 @@ WSGI(Web Server Gateway Interface)
 
 ## 지원
 
-- 어플리케이션 요청 
+- 어플리케이션 요청에 대한 처리 서빙
 - 파일 서빙
 - 파일 시스템 서빙 
 
-### 어플리케이션 요청 처리 방법(Liquirizia.WSGI.Properties) 
+### 어플리케이션 요청 처리 서빙 방법(Liquirizia.WSGI.Properties) 
 
 - Liquirizia.WSGI.Properties.RequestRunner
 - Liquirizia.WSGI.Properties.RequestStreamRunner
