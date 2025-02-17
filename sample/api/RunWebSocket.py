@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from Liquirizia.WSGI.Properties import RequestProperties, RequestWebSocketRunner
+from Liquirizia.WSGI.Properties import RequestWebSocketProperties, RequestWebSocketRunner
 from Liquirizia.WSGI import Request
 from Liquirizia.WSGI.Extends import WebSocket
 from Liquirizia.WSGI.Description import *
@@ -21,7 +21,7 @@ __all__ = (
 		),
 	),
 )
-@RequestProperties(
+@RequestWebSocketProperties(
 	method='GET',
 	url='/api/run/socket',
 )

@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from Liquirizia.WSGI.Properties import RequestProperties, RequestStreamRunner
+from Liquirizia.WSGI.Properties import (
+	RequestStreamProperties,
+	RequestStreamRunner,
+)
 from Liquirizia.WSGI import RequestReader, ResponseWriter
 from Liquirizia.WSGI.Responses import (
 	ResponseBadRequest,
@@ -28,7 +31,7 @@ __all__ = (
 		),
 	),
 )
-@RequestProperties(
+@RequestStreamProperties(
 	method='PUT',
 	url='/api/run/stream/in',
 )

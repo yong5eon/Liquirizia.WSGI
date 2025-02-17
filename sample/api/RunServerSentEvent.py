@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import (
-	RequestProperties,
+	RequestServerSentEventsProperties,
 	RequestServerSentEventsRunner,
 )
 from Liquirizia.WSGI import Request, RequestReader
@@ -33,7 +33,7 @@ __all__ = (
 		),
 	),
 )
-@RequestProperties(
+@RequestServerSentEventsProperties(
 	method='GET',
 	url='/api/run/stream/sse',
 )

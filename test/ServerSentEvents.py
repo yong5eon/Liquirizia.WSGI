@@ -9,7 +9,7 @@ from Liquirizia.WSGI import (
 	CORS,
 	Request,
 )
-from Liquirizia.WSGI.Properties import RequestServerSentEventsRunner, RequestProperties
+from Liquirizia.WSGI.Properties import RequestServerSentEventsRunner, RequestServerSentEventsProperties
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Extends import ServerSentEvents
 
@@ -17,7 +17,7 @@ from time import sleep
 from random import randrange
 
 
-@RequestProperties(
+@RequestServerSentEventsProperties(
 	method='GET',
 	url='/sse',
 	cors=CORS()
