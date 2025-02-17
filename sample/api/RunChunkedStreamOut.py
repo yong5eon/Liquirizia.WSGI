@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import (
-	RequestProperties,
+	RequestStreamProperties,
 	RequestStreamRunner,
 )
 from Liquirizia.WSGI import Request, RequestReader, ResponseWriter
@@ -31,7 +31,7 @@ __all__ = (
 		),
 	),
 )
-@RequestProperties(
+@RequestStreamProperties(
 	method='GET',
 	url='/api/run/stream/chunked/out',
 )

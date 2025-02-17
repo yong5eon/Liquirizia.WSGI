@@ -16,7 +16,7 @@ from Liquirizia.WSGI import (
 	Request,
 	Response,
 )
-from Liquirizia.WSGI.Properties import RequestWebSocketRunner, RequestProperties
+from Liquirizia.WSGI.Properties import RequestWebSocketRunner, RequestWebSocketProperties
 from Liquirizia.WSGI.Responses import *
 
 from Liquirizia.WSGI.Extends import WebSocket
@@ -29,7 +29,7 @@ from traceback import format_tb
 from typing import List
 
 
-@RequestProperties(
+@RequestWebSocketProperties(
 	method='GET',
 	url='/ws',
 	cors=CORS(),

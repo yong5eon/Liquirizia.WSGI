@@ -14,7 +14,7 @@ from Liquirizia.WSGI import (
 	RequestReader,
 	ResponseWriter,
 )
-from Liquirizia.WSGI.Properties import RequestStreamRunner, RequestProperties
+from Liquirizia.WSGI.Properties import RequestStreamRunner, RequestStreamProperties
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Extends import ChunkedStreamReader, ChunkedStreamWriter
 
@@ -22,7 +22,7 @@ from traceback import format_tb
 from time import sleep
 
 
-@RequestProperties(
+@RequestStreamProperties(
 	method='PUT',
 	url='/stream/chunked',
 )

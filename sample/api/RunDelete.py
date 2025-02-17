@@ -1,14 +1,29 @@
 # -*- coding: utf-8 -*-
 
-from Liquirizia.WSGI.Properties import RequestProperties, RequestRunner
+from Liquirizia.WSGI.Properties import (
+	RequestProperties,
+	Parameter,
+	Header,
+	QueryString,
+	Body,
+	RequestRunner,
+)
 from Liquirizia.WSGI import Request
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import BadRequestError
-from Liquirizia.WSGI.Description import *
+from Liquirizia.WSGI.Description import (
+	RequestDescription,
+	Body as RequestBodyDescription,
+	Response as ResponseDescription,
+	Content,
+	Object,
+	ObjectProperties,
+	String,
+	Number,
+	Integer,
+)
 
-from Liquirizia.Validator import Validator
 from Liquirizia.Validator.Patterns import *
-
 
 __all__ = (
 	'RunDelete'
@@ -16,8 +31,8 @@ __all__ = (
 
 
 @RequestDescription(
-	summary='POST 동작 샘플 ',
-	description='POST 동작 샘플',
+	summary='DELETE 동작 샘플',
+	description='DELETE 동작 샘플',
 	tags='RequestRunner',
 	parameters={
 		'a': Integer(
@@ -54,7 +69,7 @@ __all__ = (
 			required=False,
 		)
 	},
-	body=Body(
+	body=RequestBodyDescription(
 		content=(
 			Content(
 				format='application/json',
@@ -80,10 +95,9 @@ __all__ = (
 				example='a=0&b=0',
 			),
 		),
-		description='요청 본문'
 	),
 	responses=(
-		Response(
+		ResponseDescription(
 			status=200,
 			description='완료',
 			content=Content(
@@ -117,7 +131,7 @@ __all__ = (
 				)
 			}
 		),
-		Response(
+		ResponseDescription(
 			status=400,
 			description='잘못된 요청',
 			content=Content(
@@ -139,80 +153,72 @@ __all__ = (
 @RequestProperties(
 	method='DELETE',
 	url='/api/run/:a/:b',
-	parameter=Validator(
-		IsDictionary(
-			IsRequiredIn('a', 'b', error=BadRequestError('경로에 a 와 b 는 필수 입니다.')),
-			IsMappingOf({
-				'a': Validator(
-					IsNotToNone(error=BadRequestError('경로의 a 는 값이 있어야 합니다.')),
-					ToInteger(error=BadRequestError('경로의 a는 정수를 필요로 합니다')),
-					IsInteger(
-						IsGreaterThan(100, error=BadRequestError('경로의 a 는 100 보다 커야 합니다')),
-						error=BadRequestError('경로 a 는 정수를 필요로 합니다.')
-					)
-				),
-				'b': Validator(
-					IsNotToNone(error=BadRequestError('경로 b 는 값이 있어야 합니다')),
-					ToInteger(error=BadRequestError('경로 b는 정수 필요로 합니다')),
-					IsInteger(
-						IsGreaterThan(100, error=BadRequestError('경로 b 는 100 보다 커야 합니다')),
-						error=BadRequestError('경로 b는 정수 필요로 합니다')
-					)
-				),
-			})
-		)
-	),
-	qs=Validator(
-		IsDictionary(
-			IsRequiredIn('a', 'b', error=BadRequestError('본문에 a 와 b 가 필요합니다.')),
-			IsMappingOf({
-				'a': Validator(
-					IsNotToNone(error=BadRequestError('a 는 값이 있어야 합니다.')),
-					ToInteger(error=BadRequestError('a는 정수를 필요로 합니다')),
-					IsInteger(
-						IsGreaterThan(5, error=BadRequestError('a 는 5보다 커야 합니다')),
-						error=BadRequestError('a 는 정수를 필요로 합니다')
-					)
-				),
-				'b': Validator(
-					IsNotToNone(error=BadRequestError('b 는 값이 있어야 합니다')),
-					ToFloat(error=BadRequestError('b는 실수(부동 소수점)을 필요로 합니다')),
-					IsFloat(
-						IsGreaterThan(9, error=BadRequestError('b 는 9보다 커야 합니다')),
-						error=BadRequestError('b 는 실수(부동 소수점)을 필요로 합니다.')
-					)
-				),
-				'c': Validator(
-					SetDefault(''),
-					IsString(error=BadRequestError('c는 문자열을 필요로 합니다')),
-				),
-			}),
-		)
-	),
-	body=Validator(
-		IsNotToNone(error=BadRequestError('본문에는 값이 있어야 합니다.')),
-		IsDictionary(
-			IsRequiredIn('a', 'b', error=BadRequestError('본문에 a 와 b가 필요합니다.')),
-			IsMappingOf({
-				'a': Validator(
-					IsNotToNone(error=BadRequestError('a 는 값이 있어야 합니다.')),
-					ToInteger(error=BadRequestError('a는 정수를 필요로 합니다')),
-					IsInteger(
-						IsLessThan(5, error=BadRequestError('a 는 5보다 작아야 합니다')),
-						error=BadRequestError('a 는 정수를 필요로 합니다.')
-					)
-				),
-				'b': Validator(
-					IsNotToNone(error=BadRequestError('b 는 값이 있어야 합니다')),
-					ToFloat(error=BadRequestError('b는 실수(부동 소수점)을 필요로 합니다')),
-					IsFloat(
-						IsLessThan(9, error=BadRequestError('b 는 9보다 작아야 합니다')),
-						error=BadRequestError('b 는 실수(부동 소수점)을 필요로 합니다.')
-					)
-				),
-			}),
+	parameter=Parameter({
+		'a': (
+			ToInteger(error=BadRequestError('경로 a 는 정수를 필요로 합니다.')), 
+			IsInteger(
+				IsGreaterThan(100, error=BadRequestError('경로의 a 는 100 보다 커야 합니다')),
+				error=BadRequestError('경로 a 는 정수를 필요로 합니다.')
+			),
 		),
+		'b': (
+			ToInteger(error=BadRequestError('경로 b는 정수 필요로 합니다')),
+			IsInteger(
+				IsGreaterThan(100, error=BadRequestError('경로 b 는 100 보다 커야 합니다')),
+				error=BadRequestError('경로 b는 정수 필요로 합니다')
+			),
+		),
+	}),
+	header=Header(
+		requires=('X-Token',),
+		requiresError=BadRequestError('헤더에 X-Token 값을 필요로 합니다.'),
 	),
+	qs=QueryString(
+		mappings={
+			'a': (
+				ToInteger(),
+				IsInteger(
+					IsGreaterThan(5, error=BadRequestError('a 는 5보다 커야 합니다')),
+					error=BadRequestError('c는 정수를 필요로 합니다.')
+				),
+			),
+			'b': (
+				ToFloat(),
+				IsFloat(
+					IsGreaterThan(9, error=BadRequestError('b 는 9보다 커야 합니다')),
+					error=BadRequestError('b는 실수(부동 소수점)을 필요로 합니다')
+				),
+			),
+			'c': (
+				SetDefault(''),
+				IsString(error=BadRequestError('c는 문자열을 필요로 합니다'))
+			),
+		},
+		requires=('a', 'b'),
+		requiresError=BadRequestError('질의에 a 와 b 는 필수 입니다.'),
+		error=BadRequestError('질의를 필요로 합니다.')
+	),
+	body=Body(
+		mappings={
+			'a': (
+				ToInteger(error=BadRequestError('a는 정수를 필요로 합니다')),
+				IsInteger(
+					IsLessThan(5, error=BadRequestError('a 는 5보다 작아야 합니다')),
+					error=BadRequestError('a 는 정수를 필요로 합니다.')
+				),
+			),
+			'b': (
+				ToFloat(error=BadRequestError('b는 실수(부동 소수점)을 필요로 합니다')),
+				IsFloat(
+					IsLessThan(9, error=BadRequestError('b 는 9보다 작아야 합니다')),
+					error=BadRequestError('b 는 실수(부동 소수점)을 필요로 합니다.')
+				),
+			),
+		},
+		requires=('a', 'b'),
+		requiresError=BadRequestError('본문에는 a 와 b 값이 있어야 합니다.'),
+		error=BadRequestError('본문에는 값이 있어야 합니다.')
+	)
 )
 class RunDelete(RequestRunner):
 	def __init__(self, request: Request):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from Liquirizia.WSGI.Properties import RequestProperties, RequestStreamRunner
+from Liquirizia.WSGI.Properties import RequestStreamProperties, RequestStreamRunner
 from Liquirizia.WSGI import Request, RequestReader, ResponseWriter
 from Liquirizia.WSGI.Description import *
 
@@ -25,7 +25,7 @@ __all__ = (
 		),
 	),
 )
-@RequestProperties(
+@RequestStreamProperties(
 	method='GET',
 	url='/api/run/stream/out',
 )
