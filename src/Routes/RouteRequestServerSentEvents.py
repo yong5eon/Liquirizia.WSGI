@@ -59,7 +59,7 @@ class RouteRequestServerSentEvents(Route, RouteRun):
 				request.header(k, v)
 
 		if self.qs:
-			request.qs = self.qs(request.qs)
+			request.args = self.qs(request.args)
 
 		obj = self.object(request)
 		obj.run(ServerSentEvents(writer))

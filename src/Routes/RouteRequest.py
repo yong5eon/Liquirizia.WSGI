@@ -15,6 +15,7 @@ from ..Errors import BadRequestError, UnsupportedMediaTypeError
 from Liquirizia.Serializer import SerializerHelper
 from Liquirizia.Serializer.Errors import NotSupportedError, DecodeError
 from Liquirizia.Validator import Validator
+from Liquirizia.Utils.Dictionary import CreateDataClass, ToDataClass
 
 from typing import Type, Dict
 
@@ -69,7 +70,9 @@ class RouteRequest(Route, RouteRun):
 				raise UnsupportedMediaTypeError('{} is not supported media type'.format(request.format))
 			parse = self.bodyParsers[request.format]
 			try:
-				request.body = parse(body)
+				body = parse(body)
+				Body = CreateDataClass('Body', body)
+				request.obj = ToDataClass(body, Body)
 			except Exception as e:
 				raise BadRequestError(str(e), error=e)
 
@@ -85,10 +88,10 @@ class RouteRequest(Route, RouteRun):
 				request.header(k, v)
 
 		if self.qs:
-			request.qs = self.qs(request.qs)
+			request.args = self.qs(request.args)
 
 		if self.body:
-			request.body = self.body(request.body)
+			request.obj = self.body(request.obj)
 
 
 		if self.onRequest:

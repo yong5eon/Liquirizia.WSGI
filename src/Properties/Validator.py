@@ -3,9 +3,16 @@
 from Liquirizia.Validator import Validator, Pattern
 from Liquirizia.Validator.Patterns import (
 	IsToNone,
+	IsDataObject,
 	IsDictionary,
-	IsRequiredIn,
-	IsMappingOf,
+)
+from Liquirizia.Validator.Patterns.DataObject import (
+	IsRequiredIn as IsRequiredInDataObject,
+	IsMappingOf as IsMappingOfDataObject,
+)
+from Liquirizia.Validator.Patterns.Dictionary import (
+	IsRequiredIn as IsRequiredInDictionary,
+	IsMappingOf as IsMappingOfDictionary,
 )
 
 from ..Error import Error
@@ -28,7 +35,7 @@ class Parameter(Validator):
 		for k, patterns in mappings.items() if mappings else []:
 			if not isinstance(patterns, (list, tuple)): patterns = [patterns]
 			mappings[k] = Validator(*patterns)
-		super().__init__(IsDictionary(IsMappingOf(mappings)))
+		super().__init__(IsDataObject(IsMappingOfDataObject(mappings)))
 		return
 
 
@@ -46,8 +53,8 @@ class Header(Validator):
 		if requires and not isinstance(requires, Sequence):
 			requires = [requires]
 		super().__init__(IsDictionary(
-			IsRequiredIn(*requires if requires else [] , error=requiresError),
-			IsMappingOf(mappings if mappings else {}),
+			IsRequiredInDictionary(*requires if requires else [] , error=requiresError),
+			IsMappingOfDictionary(mappings if mappings else {}),
 		))
 		return
 
@@ -67,13 +74,13 @@ class QueryString(Validator):
 			mappings[k] = Validator(*patterns)
 		if requires and not isinstance(requires, Sequence):
 			requires = [requires]
-		super().__init__(IsDictionary(
-			IsRequiredIn(*requires if requires else [] , error=requiresError),
-			IsMappingOf(mappings if mappings else {}, error=error),
+		super().__init__(IsDataObject(
+			IsRequiredInDataObject(*requires if requires else [] , error=requiresError),
+			IsMappingOfDataObject(mappings if mappings else {}, error=error),
 			error=error,
-		) if required else IsToNone(IsDictionary(
-			IsRequiredIn(*requires if requires else [] , error=requiresError),
-			IsMappingOf(mappings if mappings else {}, error=error),
+		) if required else IsToNone(IsDataObject(
+			IsRequiredInDataObject(*requires if requires else [] , error=requiresError),
+			IsMappingOfDataObject(mappings if mappings else {}, error=error),
 			error=error,
 		)))
 		return
@@ -94,13 +101,13 @@ class Body(Validator):
 			mappings[k] = Validator(*patterns)
 		if requires and not isinstance(requires, Sequence):
 			requires = [requires]
-		super().__init__(IsDictionary(
-			IsRequiredIn(*requires if requires else [] , error=requiresError),
-			IsMappingOf(mappings if mappings else {}, error=error),
+		super().__init__(IsDataObject(
+			IsRequiredInDataObject(*requires if requires else [] , error=requiresError),
+			IsMappingOfDataObject(mappings if mappings else {}, error=error),
 			error=error,
-		) if required else IsToNone(IsDictionary(
-			IsRequiredIn(*requires if requires else [] , error=requiresError),
-			IsMappingOf(mappings if mappings else {}, error=error),
+		) if required else IsToNone(IsDataObject(
+			IsRequiredInDataObject(*requires if requires else [] , error=requiresError),
+			IsMappingOfDataObject(mappings if mappings else {}, error=error),
 			error=error,
 		)))
 		return
