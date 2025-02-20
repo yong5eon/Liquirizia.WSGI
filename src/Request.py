@@ -23,9 +23,6 @@ class Request(object):
 		uri: str, 
 		parameters: dict = None,
 		headers: dict = None, 
-		body: bytes = None, 
-		format: str = None, 
-		charset: str = None,
 		id: str = None,
 	):
 		self.id = id if id else uuid4().hex
@@ -54,15 +51,6 @@ class Request(object):
 		self.props = {}
 		for k, v in headers.items() if headers else []:
 			self.header(k, v)
-		if body:
-			self.header(
-				'Content-Type',
-				'{}{}'.format(
-					format if format else 'application/octet-stream',
-					'; charset={}'.format(charset) if charset else ''
-				)
-			)
-		self.obj = body
 		self.session = None
 		return
 
@@ -75,7 +63,6 @@ class Request(object):
 			'uri': self.path,
 			'querystring': self.args,
 			'headers': self.props,
-			'body': self.body,
 		})
 
 	def __str__(self) -> str:
@@ -125,10 +112,6 @@ class Request(object):
 	@property
 	def qs(self) -> Optional[object]:
 		return self.args
-
-	@property
-	def body(self) -> Optional[Union[bytes, object]]:
-		return self.obj
 
 	@property
 	def parameters(self) -> Optional[Dict]:

@@ -59,6 +59,7 @@ class RouteRequest(Route, RouteRun):
 		reader: RequestReader,
 		writer: ResponseWriter,
 	):
+		body = {}
 		if request.size:
 			buffer = reader.read(request.size)
 			if not buffer:
@@ -71,8 +72,6 @@ class RouteRequest(Route, RouteRun):
 			parse = self.bodyParsers[request.format]
 			try:
 				body = parse(body)
-				Body = CreateDataClass('Body', body)
-				request.obj = ToDataClass(body, Body)
 			except Exception as e:
 				raise BadRequestError(str(e), error=e)
 
@@ -91,8 +90,7 @@ class RouteRequest(Route, RouteRun):
 			request.args = self.qs(request.args)
 
 		if self.body:
-			request.obj = self.body(request.obj)
-
+			body = self.body(body)
 
 		if self.onRequest:
 			request, response = self.onRequest(request)
@@ -101,7 +99,7 @@ class RouteRequest(Route, RouteRun):
 				return
 
 		obj = self.object(request)
-		response = obj.run()
+		response = obj.run(**body)
 
 		if self.onResponse:
 			response = self.onResponse(response)
