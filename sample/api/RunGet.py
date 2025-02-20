@@ -5,10 +5,9 @@ from Liquirizia.WSGI.Properties import (
 	Parameter,
 	Header,
 	QueryString,
-	Body,
 	RequestRunner,
 )
-from Liquirizia.WSGI import Request, CORS
+from Liquirizia.WSGI import Request, Response, CORS
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import BadRequestError
 from Liquirizia.WSGI.Description import *
