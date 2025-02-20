@@ -101,13 +101,13 @@ class Body(Validator):
 			mappings[k] = Validator(*patterns)
 		if requires and not isinstance(requires, Sequence):
 			requires = [requires]
-		super().__init__(IsDataObject(
-			IsRequiredInDataObject(*requires if requires else [] , error=requiresError),
-			IsMappingOfDataObject(mappings if mappings else {}, error=error),
+		super().__init__(IsDictionary(
+			IsRequiredInDictionary(*requires if requires else [] , error=requiresError),
+			IsMappingOfDictionary(mappings if mappings else {}, error=error),
 			error=error,
 		) if required else IsToNone(IsDataObject(
-			IsRequiredInDataObject(*requires if requires else [] , error=requiresError),
-			IsMappingOfDataObject(mappings if mappings else {}, error=error),
+			IsRequiredInDictionary(*requires if requires else [] , error=requiresError),
+			IsMappingOfDictionary(mappings if mappings else {}, error=error),
 			error=error,
 		)))
 		return

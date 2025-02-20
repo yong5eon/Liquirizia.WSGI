@@ -8,7 +8,7 @@ from Liquirizia.WSGI.Properties import (
 	Body,
 	RequestRunner,
 )
-from Liquirizia.WSGI import Request
+from Liquirizia.WSGI import Request, Response, CORS
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import BadRequestError
 from Liquirizia.WSGI.Description import (
@@ -152,6 +152,10 @@ __all__ = (
 @RequestProperties(
 	method='PUT',
 	url='/api/run/:a/:b',
+	cors=CORS(
+		headers=['X-Token'],
+		exposeHeaders=['X-Refresh-Token'],
+	),
 	parameter=Parameter({
 		'a': (
 			ToInteger(error=BadRequestError('경로 a 는 정수를 필요로 합니다.')), 
@@ -224,13 +228,13 @@ class RunPut(RequestRunner):
 		self.request = request
 		return
 
-	def run(self):
+	def run(self, a: int, b: float) -> Response:
 		return ResponseJSON({
 			'status': 200,
 			'message': 'OK',
 			'data': {
 				'message': self.request.qs.c,
-				'res': self.request.parameters.a * self.request.qs.a + self.request.parameters.b * self.request.qs.b * self.request.body.a * self.request.body.b
+				'res': (self.request.parameters.a * self.request.qs.a + self.request.parameters.b * self.request.qs.b) * (a * b)
 			},
 		},
 		headers={
