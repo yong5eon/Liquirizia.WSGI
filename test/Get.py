@@ -14,6 +14,8 @@ from Liquirizia.WSGI.Responses import *
 
 from Liquirizia.WSGI.Test import TestRequest
 
+from dataclasses import asdict
+
 
 @RequestProperties(
 	method='GET',
@@ -24,7 +26,7 @@ class RunGet(RequestRunner):
 		self.request = request
 		return
 	def run(self) -> Response:
-		return ResponseJSON(self.request.qs)
+		return ResponseJSON(asdict(self.request.qs))
 
 
 class TestGet(Case):

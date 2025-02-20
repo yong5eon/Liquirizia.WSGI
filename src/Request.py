@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from .Utils import ParseHeader
+from Liquirizia.Utils.Dictionary import CreateDataClass, ToDataClass
 
 from urllib.parse import parse_qs, unquote, urlencode
 from uuid import uuid4
-from typing import Any, Optional, Dict, List
+from typing import Any, Optional, Dict, List, Union
 
 __all__ = (
 	'Request'
@@ -20,7 +21,7 @@ class Request(object):
 		port: int,
 		method: str, 
 		uri: str, 
-		parameters: dict,
+		parameters: dict = None,
 		headers: dict = None, 
 		body: bytes = None, 
 		format: str = None, 
@@ -31,19 +32,25 @@ class Request(object):
 		self.address = address
 		self.port = port
 		self.method = method
-		self.params = parameters
 		self.path, *querystring = uri.split('?', 1)
-		querystring = querystring[0] if len(querystring) else None
-		self.args = parse_qs(unquote(querystring), keep_blank_values=True) if querystring else {}
-		for k, v in self.args.items():
+		if parameters:
+			Parameters = CreateDataClass('Parameters', parameters)
+			self.params = ToDataClass(parameters, Parameters)
+		else:
+			self.params = None
+		self.qs_ = querystring[0] if len(querystring) else None
+		args = parse_qs(unquote(self.qs_), keep_blank_values=True) if self.qs_ else {}
+		for k, v in args.items():
 			if len(v) == 0:
-				self.args[k] = None
+				args[k] = None
 			elif len(v) == 1:
-				self.args[k] = v[0] if len(v[0]) else None
+				args[k] = v[0] if len(v[0]) else None
 			else:
 				for i, o in enumerate(v):
 					v[i] = o if len(o) else None
-				self.args[k] = v
+				args[k] = v
+		Querystring = CreateDataClass('Querystring', args)
+		self.args = ToDataClass(args, Querystring)
 		self.props = {}
 		for k, v in headers.items() if headers else []:
 			self.header(k, v)
@@ -95,9 +102,7 @@ class Request(object):
 
 	@property
 	def querystring(self):
-		if self.args and len(self.args.items()):
-			return urlencode(self.args)
-		return None
+		return self.qs_
 
 	@property
 	def size(self) -> int:
@@ -118,25 +123,13 @@ class Request(object):
 		return _.charset
 
 	@property
-	def qs(self) -> Dict:
+	def qs(self) -> Optional[object]:
 		return self.args
 
-	@qs.setter
-	def qs(self, args):
-		if not isinstance(args, dict):
-			raise RuntimeError('querystring must be dict')
-		self.args = args
-		return
-
 	@property
-	def body(self) -> Optional[bytes]:
+	def body(self) -> Optional[Union[bytes, object]]:
 		return self.obj
 
-	@body.setter
-	def body(self, body):
-		self.obj = body
-		return
-	
 	@property
 	def parameters(self) -> Optional[Dict]:
 		return self.params

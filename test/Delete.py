@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.Test import *
+from Liquirizia.WSGI.Test import TestRequest
 
 from Liquirizia.WSGI import (
 		Application, 
 		Configuration,
 		CORS,
 )
-
 from Liquirizia.WSGI import Request, Response
 from Liquirizia.WSGI.Properties import RequestRunner, RequestProperties
 from Liquirizia.WSGI.Responses import *
 
-from Liquirizia.WSGI.Test import TestRequest
-
 from Liquirizia.Serializer import SerializerHelper
+
+from dataclasses import asdict
 
 
 @RequestProperties(
@@ -30,8 +30,8 @@ class RunDelete(RequestRunner):
 		return
 	def run(self) -> Response:
 		return ResponseJSON({
-			'qs': self.request.qs,
-			'body': self.request.body,
+			'qs': asdict(self.request.qs),
+			'body': asdict(self.request.body),
 		})
 
 

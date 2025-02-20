@@ -61,7 +61,7 @@ class RouteRequestWebSocket(Route, RouteRun):
 				request.header(k, v)
 
 		if self.qs:
-			request.qs = self.qs(request.qs)
+			request.args = self.qs(request.args)
 
 		obj = self.object(request)
 		if request.header('Sec-WebSocket-Protocol') and not obj.switch(request.header('Sec-WebSocket-Protocol')):
