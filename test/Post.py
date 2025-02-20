@@ -29,10 +29,10 @@ class RunPost(RequestRunner):
 	def __init__(self, request: Request):
 		self.request = request
 		return
-	def run(self) -> Response:
+	def run(self, **kwargs) -> Response:
 		return ResponseJSON({
 			'qs': asdict(self.request.qs),
-			'body': asdict(self.request.body),
+			'body': kwargs,
 		})
 
 
