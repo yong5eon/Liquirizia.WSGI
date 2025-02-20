@@ -141,14 +141,14 @@ __all__ = (
 	qs=QueryString(
 		mappings={
 			'a': (
-				ToInteger(),
+				ToInteger(error=BadRequestError('a 는 정수를 필요로 합니다')),
 				IsInteger(
 					IsGreaterThan(5, error=BadRequestError('a 는 5보다 커야 합니다')),
 					error=BadRequestError('c는 정수를 필요로 합니다.')
 				),
 			),
 			'b': (
-				ToFloat(),
+				ToFloat(error=BadRequestError('b 는 실수(부동 소수점)을 필요로 합니다')),
 				IsFloat(
 					IsGreaterThan(9, error=BadRequestError('b 는 9보다 커야 합니다')),
 					error=BadRequestError('b는 실수(부동 소수점)을 필요로 합니다')
@@ -174,8 +174,8 @@ class RunGet(RequestRunner):
 			'status': 200,
 			'message': 'OK',
 			'data': {
-				'message': self.request.qs['c'],
-				'res': self.request.parameters['a'] * self.request.qs['a'] + self.request.parameters['b'] * self.request.qs['b'] 
+				'message': self.request.qs.c,
+				'res': self.request.parameters.a * self.request.qs.a + self.request.parameters.b * self.request.qs.b 
 			},
 		},
 		headers={
