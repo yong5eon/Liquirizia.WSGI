@@ -12,10 +12,9 @@ from ..Parser import Parser
 from ..CORS import CORS
 from ..Errors import BadRequestError, UnsupportedMediaTypeError
 
-from Liquirizia.Serializer import SerializerHelper
-from Liquirizia.Serializer.Errors import NotSupportedError, DecodeError
 from Liquirizia.Validator import Validator
-from Liquirizia.Utils.Dictionary import CreateDataClass, ToDataClass
+
+from collections.abc import Mapping, Sequence
 
 from typing import Type, Dict
 
@@ -35,8 +34,8 @@ class RouteRequest(Route, RouteRun):
 		parameter: Validator = None,
 		header: Validator = None,
 		qs: Validator = None,
-		body: Validator = None,
-		bodyParsers: Dict[str, Parser] = {},
+		content: Validator = None,
+		contentParsers: Dict[str, Parser] = {},
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
 		cors=CORS(),
@@ -48,9 +47,9 @@ class RouteRequest(Route, RouteRun):
 		self.header = header
 		self.parameter = parameter
 		self.qs = qs
-		self.body = body
-		self.bodyParsers = {}
-		for k, v in bodyParsers.items() if bodyParsers else {}: self.bodyParsers[k.lower()] = v
+		self.content = content
+		self.contentParsers = {}
+		for k, v in contentParsers.items() if contentParsers else {}: self.contentParsers[k.lower()] = v
 		return
 
 	def run(
@@ -59,19 +58,19 @@ class RouteRequest(Route, RouteRun):
 		reader: RequestReader,
 		writer: ResponseWriter,
 	):
-		body = {}
+		content = None
 		if request.size:
 			buffer = reader.read(request.size)
 			if not buffer:
 				raise BadRequestError('body is empty')
-			body = buffer.decode(request.charset if request.charset else 'utf-8')
+			content = buffer.decode(request.charset if request.charset else 'utf-8')
 			if not request.format:
 				raise BadRequestError('content-type header is required')
-			if request.format.lower() not in self.bodyParsers.keys():
+			if request.format.lower() not in self.contentParsers.keys():
 				raise UnsupportedMediaTypeError('{} is not supported media type'.format(request.format))
-			parse = self.bodyParsers[request.format]
+			parse = self.contentParsers[request.format]
 			try:
-				body = parse(body)
+				content = parse(content)
 			except Exception as e:
 				raise BadRequestError(str(e), error=e)
 
@@ -89,8 +88,8 @@ class RouteRequest(Route, RouteRun):
 		if self.qs:
 			request.args = self.qs(request.args)
 
-		if self.body:
-			body = self.body(body)
+		if self.content:
+			content = self.content(content)
 
 		if self.onRequest:
 			request, response = self.onRequest(request)
@@ -99,7 +98,18 @@ class RouteRequest(Route, RouteRun):
 				return
 
 		obj = self.object(request)
-		response = obj.run(**body)
+		response = None
+		if content:
+			if isinstance(content, Mapping):
+				response = obj.run(**content)
+			elif not isinstance(content, (str, bytes)) and isinstance(content, Sequence):
+				response = obj.run(*content)
+			else:
+				response = obj.run(content)
+		else:
+			response = obj.run()
+		if not response:
+			raise RuntimeError('{} must be return Response in run'.format(obj.__class__.__name__))
 
 		if self.onResponse:
 			response = self.onResponse(response)
