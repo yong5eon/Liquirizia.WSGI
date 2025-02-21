@@ -5,6 +5,11 @@ from Liquirizia.Validator.Patterns import (
 	IsToNone,
 	IsDataObject,
 	IsDictionary,
+	IsArray,
+	IsString,
+	IsFloat,
+	IsInteger,
+	IsBool,
 )
 from Liquirizia.Validator.Patterns.DataObject import (
 	IsRequiredIn as IsRequiredInDataObject,
@@ -16,13 +21,19 @@ from Liquirizia.Validator.Patterns.Dictionary import (
 )
 
 from ..Error import Error
-from typing import Dict, Sequence, Union
+from typing import Dict, Sequence, Union, Iterable
 
 __all__ = (
 	'Parameter',
 	'Header',
 	'QueryString',
-	'Body',
+	'Content',
+	'Boolean',
+	'Integer',
+	'Number',
+	'String',
+	'Array',
+	'Object',
 )
 
 
@@ -86,8 +97,84 @@ class QueryString(Validator):
 		return
 
 
-class Body(Validator):
-	"""Body Validator"""
+class Content(Validator):
+	"""Content Validator"""
+	def __init__(
+		self,
+		pattern: Pattern,
+	):
+		super().__init__(pattern)
+		return
+
+
+class Boolean(Content):
+	"""Boolean Body Validator"""
+	def __init__(
+		self,
+		*patterns: Iterable[Pattern],
+		required: bool = True,
+		error: Error = None,
+	):
+		super().__init__(IsBool(*patterns, error=error) if required else IsToNone(IsBool(*patterns, error=error)))
+		return
+
+
+class Integer(Content):
+	"""Integer Body Validator"""
+	def __init__(
+		self,
+		*patterns: Iterable[Pattern],
+		required: bool = True,
+		error: Error = None,
+	):
+		super().__init__(IsInteger(*patterns, error=error) if required else IsToNone(IsInteger(*patterns, error=error)))
+		return
+
+
+class Number(Content):
+	"""Number Body Validator"""
+	def __init__(
+		self,
+		*patterns: Iterable[Pattern],
+		required: bool = True,
+		error: Error = None,
+	):
+		super().__init__(IsFloat(*patterns, error=error) if required else IsToNone(IsFloat(*patterns, error=error)))
+		return
+
+
+class String(Content):
+	"""String Body Validator"""
+	def __init__(
+		self,
+		*patterns: Iterable[Pattern],
+		required: bool = True,
+		error: Error = None,
+	):
+		super().__init__(IsString(*patterns, error=error) if required else IsToNone(IsString(*patterns, error=error)))
+		return
+
+
+class Array(Content):
+	"""Array Body Validator"""
+	def __init__(
+		self,
+		*patterns: Iterable[Pattern],
+		required: bool = True,
+		error: Error = None,
+	):
+		super().__init__(IsArray(
+			*patterns,
+			error=error,
+		) if required else IsToNone(IsArray(
+			*patterns,
+			error=error,
+		)))
+		return
+
+
+class Object(Content):
+	"""Parameters(Dictionary) Body Validator"""
 	def __init__(
 		self,
 		mappings: Dict[str, Union[Pattern, Sequence[Pattern]]] = None,

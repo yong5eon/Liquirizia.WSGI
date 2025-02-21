@@ -2,20 +2,19 @@
 
 from Liquirizia.WSGI.Properties import (
 	RequestProperties,
-	Parameter,
-	Header,
-	QueryString,
-	Body,
-	RequestRunner,
+	Parameter as ParameterValidator,
+	QueryString as QueryStringValidator,
+	Header as HeaderValidator,
+	Object as ObjectValidator,
 	RequestRunner,
 )
-from Liquirizia.WSGI import Request, Response, CORS
+from Liquirizia.WSGI import Request, CORS
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import BadRequestError
 from Liquirizia.WSGI.Description import (
 	RequestDescription,
-	Body as RequestBodyDescription,
-	Response as ResponseDescription,
+	Body,
+	Response,
 	Content,
 	Object,
 	ObjectProperties,
@@ -70,7 +69,7 @@ __all__ = (
 			required=False,
 		)
 	},
-	body=RequestBodyDescription(
+	body=Body(
 		content=(
 			Content(
 				format='application/json',
@@ -98,7 +97,7 @@ __all__ = (
 		),
 	),
 	responses=(
-		ResponseDescription(
+		Response(
 			status=200,
 			description='완료',
 			content=Content(
@@ -130,7 +129,7 @@ __all__ = (
 				'X-Refresh-Token': String(description='리프레시 토큰')
 			}
 		),
-		ResponseDescription(
+		Response(
 			status=400,
 			description='잘못된 요청',
 			content=Content(
@@ -156,7 +155,7 @@ __all__ = (
 		headers=['X-Token'],
 		exposeHeaders=['X-Refresh-Token'],
 	),
-	parameter=Parameter({
+	parameter=ParameterValidator({
 		'a': (
 			ToInteger(error=BadRequestError('경로 a 는 정수를 필요로 합니다.')), 
 			IsInteger(
@@ -172,11 +171,11 @@ __all__ = (
 			),
 		),
 	}),
-	header=Header(
+	header=HeaderValidator(
 		requires=('X-Token',),
 		requiresError=BadRequestError('헤더에 X-Token 값을 필요로 합니다.'),
 	),
-	qs=QueryString(
+	qs=QueryStringValidator(
 		mappings={
 			'a': (
 				ToInteger(error=BadRequestError('a는 정수를 필요로 합니다')),
@@ -201,7 +200,7 @@ __all__ = (
 		requiresError=BadRequestError('질의에 a 와 b 는 필수 입니다.'),
 		error=BadRequestError('질의를 필요로 합니다.')
 	),
-	body=Body(
+	content=ObjectValidator(
 		mappings={
 			'a': (
 				ToInteger(error=BadRequestError('a는 정수를 필요로 합니다')),
@@ -228,13 +227,26 @@ class RunPost(RequestRunner):
 		self.request = request
 		return
 
-	def run(self, a: int, b: float) -> Response:
+	def run(self, a: int, b: float):
 		return ResponseJSON({
 			'status': 200,
 			'message': 'OK',
 			'data': {
 				'message': self.request.qs.c,
-				'res': (self.request.parameters.a * self.request.qs.a + self.request.parameters.b * self.request.qs.b) + (a * b)
+				'res': {
+					'parameters': {
+						'a': self.request.parameters.a,
+						'b': self.request.parameters.b,
+					},
+					'qs': {
+						'a': self.request.qs.a,
+						'b': self.request.qs.b,
+					},
+					'content': {
+						'a': a,
+						'b': b,
+					}
+				}
 			},
 		},
 		headers={

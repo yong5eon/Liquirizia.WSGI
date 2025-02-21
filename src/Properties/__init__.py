@@ -5,27 +5,24 @@ from .RequestStreamRunner import RequestStreamRunner
 from .RequestServerSentEventsRunner import RequestServerSentEventsRunner
 from .RequestWebSocketRunner import RequestWebSocketRunner
 from .Properties import Properties
+from .RequestProperties import (
+	RequestProperties,
+	RequestStreamProperties,
+	RequestServerSentEventsProperties,
+	RequestWebSocketProperties,
+)
 from .Validator import (
 	Parameter,
 	Header,
 	QueryString,
-	Body,
+	Content,
+	Boolean,
+	Integer,
+	Number,
+	String,
+	Array,
+	Object,
 )
-
-from ..Router import Router
-from ..Routes import *
-from ..Filters import (
-	RequestFilter,
-	ResponseFilter,
-)
-from ..Parser import (
-	Parser,
-	FormUrlEncodedParser,
-	JavaScriptObjectNotationParser,
-)
-from ..CORS import CORS
-
-from typing import Type, Dict
 
 __all__ = (
 	'RequestRunner',
@@ -37,174 +34,14 @@ __all__ = (
 	'RequestServerSentEventsProperties',
 	'RequestWebSocketProperties',
 	'Properties',
-	'Paramter',
+	'Parameter',
 	'Header',
 	'QueryString',
-	'Body',
+	'Content',
+	'Boolean',
+	'Integer',
+	'Number',
+	'String',
+	'Array',
+	'Object',
 )
-
-
-class RequestProperties(object):
-	"""Request Properties Decorator Class for RequestRunner"""
-	def __init__(
-		self,
-		method: str,
-		url: str,
-		cors: CORS = CORS(),
-		parameter: Parameter = None,
-		header: Header = None,
-		qs: QueryString = None,
-		body: Body = None,
-		bodyParsers: Dict[str, Parser] = {
-			'application/x-www-form-urlencoded': FormUrlEncodedParser(),
-			'application/x-www-form': FormUrlEncodedParser(),
-			'form-urlencoded': FormUrlEncodedParser(),
-			'form': FormUrlEncodedParser(),
-			'application/json': JavaScriptObjectNotationParser(),
-			'json': JavaScriptObjectNotationParser(),
-		},
-		onRequest: RequestFilter = None,
-		onResponse : ResponseFilter = None,
-	):
-		self.method = method
-		self.url = url
-		self.cors = cors
-		self.parameter = parameter
-		self.header = header
-		self.qs = qs
-		self.body = body
-		self.bodyParsers = bodyParsers
-		self.onRequest = onRequest
-		self.onResponse = onResponse
-		return
-	
-	def __call__(self, obj: Type[RequestRunner]):
-		obj.__properties__ = Properties(
-			method=self.method,
-			url=self.url,
-		)
-		router = Router()
-		router.add(RouteRequest(
-			obj=obj,
-			method=self.method,
-			url=self.url,
-			cors=self.cors,
-			parameter=self.parameter,
-			header=self.header,
-			qs=self.qs,
-			body=self.body,
-			bodyParsers=self.bodyParsers,
-			onRequest=self.onRequest,
-			onResponse=self.onResponse,
-		))
-		return obj
-
-
-class RequestStreamProperties(object):
-	"""Request Properties Decorator Class for RequestStreamRunner"""
-	def __init__(
-		self,
-		method: str,
-		url: str,
-		cors: CORS = CORS(),
-		parameter: Parameter = None,
-		header: Header = None,
-		qs: QueryString = None,
-	):
-		self.method = method
-		self.url = url
-		self.cors = cors
-		self.parameter = parameter
-		self.header = header
-		self.qs = qs
-		return
-	
-	def __call__(self, obj: Type[RequestStreamRunner]):
-		obj.__properties__ = Properties(
-			method=self.method,
-			url=self.url,
-		)
-		router = Router()
-		router.add(RouteRequestStream(
-			obj=obj,
-			method=self.method,
-			url=self.url,
-			cors=self.cors,
-			parameter=self.parameter,
-			header=self.header,
-			qs=self.qs,
-		))
-		return obj
-
-class RequestServerSentEventsProperties(object):
-	"""Request Properties Decorator Class for RequestServerSentEventsRunner"""
-	def __init__(
-		self,
-		method: str,
-		url: str,
-		cors: CORS = CORS(),
-		parameter: Parameter = None,
-		header: Header = None,
-		qs: QueryString = None,
-	):
-		self.method = method
-		self.url = url
-		self.cors = cors
-		self.parameter = parameter
-		self.header = header
-		self.qs = qs
-		return
-	
-	def __call__(self, obj: Type[RequestServerSentEventsRunner]):
-		obj.__properties__ = Properties(
-			method=self.method,
-			url=self.url,
-		)
-		router = Router()
-		router.add(RouteRequestServerSentEvents(
-			obj=obj,
-			method=self.method,
-			url=self.url,
-			cors=self.cors,
-			parameter=self.parameter,
-			header=self.header,
-			qs=self.qs,
-		))
-		return obj
-
-
-class RequestWebSocketProperties(object):
-	"""Request Properties Decorator Class for RequestWebSocketRunner"""
-	def __init__(
-		self,
-		method: str,
-		url: str,
-		cors: CORS = CORS(),
-		parameter: Parameter = None,
-		header: Header = None,
-		qs: QueryString = None,
-	):
-		self.method = method
-		self.url = url
-		self.cors = cors
-		self.parameter = parameter
-		self.header = header
-		self.qs = qs
-		return
-	
-	def __call__(self, obj: Type[RequestWebSocketRunner]):
-		obj.__properties__ = Properties(
-			method=self.method,
-			url=self.url,
-		)
-		router = Router()
-		router.add(RouteRequestWebSocket(
-			obj=obj,
-			url=self.url,
-			cors=self.cors,
-			parameter=self.parameter,
-			header=self.header,
-			qs=self.qs,
-		))
-		return obj
-

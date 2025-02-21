@@ -22,5 +22,5 @@ class RequestRunner(metaclass=ABCMeta):
 		raise NotImplementedError('{} must be implemented __init__'.format(self.__class__.__name__))
 
 	@abstractmethod
-	def run(self, **kwargs) -> Response:
+	def run(self, *args, **kwargs) -> Response:
 		raise NotImplementedError('{} must be implemented run'.format(self.__class__.__name__))

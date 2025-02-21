@@ -3,8 +3,8 @@
 from Liquirizia.WSGI.Properties import (
 	RequestProperties,
 	Parameter,
-	Header,
 	QueryString,
+	Header,
 	RequestRunner,
 )
 from Liquirizia.WSGI import Request, Response, CORS
@@ -174,7 +174,16 @@ class RunGet(RequestRunner):
 			'message': 'OK',
 			'data': {
 				'message': self.request.qs.c,
-				'res': self.request.parameters.a * self.request.qs.a + self.request.parameters.b * self.request.qs.b 
+				'res': {
+					'parameters': {
+						'a': self.request.parameters.a,
+						'b': self.request.parameters.b,
+					},
+					'qs': {
+						'a': self.request.qs.a,
+						'b': self.request.qs.b,
+					},
+				}
 			},
 		},
 		headers={
