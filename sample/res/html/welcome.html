@@ -61,6 +61,53 @@
 			</blockquote>
 		</div>
 		<div class="container">
+			<h2>요청 컨텐츠 검증 테스트</h2>
+			<h3>URL 패턴: <span>/api/run/${TYPE}</span></h3>
+			<form id="frm-test-2">
+				<div class="form-group row">
+					<label class="col-form-label col-3 text-right">켄텐츠 유형</label>
+					<div class="col-9">
+						<select class="form-control" name="content">
+							<option selected></option>
+							<option value="bool">Boolean</option>
+							<option value="integer">Integer</option>
+							<option value="number">Number</option>
+							<option value="string">String</option>
+							<option value="array">Array</option>
+							<option value="object">Object</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label class="col-form-label col-3 text-right">본문 유형</label>
+					<div class="col-9">
+						<select class="form-control" name="type">
+							<option selected></option>
+							<option value="text/plain; charset=utf-8">Text</option>
+							<option value="application/x-www-form-urlencoded; charset=utf-8">Form-UrlEncoded</option>
+							<option value="application/json; charset=utf-8">JavaScriptObjectNotation</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label class="col-form-label col-3 text-right">본문</label>
+					<div class="col-9">
+						<input class="form-control" type="text" name="body"/>
+					</div>
+				</div>
+				<div class="form-group row">
+					<div class="col-12">
+						<button class="btn btn-primary btn-sm btn-block" type="button">테스트</button>
+					</div>
+				</div>
+			</form>
+			<h3>결과</h3>
+			<blockquote class="blockquote" id="frm-test-2-result">
+				<p class="mb-0"></p>
+				<pre class="mb-0"></pre>
+			</blockquote>
+		</div>
+		<div class="container">
 			<h2>스트림 출력 테스트</h2>
 			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestStreamOut">테스트</button>
 			<blockquote class="blockquote" id="frmTestStreamOutResult">
@@ -127,6 +174,30 @@
 					$('#frm-test-result p').text(response.status + ' ' + response.statusText)
 					response.text().then(function(data) {
 						$('#frm-test-result pre').text(data);
+					});
+				}).catch(function(error) {
+					console.log(error);
+				});
+			});
+			$('form[id=frm-test-2] button').click(function(e) {
+				content = $('form[id=frm-test-2] select[name=content]').val()
+				if(!content)
+					return;
+				type = $('form[id=frm-test-2] select[name=type]').val()
+				body = $('form[id=frm-test-2] input[name=body]').val()
+				const options = {
+					method: 'POST',
+					headers: {
+						'Content-Type': type,
+					},
+					body: body
+				};
+				let url = '/api/content/' + content;
+				console.log(options);
+				fetch(url, options).then(function(response) {
+					$('#frm-test-2-result p').text(response.status + ' ' + response.statusText)
+					response.text().then(function(data) {
+						$('#frm-test-2-result pre').text(data);
 					});
 				}).catch(function(error) {
 					console.log(error);
