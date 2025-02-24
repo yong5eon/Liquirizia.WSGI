@@ -12,7 +12,11 @@ from .Routes import (
 	RouteRequestWebSocket,
 	RouteRequestServerSentEvents,
 )
-
+from .Parser import (
+	Parser,
+	FormUrlEncodedParser,
+	JavaScriptObjectNotationParser,
+)
 from .Properties import (
 	RequestRunner,
 	RequestStreamRunner,
@@ -257,6 +261,14 @@ class Application(object):
 		header: Validator = None,
 		qs: Validator = None,
 		content: Validator = None,
+		contentParsers: Dict[str, Parser] = {
+			'application/x-www-form-urlencoded': FormUrlEncodedParser(),
+			'application/x-www-form': FormUrlEncodedParser(),
+			'form-urlencoded': FormUrlEncodedParser(),
+			'form': FormUrlEncodedParser(),
+			'application/json': JavaScriptObjectNotationParser(),
+			'json': JavaScriptObjectNotationParser(),
+		},
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
 		cors: CORS = CORS(),
@@ -269,6 +281,7 @@ class Application(object):
 			header=header,
 			qs=qs,
 			content=content,
+			contentParsers=contentParsers,
 			onRequest=onRequest,
 			onResponse=onResponse,
 			cors=cors,
