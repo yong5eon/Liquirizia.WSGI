@@ -37,10 +37,11 @@ from .Auth import (
 	OpenIdConnect,
 )
 from .Documentation import (
-	Information,
-	Contact,
 	Document,
 	Path,
+	Information,
+	Contact,
+	License,
 )
 
 from typing import Type, Union, Optional, Sequence, Dict
@@ -76,10 +77,11 @@ __all__ = (
 	'TLS',
 	'OpenIdConnect',
 	# Documentation
+	'Document',
+	'Path',
 	'Information',
 	'Contact',
-	'Path',
-	'Document',
+	'License',
 )
 
 
