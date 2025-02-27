@@ -86,6 +86,7 @@ class Description(object):
 		responses: Optional[Union[Response,Sequence[Response]]] = None,
 		auth: Auth = None,
 		tags: Optional[Union[str, Sequence[str]]] = None,
+		order: Union[int, float, str] = 0,	
 	):
 		self.summary = summary
 		self.description = description
@@ -102,4 +103,5 @@ class Description(object):
 		if self.tags:
 			if isinstance(self.tags, str):
 				self.tags = [self.tags]
+		self.order = order
 		return

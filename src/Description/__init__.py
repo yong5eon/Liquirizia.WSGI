@@ -42,6 +42,7 @@ from .Documentation import (
 	Information,
 	Contact,
 	License,
+	Tag,
 )
 
 from typing import Type, Union, Optional, Sequence, Dict
@@ -82,6 +83,7 @@ __all__ = (
 	'Information',
 	'Contact',
 	'License',
+	'Tag',
 )
 
 
@@ -97,6 +99,7 @@ class RequestDescription(object):
 		responses: Optional[Union[Response,Sequence[Response]]] = None,
 		auth: Auth = None,
 		tags: Optional[Union[str, Sequence[str]]] = None,
+		order: Union[int, float, str] = 0,
 	):
 		self.description = Description(
 			summary=summary,
@@ -107,7 +110,8 @@ class RequestDescription(object):
 			body=body,
 			responses=responses,
 			auth=auth,
-			tags=tags
+			tags=tags,
+			order=order,
 		)
 		return
 	def __call__(

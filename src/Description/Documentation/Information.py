@@ -6,6 +6,7 @@ __all__ = (
 	'Information',
 	'Contact',
 	'License',
+	'Tag',
 )
 
 
@@ -56,4 +57,17 @@ class Information(Documentation):
 		if tos: self.__document__['termsOfService'] = tos
 		if contact: self.__document__['contact'] = contact
 		if license: self.__document__['license'] = license
+		return
+
+
+class Tag(Documentation):
+	def __init__(
+		self,
+		name: str,
+		description: str = None,
+	):
+		super().__init__(
+			name=name,
+		)
+		if description: self.__document__['description'] = description
 		return

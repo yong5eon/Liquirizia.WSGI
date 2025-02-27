@@ -4,6 +4,7 @@ from .Documentation import Documentation
 
 from .Information import (
 	Information,
+	Tag,
 )
 
 from ..Description import (
@@ -15,7 +16,7 @@ from ..Types import Value
 
 from uuid import uuid4
 
-from typing import Mapping, Optional
+from typing import Mapping, Optional, Sequence 
 
 __all__ = (
 	'Document',
@@ -157,6 +158,7 @@ class Document(Documentation):
 		version='3.1.0',
 		routes: Optional[Mapping[str, Mapping[str, Path]]] = None,
 		authenticates: Optional[Mapping[str, Mapping]]= None,
+		tags: Optional[Sequence[Tag]] = None,
 	):
 		self.__document__ = {
 			'openapi': version,
@@ -165,5 +167,7 @@ class Document(Documentation):
 		}
 		if routes:
 			self.__document__['paths'] = routes
+		if tags:
+			self.__document__['tags'] = tags
 		self.__document__['components']['securitySchemes'] = authenticates
 		return
