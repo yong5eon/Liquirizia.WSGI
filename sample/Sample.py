@@ -12,7 +12,7 @@ from Liquirizia.WSGI import (
 )
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Filters import RequestFilters
-from Liquirizia.WSGI.Description import Descriptor, Information, Contact
+from Liquirizia.WSGI.Description import Descriptor, Information, Contact, Tag
 
 from Liquirizia.FileSystemObject import Helper as FileSystemObjectHelper
 from Liquirizia.FileSystemObject.Implements.FileSystem import (
@@ -156,7 +156,14 @@ from swagger_ui import api_doc
 
 api_doc(
 	aps,
-	config=Descriptor().toDocument(),
+	config=Descriptor().toDocument(tags=(
+		Tag('RequestRunner'),
+		Tag('RequestRunner - Content Validation'),
+		Tag('RequestStreamRunner'),
+		Tag('RequestStreamRunner - Chunked'),
+		Tag('RequestServerSentEventsRunner'),
+		Tag('RequestWebSocketRunner'),
+	)),
 	url_prefix='/doc',
 	title='Liquirizia.WSGI Sample API',
 )

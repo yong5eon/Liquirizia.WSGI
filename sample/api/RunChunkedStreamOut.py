@@ -19,7 +19,7 @@ __all__ = (
 @RequestDescription(
 	summary='청크드 출력 스트림 샘플',
 	description='1초 간격으로 0에서 9까지 송출',
-	tags='RequestStreamRunner',
+	tags='RequestStreamRunner - Chunked',
 	responses=(
 		Response(
 			status=200,

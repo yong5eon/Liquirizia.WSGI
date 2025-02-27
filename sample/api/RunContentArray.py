@@ -28,7 +28,7 @@ __all__ = (
 @RequestDescription(
 	summary='컨텐츠 검증 샘플 - 배열',
 	description='컨텐츠 검증 샘플 - 배열',
-	tags='RequestRunner - Content',
+	tags='RequestRunner - Content Validation',
 	body=Body(
 		content=(
 			Content(
