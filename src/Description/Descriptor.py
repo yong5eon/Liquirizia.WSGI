@@ -54,8 +54,12 @@ class Descriptor(Singleton):
 		regex = compile(r':(\w+)')
 		url = regex.sub(r"{\1}", obj.__properties__.url)
 		if url not in self.maps:
-			self.maps[url] = {}
-		self.maps[url][(obj.__properties__.method.lower(), description.order)] = (PathInformation(description), description.order)
+			self.maps[url] = []
+		self.maps[url].append((
+			obj.__properties__.method.lower(),
+			description.order,
+			PathInformation(description),
+		))
 		if description.auth:
 			if description.auth.name not in self.authes.keys():
 				self.authes[description.auth.name] = description.auth.format
@@ -66,9 +70,13 @@ class Descriptor(Singleton):
 		return self
 
 	def toDocument(self, tags: Sequence[Tag] = None) -> Document:
-		_ = {}
-		# TODO : Build Ordered Path
-		return Document(info=self.infomation, version=self.version, routes=_, authenticates=self.authes, tags=tags)
+		_ = []
+		for k, paths in sorted(self.maps.items(), key=lambda x: x[1][0][1]):
+			ps = {}
+			for method, order, path in sorted(paths, key=lambda x: x[1]):
+				ps[method] = path
+			_.append((k, ps))
+		return Document(info=self.infomation, version=self.version, routes=OrderedDict(_), authenticates=self.authes, tags=tags)
 
 	def load(self, mod: str = None, path: str = None, ext: str = 'py'):
 		if mod:
