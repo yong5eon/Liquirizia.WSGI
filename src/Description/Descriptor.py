@@ -41,22 +41,14 @@ class Descriptor(Singleton):
 		return
 	def add(
 		self,
-		obj: Type[Union[
-			RequestRunner,
-			RequestStreamRunner,
-			RequestServerSentEventsRunner,
-			RequestWebSocketRunner,
-		]],
 		description: Description,
 	) -> 'Descriptor':
-		if not obj.__properties__:
-			raise RuntimeError('{} must be decorated with RequestProperties'.format(obj.__name__))
 		regex = compile(r':(\w+)')
-		url = regex.sub(r"{\1}", obj.__properties__.url)
+		url = regex.sub(r"{\1}", description.url)
 		if url not in self.maps:
 			self.maps[url] = []
 		self.maps[url].append((
-			obj.__properties__.method.lower(),
+			description.method.lower(),
 			description.order,
 			PathInformation(description),
 		))

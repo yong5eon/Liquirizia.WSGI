@@ -79,29 +79,33 @@ class Description(object):
 		self,
 		summary: str,
 		description: str,
+		tags: Optional[Union[str, Sequence[str]]] = None,
+		method: str = None,
+		url: str = None,
 		parameters: Optional[Dict[str, Value]] = None,
 		headers: Optional[Dict[str, Value]] = None,
 		qs: Optional[Dict[str, Value]] = None,
 		body: Body = None,
 		responses: Optional[Union[Response,Sequence[Response]]] = None,
 		auth: Auth = None,
-		tags: Optional[Union[str, Sequence[str]]] = None,
 		order: Union[int, float, str] = 0,	
 	):
 		self.summary = summary
 		self.description = description
-		self.responses = responses
-		if self.responses:
-			if not isinstance(self.responses, Sequence):
-				self.responses = [self.responses]
-		self.parameters = parameters
-		self.headers = headers
-		self.qs = qs
-		self.body = body
-		self.auth = auth
 		self.tags = tags
 		if self.tags:
 			if isinstance(self.tags, str):
 				self.tags = [self.tags]
+		self.method = method
+		self.url = url
+		self.parameters = parameters
+		self.headers = headers
+		self.qs = qs
+		self.body = body
+		self.responses = responses
+		if self.responses:
+			if not isinstance(self.responses, Sequence):
+				self.responses = [self.responses]
+		self.auth = auth
 		self.order = order
 		return

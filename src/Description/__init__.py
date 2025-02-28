@@ -92,25 +92,29 @@ class RequestDescription(object):
 		self,
 		summary: str,
 		description: str,
+		tags: Optional[Union[str, Sequence[str]]] = None,
+		method: str = None,
+		url: str = None,
 		parameters: Optional[Dict[str, Value]] = None,
 		headers: Optional[Dict[str, Value]] = None,
 		qs: Optional[Dict[str, Value]] = None,
 		body: Body = None,
 		responses: Optional[Union[Response,Sequence[Response]]] = None,
 		auth: Auth = None,
-		tags: Optional[Union[str, Sequence[str]]] = None,
 		order: Union[int, float, str] = 0,
 	):
 		self.description = Description(
 			summary=summary,
 			description=description,
+			tags=tags,
+			method=method,
+			url=url,
 			parameters=parameters,
 			headers=headers,
 			qs=qs,
 			body=body,
 			responses=responses,
 			auth=auth,
-			tags=tags,
 			order=order,
 		)
 		return
@@ -122,9 +126,13 @@ class RequestDescription(object):
 			RequestServerSentEventsRunner,
 			RequestWebSocketRunner
 		]]):
+		if not self.description.method or not self.description.url:
+			self.description.method = obj.__properties__.method
+			self.description.url = obj.__properties__.url
+		if not self.description.method:
+			raise RuntimeError('Method is required')
+		if not self.description.url:
+			raise RuntimeError('URL is required')
 		descriptor = Descriptor()
-		descriptor.add(
-			obj=obj,
-			description=self.description,
-		)
+		descriptor.add(self.description)
 		return obj
