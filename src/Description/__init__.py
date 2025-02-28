@@ -103,7 +103,7 @@ class RequestDescription(object):
 		body: Body = None,
 		responses: Optional[Union[Response,Sequence[Response]]] = None,
 		auth: Auth = None,
-		order: Union[int, float, str] = 0,
+		order: Union[int, float, str] = None,
 	):
 		self.description = Description(
 			summary=summary,

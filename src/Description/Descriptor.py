@@ -36,6 +36,7 @@ __all__ = (
 
 
 class Descriptor(Singleton):
+	"""Descriptor Class"""
 	def __init__(self, info: Information, version: str = '3.1.0'):
 		self.infomation = info
 		self.version = version
@@ -43,6 +44,7 @@ class Descriptor(Singleton):
 		self.schemas = {}
 		self.authes = {}
 		return
+
 	def add(
 		self,
 		description: Description,
@@ -74,9 +76,18 @@ class Descriptor(Singleton):
 
 	def toDocument(self, tags: Sequence[Tag] = None) -> Document:
 		routes = []
-		for k, paths in sorted(self.maps.items(), key=lambda x: x[1][0][1]):
+		def cpr(o):
+			key, paths = o
+			if paths[0][1]:
+				return str(paths[0][1])
+			return str(key)
+		def cpp(o):
+			method, order, path = o
+			if order: return str(order)
+			return str(method)
+		for k, paths in sorted(self.maps.items(), key=cpr):
 			ps = {}
-			for method, order, path in sorted(paths, key=lambda x: x[1]):
+			for method, order, path in sorted(paths, key=cpp):
 				ps[method] = path
 			routes.append((k, ps))
 		schemas = OrderedDict(sorted(self.schemas.items(), key=lambda x: x[0]))
