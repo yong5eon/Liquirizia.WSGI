@@ -10,7 +10,8 @@ from .Information import (
 from ..Description import (
 	Description,
 	Response as ResponseDescription,
-	Body as BodyDescription,
+	Content as ContentDescription,
+	Schema,
 )
 from ..Types import Value
 
@@ -41,14 +42,15 @@ class ResponseHeader(Documentation):
 		)
 		return
 	
-class ResponseBody(Documentation):
+class ResponseContent(Documentation):
 	def __init__(
 		self,
-		body: BodyDescription
+		content: ContentDescription
 	):
 		super().__init__(
-			schema=body.schema,
+			schema={'$ref': '#/components/schemas/{}'.format(content.schema.name)} if isinstance(content.schema, Schema) else content.schema,
 		)
+		if content.example: self['example'] = content.example
 		return
 
 
@@ -57,7 +59,7 @@ class Response(Documentation):
 		super().__init__(
 			description=response.description,
 			content={
-				content.format: ResponseBody(content) for content in response.content
+				content.format: ResponseContent(content) for content in response.content
 			} if response.content else {},
 			headers={
 				k: ResponseHeader(v) for k, v in response.headers.items()
@@ -89,10 +91,10 @@ class Path(Documentation):
 				'required': v['required'] if 'required' in v.keys() else None,
 				'deprecated': v['deprecated'] if 'deprecated' in v.keys() else None,
 			})
-		for k, v in description.headers.items() if description.headers else []:
+		for k, v in description.qs.items() if description.qs else []:
 			parameters.append({
 				'name': k,
-				'in': 'header',
+				'in': 'query',
 				'description': v['description'] if 'description' in v.keys() else None,
 				'schema': {
 					'type': v['type'] if 'type' in v.keys() else None,
@@ -105,10 +107,10 @@ class Path(Documentation):
 				'required': v['required'] if 'required' in v.keys() else None,
 				'deprecated': v['deprecated'] if 'deprecated' in v.keys() else None,
 			})
-		for k, v in description.qs.items() if description.qs else []:
+		for k, v in description.headers.items() if description.headers else []:
 			parameters.append({
 				'name': k,
-				'in': 'query',
+				'in': 'header',
 				'description': v['description'] if 'description' in v.keys() else None,
 				'schema': {
 					'type': v['type'] if 'type' in v.keys() else None,
@@ -126,19 +128,17 @@ class Path(Documentation):
 			if description.auth.optional:
 				authenticates.append({})
 			authenticates.append({description.auth.name: []})
+		responses = sorted(description.responses, key=lambda x: x.status)
 		super().__init__(
+			operationId=id if id else uuid4().hex,
 			summary=description.summary,
 			description=description.description,
-			operationId=id if id else uuid4().hex,
 			tags=description.tags,
-			responses={
-				str(response.status): Response(response) for response in description.responses
-			} if description.responses else {},
 			parameters=parameters,
 			requestBody={
 				'content': {
 					content.format : {
-						'schema': content.schema,
+						'schema': {'$ref': '#/components/schemas/{}'.format(content.schema.name)} if isinstance(content.schema, Schema) else content.schema,
 						'example': content.example,
 					} 
 					for content in description.body.content
@@ -146,6 +146,9 @@ class Path(Documentation):
 				'description': description.body.description,
 				'required': description.body.required,
 			} if description.body else {},
+			responses={
+				str(response.status): Response(response) for response in responses
+			} if description.responses else {},
 			security=authenticates,
 		)
 		return
@@ -157,17 +160,22 @@ class Document(Documentation):
 		info: Information,
 		version='3.1.0',
 		routes: Optional[Mapping[str, Mapping[str, Path]]] = None,
+		schemas: Optional[Mapping[str, Mapping]] = None,
 		authenticates: Optional[Mapping[str, Mapping]]= None,
 		tags: Optional[Sequence[Tag]] = None,
 	):
 		self.__document__ = {
 			'openapi': version,
 			'info': info,
-			'components': {}
+			'components': {
+				'schemas': schemas if schemas else {},
+				'securitySchemes': authenticates if authenticates else {},
+			}
 		}
 		if routes:
 			self.__document__['paths'] = routes
 		if tags:
 			self.__document__['tags'] = tags
+		self.__document__['components']['schemas'] = schemas
 		self.__document__['components']['securitySchemes'] = authenticates
 		return

@@ -18,6 +18,7 @@ from .Types import (
 )
 from .Description import (
 	Description,
+	Schema,
 	Content,
 	Body,
 	Auth,
@@ -62,6 +63,7 @@ __all__ = (
 	'ObjectProperties',
 	# Description
 	'Description',
+	'Schema',
 	'Content',
 	'Body',
 	'Auth',

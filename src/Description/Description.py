@@ -11,14 +11,26 @@ __all__ = (
 	'Response',
 	'Body',
 	'Content',
+	'Schema',
 )
+
+
+class Schema(object):
+	def __init__(
+		self,
+		name: str,
+		format: Value,
+	):
+		self.name = name
+		self.format = format
+		return
 
 
 class Content(object):
 	def __init__(
 		self,
 		format: str,
-		schema: Optional[Value] = None,
+		schema: Optional[Union[Value, Schema]] = None,
 		example: Optional[Any] = None,
 	):
 		self.format = format

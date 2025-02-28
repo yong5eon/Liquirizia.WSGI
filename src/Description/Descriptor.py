@@ -2,7 +2,10 @@
 
 from Liquirizia.Template import Singleton
 
-from .Description import Description
+from .Description import (
+	Description,
+	Schema,
+)
 from .Documentation import (
 	Document,
 	Information,
@@ -37,6 +40,7 @@ class Descriptor(Singleton):
 		self.infomation = info
 		self.version = version
 		self.maps = {}
+		self.schemas = {}
 		self.authes = {}
 		return
 	def add(
@@ -52,6 +56,13 @@ class Descriptor(Singleton):
 			description.order,
 			PathInformation(description),
 		))
+		for content in description.body.content if description.body and description.body.content else []:
+			if isinstance(content.schema, Schema):
+				self.schemas[content.schema.name] = content.schema.format
+		for response in description.responses if description.responses else []:
+			for content in response.content if response.content else []:
+				if isinstance(content.schema, Schema):
+					self.schemas[content.schema.name] = content.schema.format
 		if description.auth:
 			if description.auth.name not in self.authes.keys():
 				self.authes[description.auth.name] = description.auth.format
@@ -62,13 +73,21 @@ class Descriptor(Singleton):
 		return self
 
 	def toDocument(self, tags: Sequence[Tag] = None) -> Document:
-		_ = []
+		routes = []
 		for k, paths in sorted(self.maps.items(), key=lambda x: x[1][0][1]):
 			ps = {}
 			for method, order, path in sorted(paths, key=lambda x: x[1]):
 				ps[method] = path
-			_.append((k, ps))
-		return Document(info=self.infomation, version=self.version, routes=OrderedDict(_), authenticates=self.authes, tags=tags)
+			routes.append((k, ps))
+		schemas = OrderedDict(sorted(self.schemas.items(), key=lambda x: x[0]))
+		return Document(
+			info=self.infomation,
+			version=self.version,
+			routes=OrderedDict(routes),
+			schemas=schemas,
+			authenticates=self.authes,
+			tags=tags,
+		)
 
 	def load(self, mod: str = None, path: str = None, ext: str = 'py'):
 		if mod:
