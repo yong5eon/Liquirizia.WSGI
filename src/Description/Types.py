@@ -87,15 +87,15 @@ class Value(Model):
 	):
 		super().__init__(
 			type=type,
-			description=description,
-			format=format,
-			minimum=min,
-			maximum=max,
-			default=default,
-			enum=enum,
-			required=required,
-			deprecated=deprecated,
 		)
+		if description: self['description'] = description
+		if format: self['format'] = format
+		if min: self['minimum'] = min
+		if max: self['maximum'] = max
+		if default: self['default'] = default
+		if enum: self['enum'] = enum
+		if required: self['required'] = required
+		if deprecated: self['deprecated'] = deprecated
 		return
 
 
@@ -209,25 +209,26 @@ class Object(Model):
 		super().__init__(
 			type=Type.Object,
 			properties=properties,
-			description=description,
-			required=requires,
-			deprecated=deprecated,
 		)
+		if description: self['description'] = description
+		if requires: self['required'] = requires
+		if deprecated: self['deprecated'] = deprecated
 		return
 
 
 class Array(Model):
 	def __init__(
 		self,
-		format: Optional[Union[Value,Object]]= None,
+		format: Optional[Union[Value,Object]] = None,
 		description: str = None,
 		required: bool = True,
 		deprecated: bool = False,
 	):
 		super().__init__(
 			type=Type.Array,
-			items=format,
-			description=description,
-			required=required,
-			deprecated=deprecated,
 		)
+		if format: self['items'] = format
+		if description: self['description'] = description
+		if required: self['required'] = required
+		if deprecated: self['deprecated'] = deprecated
+		return

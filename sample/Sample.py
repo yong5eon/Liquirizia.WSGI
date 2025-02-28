@@ -12,7 +12,7 @@ from Liquirizia.WSGI import (
 )
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Filters import RequestFilters
-from Liquirizia.WSGI.Description import Descriptor, Information, Contact
+from Liquirizia.WSGI.Description import Descriptor, Information, Contact, Tag
 
 from Liquirizia.FileSystemObject import Helper as FileSystemObjectHelper
 from Liquirizia.FileSystemObject.Implements.FileSystem import (
@@ -156,7 +156,14 @@ from swagger_ui import api_doc
 
 api_doc(
 	aps,
-	config=Descriptor().toDocument(),
+	config=Descriptor().toDocument(tags=(
+		Tag('RequestRunner', description='일반적인 요청 처리 예제'),
+		Tag('RequestRunner - Content Validation', description='일반적인 요청 처리 시 본문으로 전달되는 컨텐츠의 유효성 검사 예제'),
+		Tag('RequestStreamRunner', description='스트림 요청 처리 예제'),
+		Tag('RequestStreamRunner - Chunked', description='청크 스트림 요청 처리 예제'),
+		Tag('RequestServerSentEventsRunner', description='Server-Sent Events 요청 처리 예제'),
+		Tag('RequestWebSocketRunner', description='WebSocket 요청 처리 예제'),
+	)),
 	url_prefix='/doc',
 	title='Liquirizia.WSGI Sample API',
 )

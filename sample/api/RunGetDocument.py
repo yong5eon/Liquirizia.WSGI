@@ -4,8 +4,7 @@ from Liquirizia.WSGI.Properties import RequestProperties, RequestRunner
 from Liquirizia.WSGI import Request
 from Liquirizia.WSGI.Responses import *
 
-from Liquirizia.WSGI import Router
-from Liquirizia.WSGI.Description import Descriptor, Information, Contact
+from Liquirizia.WSGI.Description import Descriptor, Tag
 
 __all__ = (
 	'RunGetDocument'
@@ -21,14 +20,11 @@ class RunGet(RequestRunner):
 		return
 
 	def run(self):
-		return ResponseJSON(Descriptor().toDocument(info=Information(
-			title='Liquirizia WSGI Sample API Document',
-			version=open('VERSION').read(),
-			summary='Liquirizia WSGI Sample API Document',
-			description='Liquirizia WSGI Sample API Document',
-			contact=Contact(
-				name='Liquirizia',
-				url='https://www.Liquirizia.com',
-				email='contact@Liquirizia.com'
-			)
+		return ResponseJSON(Descriptor().toDocument(tags=(
+			Tag('RequestRunner'),
+			Tag('RequestRunner - Content Validation'),
+			Tag('RequestStreamRunner'),
+			Tag('RequestStreamRunner - Chunked'),
+			Tag('RequestServerSentEventsRunner'),
+			Tag('RequestWebSocketRunner'),
 		)))

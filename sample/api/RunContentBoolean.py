@@ -28,7 +28,7 @@ __all__ = (
 @RequestDescription(
 	summary='컨텐츠 검증 샘플 - 불리언',
 	description='컨텐츠 검증 샘플 - 불리언',
-	tags='RequestRunner - Content',
+	tags='RequestRunner - Content Validation',
 	body=Body(
 		content=(
 			Content(
@@ -60,6 +60,7 @@ __all__ = (
 			),
 		),
 	),
+	order=1,
 )
 @RequestProperties(
 	method='POST',

@@ -1,11 +1,12 @@
-# Documentation with OAS(OpenAPI Sepecficiations)
+# Documentation with OAS(OpenAPI Specficiations)
+
+## Description to OAS(OPenAPI Specifications) Document
 
 ```python
-from Liquirizia.WSGI import Router
-from Liquirizia.WSGI.Documentation import Information, Contact
+from Liquirizia.WSGI.Description import Descriptor, Information, Contact
 from json import dumps
 
-_ = dumps(Router().toDocument(info=Information(
+_ = Descriptor(info=Information(
   title='${TITLE}',
   version='${VERSION}',
   summary='${SUMMARY}',
@@ -15,7 +16,8 @@ _ = dumps(Router().toDocument(info=Information(
     url='${CONTACT_URL}',
     email='${CONTACT_EMAIL}'
   )
-)))
+))
+text = dumps(_.toDocument())
 ```
 
 ## Apply Swagger
@@ -121,7 +123,8 @@ supported_list.append('Liquirizia')
 
 ```python
 from Liquirizia.WSGI import Application, Configuration, Router
-from Liquirizia.WSGI.Documentation import (
+from Liquirizia.WSGI.Description import (
+	Descriptor,
   Information,
   Contact,
 )
@@ -136,19 +139,7 @@ aps = Application()
 
 api_doc(
   aps,
-  config=Router().toDocument(
-    info=Information(
-      title='${TITLE}',
-      version='${VERSION}',
-      summary='${SUMMARY}',
-      description='${DESCRIPTION}',
-      contact=Contact(
-        name='${CONTACT_NAME}',
-        url='${CONTACT_URL}',
-        email='${CONTACT_EMAIL}'
-      )
-    )
-  ),
+  config=Descriptor().toDocument(),
   url_prefix='${URL}',
   title='${TITLE}',
 )

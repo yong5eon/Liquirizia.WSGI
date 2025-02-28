@@ -6,6 +6,7 @@ from .Information import (
 	Information,
 	Contact,
 	License,
+	Tag,
 )
 
 __all__ = (
@@ -16,4 +17,5 @@ __all__ = (
 	'Information',
 	'Contact',
 	'License',
+	'Tag',
 )
