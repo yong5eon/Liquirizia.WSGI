@@ -106,7 +106,7 @@ class Worker(UvicornWorker):
 
 ```json
 {
-  "name": "- API-Chat",
+  "name": "${NAME}",
   "type": "debugpy",
   "request": "launch",
   "cwd": "/path/to",
