@@ -6,13 +6,13 @@ from Liquirizia.WSGI import (
 		Handler,
 		Request,
 		Response,
-		Router,
 		Error,
 		serve,
 )
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Filters import RequestFilters
 from Liquirizia.WSGI.Description import Descriptor, Information, Contact, Tag
+from Liquirizia.WSGI.Utils import Load
 
 from Liquirizia.FileSystemObject import Helper as FileSystemObjectHelper
 from Liquirizia.FileSystemObject.Implements.FileSystem import (
@@ -124,7 +124,7 @@ aps = Application(
 descriptor = Descriptor(
 	info=Information(
 		title='Liquirizia.WSGI Sample API',
-		version='0.1.0',
+		version=open('VERSION', 'rt').read().strip(),
 		summary='Sample API Document',
 		description='Sample API',
 		contact=Contact(
@@ -135,7 +135,7 @@ descriptor = Descriptor(
 	)
 )
 
-aps.load(path='sample/api')
+Load(path='sample/api')
 
 # apply swagger-ui
 import sys

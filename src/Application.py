@@ -50,11 +50,7 @@ from .Handler import Handler
 
 from platform import system
 from os import walk
-from os.path import splitext, split
-from pathlib import Path
-from importlib.machinery import SourceFileLoader
-from importlib import import_module
-from pkgutil import walk_packages
+from os.path import splitext
 from uuid import uuid4
 
 from typing import Type, Dict, Callable
@@ -345,34 +341,4 @@ class Application(object):
 			qs=qs,
 			cors=cors,
 		))
-		return
-
-	def load(self, mod: str = None, path: str = None, ext: str = 'py'):
-		if mod:
-			self.loadModule(mod)
-		if path:
-			ps = Path(path).rglob('*.{}'.format(ext))
-			for p in ps if ps else []:
-				p = self.loadPath(str(p))
-		return
-	
-	def loadPath(self, path):
-		head, tail = split(path)
-		file, ext = splitext(tail)
-		head = head.replace('\\', '.').replace('/', '.')
-		mod = '{}.{}'.format(head, file)
-		loader = SourceFileLoader(mod, path)
-		mo = loader.load_module()
-		if not mo:
-			return None
-		return mo
-	
-	def loadModule(self, mod):
-		pkg = import_module(mod)
-		for _, name, isPackage in walk_packages(pkg.__path__):
-			fullname = pkg.__name__ + '.' + name
-			if isPackage:
-				self.loadModule(fullname)
-				continue
-			import_module(fullname)
 		return

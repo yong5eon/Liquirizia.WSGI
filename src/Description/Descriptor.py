@@ -9,26 +9,14 @@ from .Description import (
 from .Documentation import (
 	Document,
 	Information,
-	Path as PathInformation,
+	Path,
 	Tag,
-)
-
-from ..Properties import (
-	RequestRunner,
-	RequestStreamRunner,
-	RequestServerSentEventsRunner,
-	RequestWebSocketRunner,
 )
 
 from collections import OrderedDict
 from re import compile
-from os.path import splitext, split
-from pathlib import Path
-from importlib.machinery import SourceFileLoader
-from importlib import import_module
-from pkgutil import walk_packages
 
-from typing import Type, Union, Sequence
+from typing import Sequence
 
 __all__ = (
 	'Descriptor',
@@ -56,7 +44,7 @@ class Descriptor(Singleton):
 		self.maps[url].append((
 			description.method.lower(),
 			description.order,
-			PathInformation(description),
+			Path(description),
 		))
 		for content in description.body.content if description.body and description.body.content else []:
 			if isinstance(content.schema, Schema):
@@ -99,33 +87,3 @@ class Descriptor(Singleton):
 			authenticates=self.authes,
 			tags=tags,
 		)
-
-	def load(self, mod: str = None, path: str = None, ext: str = 'py'):
-		if mod:
-			self.loadModule(mod)
-		if path:
-			ps = Path(path).rglob('*.{}'.format(ext))
-			for p in ps if ps else []:
-				p = self.loadPath(str(p))
-		return
-	
-	def loadPath(self, path):
-		head, tail = split(path)
-		file, ext = splitext(tail)
-		head = head.replace('\\', '.').replace('/', '.')
-		mod = '{}.{}'.format(head, file)
-		loader = SourceFileLoader(mod, path)
-		mo = loader.load_module()
-		if not mo:
-			return None
-		return mo
-	
-	def loadModule(self, mod):
-		pkg = import_module(mod)
-		for _, name, isPackage in walk_packages(pkg.__path__):
-			fullname = pkg.__name__ + '.' + name
-			if isPackage:
-				self.loadModule(fullname)
-				continue
-			import_module(fullname)
-		return
