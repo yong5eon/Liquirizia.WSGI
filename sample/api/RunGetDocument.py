@@ -4,7 +4,7 @@ from Liquirizia.WSGI.Properties import RequestProperties, RequestRunner
 from Liquirizia.WSGI import Request
 from Liquirizia.WSGI.Responses import *
 
-from Liquirizia.WSGI.Description import Descriptor
+from Liquirizia.WSGI.Description import Descriptor, Tag
 
 __all__ = (
 	'RunGetDocument'
@@ -20,4 +20,11 @@ class RunGet(RequestRunner):
 		return
 
 	def run(self):
-		return ResponseJSON(Descriptor().toDocument())
+		return ResponseJSON(Descriptor().toDocument(tags=(
+			Tag('RequestRunner'),
+			Tag('RequestRunner - Content Validation'),
+			Tag('RequestStreamRunner'),
+			Tag('RequestStreamRunner - Chunked'),
+			Tag('RequestServerSentEventsRunner'),
+			Tag('RequestWebSocketRunner'),
+		)))

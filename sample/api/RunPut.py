@@ -25,6 +25,8 @@ from Liquirizia.WSGI.Description import (
 
 from Liquirizia.Validator.Patterns import *
 
+from .Format import *
+
 __all__ = (
 	'RunPut'
 )
@@ -73,12 +75,7 @@ __all__ = (
 		content=(
 			Content(
 				format='application/json',
-				schema=Object(
-					properties=ObjectProperties(
-						a=Integer(description='함수의 3차원 상수 a'),
-						b=Number(description='함수의 3차원 상수 b'),
-					)
-				),
+				schema=FormatRequest(),
 				example={
 					'a': 0,
 					'b': 0,
@@ -86,12 +83,7 @@ __all__ = (
 			),
 			Content(
 				format='application/x-www-form',
-				schema=Object(
-					properties=ObjectProperties(
-						a=Integer(description='함수의 3차원 상수 a'),
-						b=Number(description='함수의 3차원 상수 b'),
-					)
-				),
+				schema=FormatRequest(),
 				example='a=0&b=0',
 			),
 		),
@@ -103,20 +95,7 @@ __all__ = (
 			description='완료',
 			content=Content(
 				format='application/json',
-				schema=Object(
-					properties=ObjectProperties(
-						status=Integer(description='상태'),
-						message=String(description='메세지'),
-						data=Object(
-							properties=ObjectProperties(
-								message=String(description='응답 스트링 에코'),
-								res=Number(description='실행 결과'),
-							),
-							description='데이터',
-						)
-					),
-					description='응답',
-				),
+				schema=FormatResponse(),
 				example={
 					'status': 200,
 					'message': 'OK',
@@ -135,12 +114,7 @@ __all__ = (
 			description='잘못된 요청',
 			content=Content(
 				format='application/json',
-				schema=Object(
-					properties=ObjectProperties(
-						reason=String(description='원인'),
-						trace=String(description='오류 발생 장소'),
-					)
-				),
+				schema=FormatError(),
 				example={
 					'reason': '원인',
 					'trace': '트래이스',

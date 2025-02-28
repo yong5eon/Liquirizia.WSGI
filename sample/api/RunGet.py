@@ -14,6 +14,8 @@ from Liquirizia.WSGI.Description import *
 
 from Liquirizia.Validator.Patterns import *
 
+from .Format import *
+
 __all__ = (
 	'RunGet'
 )
@@ -62,50 +64,20 @@ __all__ = (
 		Response(
 			status=200,
 			description='완료',
-			content=Content(
-				format='application/json',
-				schema=Object(
-					properties=ObjectProperties(
-						status=Integer(description='상태'),
-						message=String(description='메세지'),
-						data=Object(
-							properties=ObjectProperties(
-								message=String(description='응답 스트링 에코'),
-								res=Number(description='실행 결과'),
-							),
-							description='데이터',
-						)
-					),
-					description='응답',
-				),
-				example={
-					'status': 200,
-					'message': 'OK',
-					'data': {
-						'message': 'message',
-						'res': 0.0,
-					},
-				}
-			),
 			headers={
 				'X-Refresh-Token': String(description='리프레시 토큰'),
-			}
+			},
+			content=Content(
+				format='application/json',
+				schema=FormatResponse(),
+			),
 		),
 		Response(
 			status=400,
 			description='잘못된 요청',
 			content=Content(
 				format='application/json',
-				schema=Object(
-					properties=ObjectProperties(
-						reason=String(description='원인'),
-						trace=String(description='오류 발생 장소'),
-					)
-				),
-				example={
-					'reason': '원인',
-					'trace': '트래이스',
-				},
+				schema=FormatError(),
 			)
 		)
 	),
