@@ -30,6 +30,7 @@ __all__ = (
 			),
 		),
 	),
+	order=1,
 )
 @RequestStreamProperties(
 	method='PUT',

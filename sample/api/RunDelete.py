@@ -149,6 +149,7 @@ __all__ = (
 			)
 		)
 	),
+	order=4,
 )
 @RequestProperties(
 	method='DELETE',
@@ -222,7 +223,7 @@ __all__ = (
 		requires=('a', 'b'),
 		requiresError=BadRequestError('본문에는 a 와 b 값이 있어야 합니다.'),
 		error=BadRequestError('본문에는 값이 있어야 합니다.')
-	)
+	),
 )
 class RunDelete(RequestRunner):
 	def __init__(self, request: Request):

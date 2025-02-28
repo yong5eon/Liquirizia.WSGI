@@ -60,6 +60,7 @@ __all__ = (
 			),
 		),
 	),
+	order=4,
 )
 @RequestProperties(
 	method='POST',
