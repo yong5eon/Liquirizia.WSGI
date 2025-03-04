@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 
-# COMMON
+# Error
 from .ResponseError import ResponseError
-from .ResponseHTML import ResponseHTML
-from .ResponseJSON import ResponseJSON
+# Content
+from .ResponseContent import (
+	ResponseHTML,
+	ResponseJSON,
+)
+# File
 from .ResponseFile import ResponseFile
+# Buffer
 from .ResponseBuffer import ResponseBuffer
 # 1XX Informational
 # 2XX Succesful

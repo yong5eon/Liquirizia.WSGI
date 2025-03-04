@@ -2,14 +2,18 @@
 
 from ..Response import Response
 
-from Liquirizia.Serializer import SerializerHelper
-
 from typing import Dict, Any
 
 __all__ = (
-	'ResponseMovePermanently',
-	'ResponseFound',
-	'ResponseNotModified',
+	# TODO : 300 Multiple Choices
+	'ResponseMovePermanently', # 301
+	'ResponseFound', # 302
+	# TODO : 303 See Other
+	'ResponseNotModified', # 304
+	# TODO : 305 Use Proxy
+	# TODO : 306 Switch Proxy
+	# TODO : 307 Temporary Redirect
+	# TODO : 308 Permanent Redirect
 )
 
 
@@ -17,14 +21,13 @@ class ResponseMovePermanently(Response):
 	"""Response 301 Move Permanently Class"""
 	def __init__(self, url, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
 		headers.update({
-			'Content-Length': len(body) if body else 0,
 			'Location': url,
 		})
 		super(ResponseMovePermanently, self).__init__(
 			status=301,
 			message='Move Permanently',
 			headers=headers,
-			body=SerializerHelper.Encode(body, format, charset) if body else None,
+			body=body,
 			format=format,
 			charset=charset,
 		)
@@ -35,14 +38,13 @@ class ResponseFound(Response):
 	"""Response 302 Found Class"""
 	def __init__(self, url, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
 		headers.update({
-			'Content-Length': len(body) if body else 0,
 			'Location': url,
 		})
 		super().__init__(
 			status=302,
 			message='Found',
 			headers=headers,
-			body=SerializerHelper.Encode(body, format, charset) if body else None,
+			body=body,
 			format=format,
 			charset=charset,
 		)
@@ -52,12 +54,11 @@ class ResponseFound(Response):
 class ResponseNotModified(Response):
 	"""Reponse 304 Not Modified Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
-		headers.update({'Content-Length': len(body) if body else 0})
 		super(ResponseNotModified, self).__init__(
 			status=304,
 			message='Not Modified',
 			headers=headers,
-			body=SerializerHelper.Encode(body, format, charset) if body else None,
+			body=body,
 			format=format,
 			charset=charset,
 		)
