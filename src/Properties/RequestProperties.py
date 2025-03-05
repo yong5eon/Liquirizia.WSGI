@@ -18,14 +18,15 @@ from ..Filters import (
 	RequestFilter,
 	ResponseFilter,
 )
-from ..Parser import (
-	Parser,
-	FormUrlEncodedParser,
-	JavaScriptObjectNotationParser,
+from ..Decoder import Decoder
+from ..Decoders import (
+	TextDecoder,
+	FormUrlEncodedDecoder,
+	JavaScriptObjectNotationDecoder
 )
 from ..CORS import CORS
 
-from typing import Type, Dict, Union
+from typing import Type, Sequence
 
 __all__ = (
 	'RequestProperties',
@@ -46,14 +47,11 @@ class RequestProperties(object):
 		header: Header = None,
 		qs: QueryString = None,
 		content: Content = None,
-		contentParsers: Dict[str, Parser] = {
-			'application/x-www-form-urlencoded': FormUrlEncodedParser(),
-			'application/x-www-form': FormUrlEncodedParser(),
-			'form-urlencoded': FormUrlEncodedParser(),
-			'form': FormUrlEncodedParser(),
-			'application/json': JavaScriptObjectNotationParser(),
-			'json': JavaScriptObjectNotationParser(),
-		},
+		contentParsers: Sequence[Decoder] = (
+			TextDecoder('utf-8'),
+			FormUrlEncodedDecoder('utf-8'),
+			JavaScriptObjectNotationDecoder('utf-8'),
+		),
 		onRequest: RequestFilter = None,
 		onResponse : ResponseFilter = None,
 	):

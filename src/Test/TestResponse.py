@@ -3,12 +3,15 @@
 from ..Utils import ToHeader, ParseHeader
 
 from .Sender import Sender
-
-from Liquirizia.Serializer import SerializerHelper
+from ..Decoder import Decoder
+from ..Decoders import (
+	TextDecoder,
+	JavaScriptObjectNotationDecoder,
+)
 
 from io import BytesIO, BufferedReader
 
-from typing import Iterable
+from typing import Iterable, Sequence
 
 __all__ = (
 	'TestResponse',
@@ -22,12 +25,23 @@ class TestResponse(object):
 	def __init__(
 		self,
 		sender: Sender,
+		decoders: Sequence[Decoder] = (
+			TextDecoder('utf-8'),
+			JavaScriptObjectNotationDecoder('utf-8'),
+		)
 	):
 		self.status = int(sender.status)
 		self.message = sender.message
 		self.headers = {}
 		for k, v in sender.headers:
 			self.headers[k] = str(v) 
+		decode = None
+		for decoder in decoders:
+			if decoder.format == self.format:
+				decode = decoder
+				break
+		if sender.buffer and not decode:
+			raise ValueError('Decoder not found')
 		if self.header('Transfer-Encoding') == 'chunked':
 			buffer = bytes()
 			buf = BytesIO(sender.buffer)
@@ -38,17 +52,9 @@ class TestResponse(object):
 					break
 				buffer += buf.read(size)
 				line = buf.readline()
-			self.body = SerializerHelper.Decode(
-				buffer,
-				self.format,
-				self.charset
-			) if sender.buffer else None
+			self.body = decode(buffer) if sender.buffer else None
 		else:
-			self.body = SerializerHelper.Decode(
-				sender.buffer,
-				self.format,
-				self.charset
-			) if sender.buffer else None
+			self.body = decode(sender.buffer) if sender.buffer else None
 		return
 
 	def header(self, key: str):

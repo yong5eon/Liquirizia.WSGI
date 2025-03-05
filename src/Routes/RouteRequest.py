@@ -8,7 +8,7 @@ from ..Properties import RequestRunner
 from ..Filters import *
 from ..RequestReader import RequestReader
 from ..ResponseWriter import ResponseWriter
-from ..Parser import Parser
+from ..Decoder import Decoder
 from ..CORS import CORS
 from ..Errors import BadRequestError, UnsupportedMediaTypeError
 
@@ -16,7 +16,7 @@ from Liquirizia.Validator import Validator
 
 from collections.abc import Mapping, Sequence
 
-from typing import Type, Dict
+from typing import Type, Sequence
 
 __all__ = (
 	'RouteRequest'
@@ -35,7 +35,7 @@ class RouteRequest(Route, RouteRun):
 		header: Validator = None,
 		qs: Validator = None,
 		content: Validator = None,
-		contentParsers: Dict[str, Parser] = {},
+		contentParsers: Sequence[Decoder] = (), 
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
 		cors=CORS(),
@@ -48,8 +48,7 @@ class RouteRequest(Route, RouteRun):
 		self.parameter = parameter
 		self.qs = qs
 		self.content = content
-		self.contentParsers = {}
-		for k, v in contentParsers.items() if contentParsers else {}: self.contentParsers[k.lower()] = v
+		self.contentParsers = contentParsers
 		return
 
 	def run(
@@ -63,16 +62,14 @@ class RouteRequest(Route, RouteRun):
 			buffer = reader.read(request.size)
 			if not buffer:
 				raise BadRequestError('body is empty')
-			content = buffer.decode(request.charset if request.charset else 'utf-8')
-			if not request.format:
-				raise BadRequestError('content-type header is required')
-			if request.format.lower() not in self.contentParsers.keys():
+			decode = None
+			for dec in self.contentParsers:
+				if request.format.lower() == dec.format:
+					decode = dec
+					break
+			if not decode:
 				raise UnsupportedMediaTypeError('{} is not supported media type'.format(request.format))
-			parse = self.contentParsers[request.format]
-			try:
-				content = parse(content)
-			except Exception as e:
-				raise BadRequestError(str(e), error=e)
+			content = decode(buffer)
 
 		if self.parameter:
 			request.params = self.parameter(request.params)

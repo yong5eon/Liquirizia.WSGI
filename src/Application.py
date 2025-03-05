@@ -12,10 +12,11 @@ from .Routes import (
 	RouteRequestWebSocket,
 	RouteRequestServerSentEvents,
 )
-from .Parser import (
-	Parser,
-	FormUrlEncodedParser,
-	JavaScriptObjectNotationParser,
+from .Decoder import Decoder
+from .Decoders import (
+	TextDecoder,
+	FormUrlEncodedDecoder,
+	JavaScriptObjectNotationDecoder,
 )
 from .Properties import (
 	RequestRunner,
@@ -53,7 +54,7 @@ from os import walk
 from os.path import splitext
 from uuid import uuid4
 
-from typing import Type, Dict, Callable
+from typing import Type, Dict, Callable, Sequence
 
 __all__ = (
 	'Application'
@@ -257,14 +258,11 @@ class Application(object):
 		header: Validator = None,
 		qs: Validator = None,
 		content: Validator = None,
-		contentParsers: Dict[str, Parser] = {
-			'application/x-www-form-urlencoded': FormUrlEncodedParser(),
-			'application/x-www-form': FormUrlEncodedParser(),
-			'form-urlencoded': FormUrlEncodedParser(),
-			'form': FormUrlEncodedParser(),
-			'application/json': JavaScriptObjectNotationParser(),
-			'json': JavaScriptObjectNotationParser(),
-		},
+		contentParsers: Sequence[Decoder] = (
+			TextDecoder('utf-8'),
+			FormUrlEncodedDecoder('utf-8'),
+			JavaScriptObjectNotationDecoder('utf-8'),
+		),
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
 		cors: CORS = CORS(),
