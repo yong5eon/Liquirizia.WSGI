@@ -11,10 +11,10 @@ from Liquirizia.WSGI import (
 from Liquirizia.WSGI import Request, Response
 from Liquirizia.WSGI.Properties import RequestRunner, RequestProperties
 from Liquirizia.WSGI.Responses import *
+from Liquirizia.WSGI.Encoders import JavaScriptObjectNotationEncoder
 
 from Liquirizia.WSGI.Test import TestRequest
 
-from Liquirizia.Serializer import SerializerHelper
 from dataclasses import asdict
 
 
@@ -65,11 +65,12 @@ class TestPost(Case):
 	@Order(1)
 	def testRequest(self, qs, body):
 		_ = TestRequest(Application(conf=Configuration()))
+		encode = JavaScriptObjectNotationEncoder('utf-8')
 		response = _.request(
 			method='POST',
 			uri='/',
 			qs=qs,
-			body=SerializerHelper.Encode(body, 'application/json', 'utf-8'),
+			body=encode(body),
 			format='application/json',
 			charset='utf-8',
 		)

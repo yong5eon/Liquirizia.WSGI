@@ -5,7 +5,7 @@ from Liquirizia.WSGI.Description import (
 	Information,
 	Contact,
 )
-from Liquirizia.Serializer import SerializerHelper
+from Liquirizia.WSGI.Encoders import JavaScriptObjectNotationEncoder
 
 from json import dump, dumps
 
@@ -23,9 +23,8 @@ _ = Descriptor(
 	)
 )
 
+encode = JavaScriptObjectNotationEncoder('utf-8')
 _.load(path='sample/api')
-
 with open('sample.json', 'wb') as f:
-	text = SerializerHelper.Serialize(_.toDocument(), 'application/json')
-	f.write(text.encode('utf-8'))
+	f.write(encode(_.toDocument()))
 

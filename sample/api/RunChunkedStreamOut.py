@@ -7,8 +7,7 @@ from Liquirizia.WSGI.Properties import (
 from Liquirizia.WSGI import Request, RequestReader, ResponseWriter
 from Liquirizia.WSGI.Extends import ChunkedStreamWriter
 from Liquirizia.WSGI.Description import *
-
-from Liquirizia.Serializer import SerializerHelper
+from Liquirizia.WSGI.Encoders import TextEncoder
 
 from time import sleep
 
@@ -43,8 +42,9 @@ class RunChunkedStreamOut(RequestStreamRunner):
 	def run(self, reader: RequestReader, writer: ResponseWriter):
 		writer = ChunkedStreamWriter(writer)
 		writer.begin(format='text/plain', charset='utf-8')
+		encode = TextEncoder('utf-8')
 		for i in range(0, 10):
-			writer.chunk(SerializerHelper.Encode(str(i), format='text/plain', charset='utf-8'))
+			writer.chunk(encode(str(i)))
 			sleep(1)
 		writer.end()
 		return
