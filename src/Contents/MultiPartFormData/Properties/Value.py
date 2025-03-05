@@ -2,6 +2,8 @@
 
 from .Object import Object
 
+from typing import List, Tuple, Any
+
 __all__ = (
 	'Value'
 )
@@ -10,15 +12,15 @@ __all__ = (
 class Value(Object):
 	"""Multi Part Form Data Value Object"""
 
-	def __init__(self, name, value=None):
+	def __init__(self, name: str, value: Any = None):
 		self.name = name
 		self.value = value
 		return
 
-	def headers(self):
+	def headers(self) -> List[Tuple[str, str]]:
 		headers = []
 		headers.append(('Content-Disposition', 'form-data; name="{}"'.format(self.name)))
 		return headers
 
-	def body(self):
-		return self.value.encode()
+	def body(self) -> str:
+		return str(self.value)
