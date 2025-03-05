@@ -59,7 +59,6 @@ __all__ = (
 			),
 		),
 	),
-	order=6,
 )
 @RequestProperties(
 	method='POST',

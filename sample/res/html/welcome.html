@@ -205,7 +205,7 @@
 			});
 			$('#btnTestStreamOut').click(function(e) {
 				const options = {method: 'GET'};
-				fetch('/api/run/stream/out', options).then(function(response) {
+				fetch('/api/run/stream', options).then(function(response) {
 					$('#frmTestStreamOutResult p').text(response.status + ' ' + response.statusText);
 					$('#frmTestStreamOutResult pre').text('');
 					const reader = response.body.getReader();
@@ -226,7 +226,7 @@
 			});
 			$('#btnTestChunkedStreamOut').click(function(e) {
 				const options = {method: 'GET'};
-				fetch('/api/run/stream/chunked/out', options).then(function(response) {
+				fetch('/api/run/stream/chunked', options).then(function(response) {
 					$('#frmTestChunkedStreamOutResult p').text(response.status + ' ' + response.statusText);
 					$('#frmTestChunkedStreamOutResult pre').text('');
 					const reader = response.body.getReader();
