@@ -154,16 +154,38 @@ from Liquirizia.WSGI.Description import (
 )
 from swagger_ui import api_doc
 
+def urlkey(url):
+	return {
+		'/api/content/bool': '11',
+		'/api/content/integer': '12',
+		'/api/content/number': '13',
+		'/api/content/string': '14',
+		'/api/content/array': '14',
+		'/api/content/object': '14',
+	}.get(url.lower(), '99')
+
+def methodkey(o):
+	return {
+		'GET': 1,
+		'POST': 2,
+		'PUT': 3,
+		'DELETE': 4,
+	}.get(o.upper(), 9)
+
 api_doc(
 	aps,
-	config=Descriptor().toDocument(tags=(
-		Tag('RequestRunner', description='일반적인 요청 처리 예제'),
-		Tag('RequestRunner - Content Validation', description='일반적인 요청 처리 시 본문으로 전달되는 컨텐츠의 유효성 검사 예제'),
-		Tag('RequestStreamRunner', description='스트림 요청 처리 예제'),
-		Tag('RequestStreamRunner - Chunked', description='청크 스트림 요청 처리 예제'),
-		Tag('RequestServerSentEventsRunner', description='Server-Sent Events 요청 처리 예제'),
-		Tag('RequestWebSocketRunner', description='WebSocket 요청 처리 예제'),
-	)),
+	config=Descriptor().toDocument(
+		tags=(
+			Tag('RequestRunner', description='일반적인 요청 처리 예제'),
+			Tag('RequestRunner - Content Validation', description='일반적인 요청 처리 시 본문으로 전달되는 컨텐츠의 유효성 검사 예제'),
+			Tag('RequestStreamRunner', description='스트림 요청 처리 예제'),
+			Tag('RequestStreamRunner - Chunked', description='청크 스트림 요청 처리 예제'),
+			Tag('RequestServerSentEventsRunner', description='Server-Sent Events 요청 처리 예제'),
+			Tag('RequestWebSocketRunner', description='WebSocket 요청 처리 예제'),
+		),
+		url=urlkey,
+		method=methodkey,
+	),
 	url_prefix='/doc',
 	title='Liquirizia.WSGI Sample API',
 )

@@ -33,7 +33,7 @@ __all__ = (
 )
 @RequestStreamProperties(
 	method='PUT',
-	url='/api/run/stream/in',
+	url='/api/run/stream',
 )
 class RunStreamIn(RequestStreamRunner):
 	def __init__(self, request):

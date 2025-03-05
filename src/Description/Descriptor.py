@@ -13,14 +13,37 @@ from .Documentation import (
 	Tag,
 )
 
+from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
 from re import compile
-
-from typing import Sequence
+from typing import Sequence, Any
 
 __all__ = (
 	'Descriptor',
 )
+
+class SortKey(metaclass=ABCMeta):
+	@abstractmethod
+	def __call__(self, o: Any) -> Any:
+		raise NotImplementedError('{} must be implemented __call__'.format(self.__class__.__name__))
+	
+class Url(SortKey):
+	def __call__(self, o: str) -> str:
+		return o
+
+class Method(SortKey):
+	def __call__(self, o: str) -> str:
+		return {
+			'OPTIONS': '00',
+			'CONNECT': '10',
+			'POST': '21',
+			'HEAD': '30',
+			'GET': '31',
+			'PUT': '41',
+			'PATCH': '42',
+			'TRACE': '50',
+			'DELETE': '71',
+		}.get(o.upper(), '99')
 
 
 class Descriptor(Singleton):
@@ -37,13 +60,10 @@ class Descriptor(Singleton):
 		self,
 		description: Description,
 	) -> 'Descriptor':
-		regex = compile(r':(\w+)')
-		url = regex.sub(r"{\1}", description.url)
-		if url not in self.maps:
-			self.maps[url] = []
-		self.maps[url].append((
+		if description.url not in self.maps:
+			self.maps[description.url] = []
+		self.maps[description.url].append((
 			description.method.lower(),
-			description.order,
 			Path(description),
 		))
 		for content in description.body.content if description.body and description.body.content else []:
@@ -62,22 +82,26 @@ class Descriptor(Singleton):
 				self.authes[description.auth.name] = fmt
 		return self
 
-	def toDocument(self, tags: Sequence[Tag] = None) -> Document:
+	def toDocument(
+		self,
+		tags: Sequence[Tag] = None,
+		url: SortKey = Url(),
+		method: SortKey = Method(),
+	) -> Document:
+		regex = compile(r':(\w+)')
 		routes = []
 		def cpr(o):
-			key, paths = o
-			if paths[0][1]:
-				return str(paths[0][1])
-			return str(key)
+			key, desc = o
+			return url(key)
 		def cpp(o):
-			method, order, path = o
-			if order: return str(order)
-			return str(method)
-		for k, paths in sorted(self.maps.items(), key=cpr):
-			ps = {}
-			for method, order, path in sorted(paths, key=cpp):
-				ps[method] = path
-			routes.append((k, ps))
+			m, path = o
+			return method(m)
+		for p, desc in sorted(self.maps.items(), key=cpr):
+			p= regex.sub(r"{\1}", p)
+			ps = OrderedDict()
+			for m, path in sorted(desc, key=cpp):
+				ps[m] = path
+			routes.append((p, ps))
 		schemas = OrderedDict(sorted(self.schemas.items(), key=lambda x: x[0]))
 		return Document(
 			info=self.infomation,

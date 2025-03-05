@@ -103,7 +103,6 @@ class RequestDescription(object):
 		body: Body = None,
 		responses: Optional[Union[Response,Sequence[Response]]] = None,
 		auth: Auth = None,
-		order: Union[int, float, str] = None,
 	):
 		self.description = Description(
 			summary=summary,
@@ -117,7 +116,6 @@ class RequestDescription(object):
 			body=body,
 			responses=responses,
 			auth=auth,
-			order=order,
 		)
 		return
 	def __call__(

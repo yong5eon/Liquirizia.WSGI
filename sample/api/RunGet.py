@@ -81,7 +81,6 @@ __all__ = (
 			)
 		)
 	),
-	order=2,
 )
 @RequestProperties(
 	method='GET',

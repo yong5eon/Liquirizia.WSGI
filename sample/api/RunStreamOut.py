@@ -27,7 +27,7 @@ __all__ = (
 )
 @RequestStreamProperties(
 	method='GET',
-	url='/api/run/stream/out',
+	url='/api/run/stream',
 )
 class RunStreamOut(RequestStreamRunner):
 	def __init__(self, request: Request):

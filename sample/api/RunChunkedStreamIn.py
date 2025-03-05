@@ -31,7 +31,7 @@ __all__ = (
 )
 @RequestStreamProperties(
 	method='PUT',
-	url='/api/run/stream/chunked/in',
+	url='/api/run/stream/chunked',
 )
 class RunChunkedStreamIn(RequestStreamRunner):
 	def __init__(self, request: Request):

@@ -100,7 +100,6 @@ class Description(object):
 		body: Body = None,
 		responses: Optional[Union[Response,Sequence[Response]]] = None,
 		auth: Auth = None,
-		order: Union[int, float, str] = 0,	
 	):
 		self.summary = summary
 		self.description = description
@@ -119,5 +118,4 @@ class Description(object):
 			if not isinstance(self.responses, Sequence):
 				self.responses = [self.responses]
 		self.auth = auth
-		self.order = order
 		return
