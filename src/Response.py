@@ -110,12 +110,12 @@ class Response(object):
 	@property
 	def format(self):
 		_ = self.header('Content-Type')
-		return _.type
+		return _.type if _ else None
 
 	@property
 	def charset(self):
 		_ = self.header('Content-Type')
-		return _.charset
+		return _.charset if _ else None
 
 	@property
 	def body(self):
