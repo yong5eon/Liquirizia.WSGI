@@ -5,7 +5,7 @@ from .TestResponse import TestResponseServerSentEvents
 
 from ..Application import Application
 
-from urllib.parse import urlencode
+from urllib.parse import urlencode, quote
 from sys import stderr
 from io import BytesIO, BufferedReader
 from threading import Thread
@@ -47,6 +47,7 @@ class TestRequestServerSentEvents(object):
 			'SCRIPT_NAME': uri,
 			'PATH_INFO': uri,
 			'QUERY_STRING': urlencode(qs) if qs else None,
+			'RAW_URI': '{}{}'.format(quote(uri), '?{}'.format(urlencode(qs)) if qs else ''),
 			'CONTENT_TYPE': '{}{}'.format(format, '; charset={}'.format(charset) if charset else '') if format else None,
 			'CONTENT_LENGTH': len(body) if body else None,
 			'SERVER_NAME': '127.0.0.1',
