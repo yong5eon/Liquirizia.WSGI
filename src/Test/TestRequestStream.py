@@ -5,7 +5,7 @@ from .TestResponse import TestResponse, TestResponseStream
 
 from ..Application import Application
 
-from urllib.parse import urlencode
+from urllib.parse import urlencode, quote
 from sys import stderr
 from threading import Thread
 
@@ -53,6 +53,7 @@ class TestRequestStream(object):
 			'SCRIPT_NAME': uri,
 			'PATH_INFO': uri,
 			'QUERY_STRING': urlencode(qs) if qs else None,
+			'RAW_URI': '{}{}'.format(quote(uri), '?{}'.format(urlencode(qs)) if qs else ''),
 			'SERVER_NAME': '127.0.0.1',
 			'SERVER_PORT': '80',
 			'SERVER_PROTOCOL': 'HTTP',
