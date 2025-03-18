@@ -49,6 +49,7 @@ from .Utils import ToHeader
 
 from .Handler import Handler
 
+from urllib.parse import unquote
 from platform import system
 from os import walk
 from os.path import splitext
@@ -76,6 +77,7 @@ class Application(object):
 
 	def __call__(self, env: Dict, send: Callable):
 		try:
+			env['PATH_INFO'] = unquote(env['RAW_URI'].split('?')[0])
 			env['REQUEST_ID'] = uuid4().hex
 
 			request = None
