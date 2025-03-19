@@ -201,7 +201,7 @@ class ObjectProperties(Model): pass
 class Object(Model):
 	def __init__(
 		self,
-		properties: ObjectProperties,
+		properties: ObjectProperties = ObjectProperties(),
 		description: Optional[str] = None,
 		requires: Optional[Sequence[str]] = None,
 		deprecated: bool = False,
