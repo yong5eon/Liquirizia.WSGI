@@ -132,7 +132,8 @@ descriptor = Descriptor(
 			url='https://github.com/yong5eon/Liquirizia.WSGI',
 			email='contact@email.com'
 		)
-	)
+	),
+	# version='3.0.0'
 )
 
 Load(path='sample/api')
@@ -199,6 +200,8 @@ aps.addFileSystemObject(
 	prefix='/thumbs',
 	onRequest=RequestFilters(ToJPEG()),
 )
+aps.addFile('sample/res/html/swagger.html', '/doc/swagger')
+aps.addFile('sample/res/html/redoc.html', '/doc/redoc')
 
 
 if __name__ == '__main__':
