@@ -77,7 +77,7 @@ class Application(object):
 
 	def __call__(self, env: Dict, send: Callable):
 		try:
-			env['PATH_INFO'] = unquote(env['RAW_URI'].split('?')[0])
+			env['PATH_INFO'] = env['PATH_INFO'].encode('latin1').decode('utf-8')
 			env['REQUEST_ID'] = uuid4().hex
 
 			request = None
