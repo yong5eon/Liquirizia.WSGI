@@ -4,7 +4,6 @@ from Liquirizia.Template import Singleton
 
 from .Description import (
 	Description,
-	Schema,
 )
 from .Documentation import (
 	Document,
@@ -12,6 +11,7 @@ from .Documentation import (
 	Path,
 	Tag,
 )
+from .Value import Schema
 
 from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
@@ -52,7 +52,6 @@ class Descriptor(Singleton):
 		self.infomation = info
 		self.version = version
 		self.maps = {}
-		self.schemas = {}
 		self.authes = {}
 		return
 
@@ -66,13 +65,6 @@ class Descriptor(Singleton):
 			description.method.lower(),
 			Path(description),
 		))
-		for content in description.body.content if description.body and description.body.content else []:
-			if isinstance(content.schema, Schema):
-				self.schemas[content.schema.name] = content.schema.format
-		for response in description.responses if description.responses else []:
-			for content in response.content if response.content else []:
-				if isinstance(content.schema, Schema):
-					self.schemas[content.schema.name] = content.schema.format
 		if description.auth:
 			if description.auth.name not in self.authes.keys():
 				self.authes[description.auth.name] = description.auth.format
@@ -85,6 +77,7 @@ class Descriptor(Singleton):
 	def toDocument(
 		self,
 		tags: Sequence[Tag] = None,
+		schemas: Sequence[Schema] = None,
 		url: SortKey = Url(),
 		method: SortKey = Method(),
 	) -> Document:
@@ -102,12 +95,12 @@ class Descriptor(Singleton):
 			for m, path in sorted(desc, key=cpp):
 				ps[m] = path
 			routes.append((p, ps))
-		schemas = OrderedDict(sorted(self.schemas.items(), key=lambda x: x[0]))
+		formats = {schema.name: schema.format for schema in schemas} if schemas else {}
 		return Document(
 			info=self.infomation,
 			version=self.version,
 			routes=OrderedDict(routes),
-			schemas=schemas,
+			schemas=formats,
 			authenticates=self.authes,
 			tags=tags,
 		)

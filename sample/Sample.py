@@ -20,6 +20,8 @@ from Liquirizia.FileSystemObject.Implements.FileSystem import (
 		Connection as FileSystemObject,
 )
 
+from api.Format import *
+
 from filters import ToJPEG
 from os.path import dirname, realpath
 from sys import stderr
@@ -155,24 +157,6 @@ from Liquirizia.WSGI.Description import (
 )
 from swagger_ui import api_doc
 
-def urlkey(url):
-	return {
-		'/api/content/bool': '11',
-		'/api/content/integer': '12',
-		'/api/content/number': '13',
-		'/api/content/string': '14',
-		'/api/content/array': '14',
-		'/api/content/object': '14',
-	}.get(url.lower(), '99')
-
-def methodkey(o):
-	return {
-		'GET': 1,
-		'POST': 2,
-		'PUT': 3,
-		'DELETE': 4,
-	}.get(o.upper(), 9)
-
 api_doc(
 	aps,
 	config=Descriptor().toDocument(
@@ -184,8 +168,30 @@ api_doc(
 			Tag('RequestServerSentEventsRunner', description='Server-Sent Events 요청 처리 예제'),
 			Tag('RequestWebSocketRunner', description='WebSocket 요청 처리 예제'),
 		),
-		url=urlkey,
-		method=methodkey,
+		schemas=(
+			FormatError,
+			FormatRequest,
+			FormatResponse,	
+			FormatData,
+			FormatParameters,
+			FormatQueryString,
+			FormatContent,
+			FormatExtra,
+		),
+		url=lambda url: {
+			'/api/content/bool': '11',
+			'/api/content/integer': '12',
+			'/api/content/number': '13',
+			'/api/content/string': '14',
+			'/api/content/array': '14',
+			'/api/content/object': '14',
+		}.get(url, '99'),
+		method=lambda o: {
+			'GET': 1,
+			'POST': 2,
+			'PUT': 3,
+			'DELETE': 4,
+		}.get(o.upper(), 9),
 	),
 	url_prefix='/doc',
 	title='Liquirizia.WSGI Sample API',
