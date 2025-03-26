@@ -69,7 +69,7 @@ __all__ = (
 			},
 			content=Content(
 				format='application/json',
-				schema=FormatResponse(),
+				schema=FormatResponse,
 			),
 		),
 		Response(
@@ -77,7 +77,7 @@ __all__ = (
 			description='잘못된 요청',
 			content=Content(
 				format='application/json',
-				schema=FormatError(),
+				schema=FormatError,
 			)
 		)
 	),

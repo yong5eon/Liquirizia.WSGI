@@ -6,8 +6,11 @@ from ..Properties import (
 	RequestServerSentEventsRunner,
 	RequestWebSocketRunner,
 )
-from .Types import (
+from .Value import (
 	Value,
+	Schema,
+)
+from .Types import (
 	Boolean,
 	Integer,
 	Number,
@@ -18,7 +21,6 @@ from .Types import (
 )
 from .Description import (
 	Description,
-	Schema,
 	Content,
 	Body,
 	Auth,
@@ -53,6 +55,9 @@ __all__ = (
 	'RequestDescription',
 	# Descriptor
 	'Descriptor',
+	# Value
+	'Value',
+	'Schema',
 	# Types
 	'Boolean',
 	'Integer',

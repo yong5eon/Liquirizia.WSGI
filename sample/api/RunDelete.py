@@ -75,7 +75,7 @@ __all__ = (
 		content=(
 			Content(
 				format='application/json',
-				schema=FormatRequest(),
+				schema=FormatRequest,
 				example={
 					'a': 0,
 					'b': 0,
@@ -83,7 +83,7 @@ __all__ = (
 			),
 			Content(
 				format='application/x-www-form',
-				schema=FormatRequest(),
+				schema=FormatRequest,
 				example='a=0&b=0',
 			),
 		),
@@ -94,15 +94,7 @@ __all__ = (
 			description='완료',
 			content=Content(
 				format='application/json',
-				schema=FormatResponse(),
-				example={
-					'status': 200,
-					'message': 'OK',
-					'data': {
-						'message': 'message',
-						'res': 0.0,
-					},
-				}
+				schema=FormatResponse,
 			),
 			headers={
 				'X-Refresh-Token': String(
@@ -115,11 +107,7 @@ __all__ = (
 			description='잘못된 요청',
 			content=Content(
 				format='application/json',
-				schema=FormatError(),
-				example={
-					'reason': '원인',
-					'trace': '트래이스',
-				},
+				schema=FormatError,
 			)
 		)
 	),

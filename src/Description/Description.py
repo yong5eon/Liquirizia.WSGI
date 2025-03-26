@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .Types import Value
+from .Value import Value, Schema
 from .Auth import Authorization
 
 from typing import Optional, Union, Sequence, Dict, Any
@@ -11,19 +11,7 @@ __all__ = (
 	'Response',
 	'Body',
 	'Content',
-	'Schema',
 )
-
-
-class Schema(object):
-	def __init__(
-		self,
-		name: str,
-		format: Value,
-	):
-		self.name = name
-		self.format = format
-		return
 
 
 class Content(object):

@@ -14,76 +14,110 @@ __all__ = (
 	'FormatError',
 	'FormatRequest',
 	'FormatResponse',
+	'FormatData',
+	'FormatParameters',
+	'FormatQueryString',
+	'FormatContent',
+	'FormatExtra',
 )
 
 
-class FormatError(Schema):
-	def __init__(self):
-		super().__init__(
-			name='Error',
-			format=String('에러 메세지'),
-		)
-		return
+FormatError = Schema(
+	name='Error',
+	format=String('에러 메세지'),
+)
 
+FormatRequest = Schema(
+	name='Request',
+	format=Object(
+		properties=ObjectProperties(
+			a=Integer('파라미터 a'),
+			b=Number('파라미터 b'),
+		),
+	),
+)
 
-class FormatRequest(Schema):
-	def __init__(self):
-		super().__init__(
-			name='Request',
-			format=Object(
+FormatParameters = Schema(
+	name='Parameters',
+	format=Object(
+		properties=ObjectProperties(
+			a=Integer('a'),
+			b=Number('b'),
+		),
+		requires=('a', 'b'),
+		description='파라미터',
+	),
+)
+
+FormatQueryString = Schema(
+	name='QueryString',
+	format=Object(
+		properties=ObjectProperties(
+			a=Integer('a'),
+			b=Number('b'),
+		),
+		requires=('a', 'b'),
+		description='쿼리스트링',
+	),
+)
+
+FormatContent = Schema(
+	name='Content',
+	format=Object(
+		properties=ObjectProperties(
+			a=Integer('a'),
+			b=Number('b'),
+		),
+		requires=('a', 'b'),
+		description='컨텐츠',
+	),
+)
+
+FormatData = Schema(
+	name='Data',
+	format=Object(
+		properties=ObjectProperties(
+			message=String('응답 메세지'),
+			res=Object(
 				properties=ObjectProperties(
-					a=Integer('파라미터 a'),
-					b=Number('파라미터 b'),
+					parameters=FormatParameters,
+					qs=FormatQueryString,
+					content=FormatContent
 				),
+				requires=('parameters', 'qs'),
+				description='응답 결과',
 			),
-		)
-		return
+		),
+		requires=('message', 'res'),
+		description='데이터',
+	),
+)
 
+FormatExtra = Schema(
+	name='Extra',
+	format=Object(
+		properties=ObjectProperties(
+			a=Integer('a'),
+			b=Number('b'),
+		),
+		description='추가 데이터',
+	),
+)
 
-class FormatResponse(Schema):
-	def __init__(self):
-		super().__init__(
-			name='Response',
-			format=Object(
-				properties=ObjectProperties(
-					status=Integer('상태'),
-					message=String('메세지'),
-					data=Object(
-						properties=ObjectProperties(
-							message=String('응답 메세지'),
-							res=Object(
-								properties=ObjectProperties(
-									parameters=Object(
-										properties=ObjectProperties(
-											a=Integer('파라미터 a'),
-											b=Number('파라미터 b'),
-										),
-										description='파라미터',
-									),
-									qs=Object(
-										properties=ObjectProperties(
-											a=Integer('쿼리스트링 a'),
-											b=Number('쿼리스트링 b'),
-										),
-										description='쿼리스트링',
-									),
-									content=Object(
-										properties=ObjectProperties(
-											a=Integer('컨텐트 a'),
-											b=Number('컨텐트 b'),
-										),
-										description='컨텐트',
-									)
-								),
-								description='응답 결과',
-								requires=('parameters', 'qs'),
-							)
-						),
-						description='응답 데이터',
-					)
-				),
-				description='응답',
-				requires=('status', 'message', 'data'),
+FormatResponse = Schema(
+	name='Response',
+	format=Object(
+		properties=ObjectProperties(
+			status=Integer('상태'),
+			message=String('메세지'),
+			data=FormatData,
+			extras=Array(
+				format=FormatExtra,
+				description='추가 데이터 리스트',
+				required=False,
 			),
-		)
-		return
+		),
+		description='응답',
+		requires=('status', 'message', 'data'),
+	),
+)
