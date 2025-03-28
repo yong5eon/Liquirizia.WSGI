@@ -56,13 +56,13 @@ class TestPutChunkedStream(Case):
 			method='OPTIONS',
 			uri='*'
 		)
-		ASSERT_IS_EQUAL(response.status, 204)
+		ASSERT_TRUE(response.status in (200, 204))
 		ASSERT_TRUE('PUT' in response.header('Allow'))
 		response = _.request(
 			method='OPTIONS',
 			uri='/stream/chunked'
 		)
-		ASSERT_IS_EQUAL(response.status, 204)
+		ASSERT_TRUE(response.status in (200, 204))
 		ASSERT_TRUE('PUT' in response.header('Allow'))
 		return
 

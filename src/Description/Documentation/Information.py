@@ -40,8 +40,8 @@ class License(Documentation):
 class Information(Documentation):
 	def __init__(
 		self,
-		title: str,
-		version: str,
+		title: str = '',
+		version: str = '',
 		summary: str = None,
 		description: str = None,
 		tos: str = None,

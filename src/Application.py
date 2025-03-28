@@ -100,8 +100,8 @@ class Application(object):
 			if env['REQUEST_METHOD'] == 'OPTIONS':
 				runner = RouteOptions()
 			else:
-				patterns = self.router.matches(env['PATH_INFO'])
-				if not patterns:
+				_, patterns = self.router.matches(env['PATH_INFO'])
+				if not _ or not patterns:
 					raise NotFoundError('{} is not found in router'.format(env['PATH_INFO']))
 
 				if env['REQUEST_METHOD'] not in patterns.keys():

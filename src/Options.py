@@ -22,7 +22,7 @@ class Options(RequestRunner):
 			return ResponseNoContent(headers={
 				'Allow': ', '.join(sorted(list(set(router.methods))))
 			})
-		patterns = router.matches(self.request.uri)
+		_, patterns = router.matches(self.request.uri)
 		if not patterns:
 			raise NotFoundError('{} is not found in router'.format(self.request.uri))
 		# TODO : Use ResponseOK in HTTP/1.0

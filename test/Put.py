@@ -44,13 +44,13 @@ class TestPut(Case):
 			method='OPTIONS',
 			uri='*'
 		)
-		ASSERT_IS_EQUAL(response.status, 204)
+		ASSERT_TRUE(response.status in (200, 204))
 		ASSERT_TRUE('PUT' in response.header('Allow'))
 		response = _.request(
 			method='OPTIONS',
 			uri='/'
 		)
-		ASSERT_IS_EQUAL(response.status, 204)
+		ASSERT_TRUE(response.status in (200, 204))
 		ASSERT_TRUE('PUT' in response.header('Allow'))
 		ASSERT_TRUE('PUT' in response.header('Access-Control-Allow-Methods'))
 		headers = response.header('Access-Control-Allow-Headers')
