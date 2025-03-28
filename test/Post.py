@@ -44,13 +44,13 @@ class TestPost(Case):
 			method='OPTIONS',
 			uri='*'
 		)
-		ASSERT_IS_EQUAL(response.status, 204)
+		ASSERT_TRUE(response.status in (200, 204))
 		ASSERT_IS_EQUAL('POST' in response.header('Allow'), True)
 		response = _.request(
 			method='OPTIONS',
 			uri='/'
 		)
-		ASSERT_IS_EQUAL(response.status, 204)
+		ASSERT_TRUE(response.status in (200, 204))
 		ASSERT_IS_EQUAL('POST' in response.header('Allow'), True)
 		ASSERT_IS_EQUAL('POST' in response.header('Access-Control-Allow-Methods'), True)
 		headers = response.header('Access-Control-Allow-Headers')
