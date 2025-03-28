@@ -3,6 +3,7 @@
 from Liquirizia.Template import Singleton
 
 from .Route import Route
+from typing import Tuple
 
 __all__ = (
 	'Router'
@@ -24,7 +25,7 @@ class Router(Singleton):
 		self.methods = {'OPTIONS'}
 		return
 
-	def matches(self, url: str):
+	def matches(self, url: str) -> Tuple[str, Match]:
 		routes = {}
 		path = None
 		
