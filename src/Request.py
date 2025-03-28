@@ -36,16 +36,16 @@ class Request(object):
 		else:
 			self.params = None
 		self.qs_ = querystring[0] if len(querystring) else None
-		args = parse_qs(unquote(self.qs_), keep_blank_values=True) if self.qs_ else {}
+		args = parse_qs(self.qs_, keep_blank_values=True) if self.qs_ else {}
 		for k, v in args.items():
 			if len(v) == 0:
 				args[k] = None
 			elif len(v) == 1:
-				args[k] = v[0] if len(v[0]) else None
+				args[k] = unquote(v[0]) if len(v[0]) else None
 			else:
 				for i, o in enumerate(v):
 					v[i] = o if len(o) else None
-				args[k] = v
+				args[k] = unquote(v)
 		Querystring = CreateDataClass('Querystring', args)
 		self.args = ToDataClass(args, Querystring)
 		self.props = {}

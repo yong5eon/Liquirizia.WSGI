@@ -26,6 +26,7 @@ class Router(Singleton):
 
 	def matches(self, url: str):
 		routes = {}
+		path = None
 		
 		# find matched list
 		for route in self.routes:
@@ -40,8 +41,9 @@ class Router(Singleton):
 		for method in routes.keys():
 			routes[method].sort(key=lambda r: len(r.params.keys()))
 			routes[method] = routes[method][0]  # select top priority
+			path = routes[method].route.url
 
-		return routes
+		return path, routes
 
 	def add(self, route: Route):
 		self.routes.append(route)

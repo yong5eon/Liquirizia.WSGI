@@ -48,7 +48,7 @@ class Method(SortKey):
 
 class Descriptor(Singleton):
 	"""Descriptor Class"""
-	def __init__(self, info: Information, version: str = '3.1.0'):
+	def __init__(self, info: Information = Information(), version: str = '3.1.0'):
 		self.infomation = info
 		self.version = version
 		self.maps = {}
@@ -76,6 +76,7 @@ class Descriptor(Singleton):
 
 	def toDocument(
 		self,
+		path: str = None,
 		tags: Sequence[Tag] = None,
 		schemas: Sequence[Schema] = None,
 		url: SortKey = Url(),
@@ -89,12 +90,22 @@ class Descriptor(Singleton):
 		def cpp(o):
 			m, path = o
 			return method(m)
-		for p, desc in sorted(self.maps.items(), key=cpr):
-			p= regex.sub(r"{\1}", p)
-			ps = OrderedDict()
-			for m, path in sorted(desc, key=cpp):
-				ps[m] = path
-			routes.append((p, ps))
+		if path:
+			if path in self.maps:
+				p= regex.sub(r"{\1}", path)
+				ps = OrderedDict()
+				for m, path in sorted(self.maps[path], key=cpp):
+					ps[m] = path
+				routes.append((p, ps))
+			else:
+				return None
+		else:
+			for p, desc in sorted(self.maps.items(), key=cpr):
+				p= regex.sub(r"{\1}", p)
+				ps = OrderedDict()
+				for m, path in sorted(desc, key=cpp):
+					ps[m] = path
+				routes.append((p, ps))
 		formats = {schema.name: schema.format for schema in schemas} if schemas else {}
 		return Document(
 			info=self.infomation,
