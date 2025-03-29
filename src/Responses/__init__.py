@@ -45,7 +45,7 @@ from .ResponseClientError import (
 	ResponseUnsupportedMediaType, # 415 Unsupported Media Type
 	ResponseRangeNotSatisfiable, # 416 Range Not Satisfiable
 	ResponseExpectationFailed, # 417 Expectation Failed
-	# TODO : 418 Im a teapot
+	# TODO : 418 I'm a teapot
 	ResponseMisdirectedRequest, # 421 Misdirected Request
 	ResponseUnprocessableEntity, # 422 Unprocessable Entity
 	ResponseLocked, # 423 Locked
