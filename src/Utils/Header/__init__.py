@@ -384,7 +384,7 @@ def ParseHeader(k: str, v: str) -> Any:
 		'CONTENT_DIGEST': ParseParameters(),
 		'CONTENT_DISPOSITION': ParseStringWithParameters(paramsep=';'),
 		'CONTENT_DPR': ParseFloat(),
-		'CONTENT_ENCODING': ParseList(),
+		'CONTENT_ENCODING': ParseString(),
 		'CONTENT_LANGUAGE': ParseList(),
 		'CONTENT_LENGTH': ParseInteger(),
 		'CONTENT_LOCATION': ParseString(),
