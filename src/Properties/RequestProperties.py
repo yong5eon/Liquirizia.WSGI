@@ -99,6 +99,7 @@ class RequestStreamProperties(object):
 		parameter: Parameter = None,
 		header: Header = None,
 		qs: QueryString = None,
+		onRequest: RequestFilter = None,
 	):
 		self.method = method
 		self.url = url
@@ -106,6 +107,7 @@ class RequestStreamProperties(object):
 		self.parameter = parameter
 		self.header = header
 		self.qs = qs
+		self.onRequest = onRequest
 		return
 	
 	def __call__(self, obj: Type[RequestStreamRunner]):
@@ -122,6 +124,7 @@ class RequestStreamProperties(object):
 			parameter=self.parameter,
 			header=self.header,
 			qs=self.qs,
+			onRequest=self.onRequest,
 		))
 		return obj
 
@@ -135,6 +138,7 @@ class RequestServerSentEventsProperties(object):
 		parameter: Parameter = None,
 		header: Header = None,
 		qs: QueryString = None,
+		onRequest: RequestFilter = None,
 	):
 		self.method = method
 		self.url = url
@@ -142,6 +146,7 @@ class RequestServerSentEventsProperties(object):
 		self.parameter = parameter
 		self.header = header
 		self.qs = qs
+		self.onRequest = onRequest
 		return
 	
 	def __call__(self, obj: Type[RequestServerSentEventsRunner]):
@@ -158,6 +163,7 @@ class RequestServerSentEventsProperties(object):
 			parameter=self.parameter,
 			header=self.header,
 			qs=self.qs,
+			onRequest=self.onRequest,
 		))
 		return obj
 
@@ -172,6 +178,7 @@ class RequestWebSocketProperties(object):
 		parameter: Parameter = None,
 		header: Header = None,
 		qs: QueryString = None,
+		onRequest: RequestFilter = None,
 	):
 		self.method = method
 		self.url = url
@@ -179,6 +186,7 @@ class RequestWebSocketProperties(object):
 		self.parameter = parameter
 		self.header = header
 		self.qs = qs
+		self.onRequest = onRequest
 		return
 	
 	def __call__(self, obj: Type[RequestWebSocketRunner]):
@@ -194,6 +202,7 @@ class RequestWebSocketProperties(object):
 			parameter=self.parameter,
 			header=self.header,
 			qs=self.qs,
+			onRequest=self.onRequest,
 		))
 		return obj
 

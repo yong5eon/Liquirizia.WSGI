@@ -34,10 +34,12 @@ class RouteRequestWebSocket(Route, RouteRun):
 		parameter: Validator = None,
 		header: Validator = None,
 		qs: Validator = None,
+		onRequest: RequestFilter = None,
 		cors=CORS(),
 	):
 		super(RouteRequestWebSocket, self).__init__('GET', url, cors=cors)
 		self.object = obj
+		self.onRequest = onRequest
 		self.parameter = parameter
 		self.header = header
 		self.qs = qs
@@ -62,6 +64,12 @@ class RouteRequestWebSocket(Route, RouteRun):
 
 		if self.qs:
 			request.args = self.qs(request.args)
+
+		if self.onRequest:
+			request, response = self.onRequest(request)
+			if response:
+				writer.response(response)
+				return
 
 		obj = self.object(request)
 		if request.header('Sec-WebSocket-Protocol') and not obj.switch(request.header('Sec-WebSocket-Protocol')):

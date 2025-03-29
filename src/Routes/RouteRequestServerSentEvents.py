@@ -32,10 +32,12 @@ class RouteRequestServerSentEvents(Route, RouteRun):
 		parameter: Validator = None,
 		header: Validator = None,
 		qs: Validator = None,
+		onRequest: RequestFilter = None,
 		cors=CORS(),
 	):
 		super(RouteRequestServerSentEvents, self).__init__(method, url, cors=cors)
 		self.object = obj
+		self.onRequest = onRequest
 		self.parameter = parameter
 		self.header = header
 		self.qs = qs
@@ -60,6 +62,12 @@ class RouteRequestServerSentEvents(Route, RouteRun):
 
 		if self.qs:
 			request.args = self.qs(request.args)
+
+		if self.onRequest:
+			request, response = self.onRequest(request)
+			if response:
+				writer.response(response)
+				return
 
 		obj = self.object(request)
 		obj.run(ServerSentEvents(writer))
