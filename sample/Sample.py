@@ -61,6 +61,8 @@ class SampleHandler(Handler):
 			str(response),
 			response.size
 		))
+		for k, _ in response.headers():
+			print('{} - {}'.format(k, response.header(k)))
 		return response
 	def onRequestComplete(self, request: Request):
 		print('{} - {} - REQUEST DONE      - {} - {}'.format(
