@@ -27,6 +27,7 @@ __all__ = (
 	'Parameter',
 	'Header',
 	'QueryString',
+	'Body',
 	'Content',
 	'Boolean',
 	'Integer',
@@ -107,94 +108,15 @@ class Content(Validator):
 		return
 
 
-class Boolean(Content):
-	"""Boolean Body Validator"""
+class Body(object):
+	"""Body Validator"""
 	def __init__(
 		self,
-		*patterns: Iterable[Pattern],
-		required: bool = True,
-		error: Error = None,
+		format: str,
+		content: Union[Content, Sequence[Content]] = None,
 	):
-		super().__init__(IsBool(*patterns, error=error) if required else IsToNone(IsBool(*patterns, error=error)))
+		self.content = content
 		return
 
 
-class Integer(Content):
-	"""Integer Body Validator"""
-	def __init__(
-		self,
-		*patterns: Iterable[Pattern],
-		required: bool = True,
-		error: Error = None,
-	):
-		super().__init__(IsInteger(*patterns, error=error) if required else IsToNone(IsInteger(*patterns, error=error)))
-		return
 
-
-class Number(Content):
-	"""Number Body Validator"""
-	def __init__(
-		self,
-		*patterns: Iterable[Pattern],
-		required: bool = True,
-		error: Error = None,
-	):
-		super().__init__(IsFloat(*patterns, error=error) if required else IsToNone(IsFloat(*patterns, error=error)))
-		return
-
-
-class String(Content):
-	"""String Body Validator"""
-	def __init__(
-		self,
-		*patterns: Iterable[Pattern],
-		required: bool = True,
-		error: Error = None,
-	):
-		super().__init__(IsString(*patterns, error=error) if required else IsToNone(IsString(*patterns, error=error)))
-		return
-
-
-class Array(Content):
-	"""Array Body Validator"""
-	def __init__(
-		self,
-		*patterns: Iterable[Pattern],
-		required: bool = True,
-		error: Error = None,
-	):
-		super().__init__(IsArray(
-			*patterns,
-			error=error,
-		) if required else IsToNone(IsArray(
-			*patterns,
-			error=error,
-		)))
-		return
-
-
-class Object(Content):
-	"""Parameters(Dictionary) Body Validator"""
-	def __init__(
-		self,
-		mappings: Dict[str, Union[Pattern, Sequence[Pattern]]] = None,
-		requires: Union[str, Sequence[str]] = None,
-		requiresError: Error = None,
-		required: bool = True,
-		error: Error = None,
-	):
-		for k, patterns in mappings.items() if mappings else []:
-			if not isinstance(patterns, (list, tuple)): patterns = [patterns]
-			mappings[k] = Validator(*patterns)
-		if requires and not isinstance(requires, Sequence):
-			requires = [requires]
-		super().__init__(IsDictionary(
-			IsRequiredInDictionary(*requires if requires else [] , error=requiresError),
-			IsMappingOfDictionary(mappings if mappings else {}, error=error),
-			error=error,
-		) if required else IsToNone(IsDataObject(
-			IsRequiredInDictionary(*requires if requires else [] , error=requiresError),
-			IsMappingOfDictionary(mappings if mappings else {}, error=error),
-			error=error,
-		)))
-		return
