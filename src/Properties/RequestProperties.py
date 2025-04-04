@@ -26,7 +26,7 @@ from ..Decoders import (
 )
 from ..CORS import CORS
 
-from typing import Type, Sequence
+from typing import Type, Sequence, Union
 
 __all__ = (
 	'RequestProperties',
@@ -38,22 +38,129 @@ __all__ = (
 
 class RequestProperties(object):
 	"""Request Properties Decorator Class for RequestRunner"""
+	"""
+	Declare Request
+	----------------------------------------------------------------------------
+	@RequestProperties(
+		method='...',
+		url='/api/sample/:a/:b/:c',
+		auth=Http(
+			scheme='Bearer',
+			format='JWT',
+			auth=SampleAuthorization(),
+		),
+		parameter=Parameter(
+			va={
+				'a': IsString(),
+				'b': ToInteger(required=False),
+				'c': ToNumber(required=False),
+			},
+			schema={
+				'a': String(),
+				'b': Integer(required=False),
+				'c': Number(required=False),
+			},
+		),
+		qs=QueryString(
+			va={
+				'a': IsString(),
+				'b': ToInteger(required=False),
+				'c': ToFloat(required=False),
+			},
+			requires=['a'],
+			requiresError=BadRequestError('a is required'),
+			schema={
+				'a': String(),
+				'b': Integer(required=False),
+				'c': Number(required=False),
+			},
+		),
+		header=Header(
+			va={
+				'X-Custom-Header': IsString(),
+			},
+			requires=['Authorization'],
+			requiresError=Error('Authorization header is required'),
+			schema={
+				'X-Custom-Header': String(),
+			},
+		),
+		body=Body(
+			content=Content(
+				va=IsObject(
+					required=False,
+				),
+				requres=['a'],
+				requresError=BadRequestError('a is required'),
+				error=BadRequestError('Invalid JSON'),
+				decode=JavaScriptObjectNotationDecoder(),
+				format='application/json',
+				schema=Object(
+					properties={
+						'a': IsString(),
+						'b': IsInteger(required=False),
+						'c': IsNumber(required=False),
+					},
+					required=False,
+				),
+			),
+			content=Content(
+				format='application/x-www-form-urlencoded',
+				schema=Object(
+					properties={
+						'a': IsString(),
+						'b': IsInteger(required=False),
+						'c': IsNumber(required=False),
+					},
+					required=False,
+				),
+				decoder=FormUrlEncodedDecoder(),
+				va=IsObject(
+					required=False,
+				),
+				requres=['a'],
+				requresError=BadRequestError('a is required'),
+				error=BadRequestError('Invalid FormUrlEncoded'),
+			),
+		),
+		response=(
+			Response(
+				status=200,
+				description='성공',
+				content=Content(
+					format='application/json',
+					schema=Object(),
+				),
+			),
+			Response(
+				status=400,
+				description='실패',
+				content=Content(
+					format='text/plain',
+				),
+			),
+			...
+		),
+		origin='*',
+		onRequest=SampleRequest(),
+		onResponse=SampleResponse(),
+	)
+	class SampleRequest(RequestRunner):
+		...
+	"""
 	def __init__(
 		self,
 		method: str,
 		url: str,
-		cors: CORS = CORS(),
 		parameter: Parameter = None,
-		header: Header = None,
 		qs: QueryString = None,
-		content: Content = None,
-		contentParsers: Sequence[Decoder] = (
-			TextDecoder('utf-8'),
-			FormUrlEncodedDecoder('utf-8'),
-			JavaScriptObjectNotationDecoder('utf-8'),
-		),
+		header: Header = None,
+		body = None,
+		auth = None,
+		origin: Union[str, Sequence[str]] = None,
 		onRequest: RequestFilter = None,
 		onResponse : ResponseFilter = None,
+		respones = None,
 	):
 		self.method = method
 		self.url = url
