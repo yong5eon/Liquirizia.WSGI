@@ -131,13 +131,6 @@ class RequestDescription(object):
 			RequestServerSentEventsRunner,
 			RequestWebSocketRunner
 		]]):
-		if not self.description.method or not self.description.url:
-			self.description.method = obj.__properties__.method
-			self.description.url = obj.__properties__.url
-		if not self.description.method:
-			raise RuntimeError('Method is required')
-		if not self.description.url:
-			raise RuntimeError('URL is required')
 		descriptor = Descriptor()
 		descriptor.add(self.description)
 		return obj
