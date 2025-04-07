@@ -38,10 +38,6 @@ class JavaScriptObjectNotationEncoder(Encoder):
 		self.chs = charset
 		self.ea = ensure_ascii
 		return
-	@property
-	def format(self): return 'application/json'
-	@property
-	def charset(self): return self.chs
 	def __call__(self, obj):
 		return dumps(
 			obj, 
