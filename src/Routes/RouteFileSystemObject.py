@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from ..Route import Route
-from ..RouteRun import RouteRun
+from ..RequestFactory import RequestFactory
 
 from ..Request import Request
 from ..Filters import *
 from ..RequestReader import RequestReader
 from ..ResponseWriter import ResponseWriter
-from ..CORS import CORS
-
 from ..Responses import (
 	ResponseBuffer,
 	ResponseNotModified,
@@ -25,18 +23,24 @@ __all__ = (
 )
 
 
-class RouteFileSystemObject(Route, RouteRun):
+class RouteFileSystemObject(Route, RequestFactory):
 	"""File System Object Route Class"""
-
+	"""
+	TODO : Do something according to follows
+	- Origin
+	- Authorization
+	- Parameter
+	- QueryString
+	- Header
+	"""
 	def __init__(
 		self,
 		prefix: str,
 		fso: Connection,
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
-		cors: CORS = CORS(),
 	):
-		super(RouteFileSystemObject, self).__init__('GET', '{}'.format(prefix), cors=cors)
+		super(RouteFileSystemObject, self).__init__('GET', '{}'.format(prefix))
 		self.prefix = prefix
 		self.fso = fso
 		self.regex = compile('^{}/'.format(prefix))

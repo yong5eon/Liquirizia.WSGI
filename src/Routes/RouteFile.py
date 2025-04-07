@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from ..Route import Route
-from ..RouteRun import RouteRun
+from ..RequestFactory import RequestFactory
 
 from ..Request import Request
 from ..Filters import (
@@ -10,8 +10,6 @@ from ..Filters import (
 )
 from ..RequestReader import RequestReader
 from ..ResponseWriter import ResponseWriter
-from ..CORS import CORS
-
 from ..Responses import (
 	ResponseFile,
 	ResponseNotModified,
@@ -31,18 +29,24 @@ __all__ = (
 )
 
 
-class RouteFile(Route, RouteRun):
+class RouteFile(Route, RequestFactory):
 	"""File Route Class"""
-
+	"""
+	TODO : Do something according to follows
+	- Origin
+	- Authorization
+	- Parameter
+	- QueryString
+	- Header
+	"""
 	def __init__(
 		self,
 		url,
 		path,
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
-		cors: CORS = CORS(),
 	):
-		super(RouteFile, self).__init__('GET', url, cors=cors)
+		super(RouteFile, self).__init__('GET', url)
 		self.onRequest = onRequest
 		self.onResponse = onResponse
 		self.path = path
@@ -89,17 +93,15 @@ class RouteFile(Route, RouteRun):
 
 		if request.header('ETag') and request.header('ETag') == self.etag():
 			response = ResponseNotModified()
-			for k, v in self.headers(request).items():
-				response.header(k, v)
 			writer.response(response)
 			return
 
 		if request.header('If-Modified-Since'):
-			timestamp = request.header('If-Modified-Since').replace(tzinfo=timezone.utc).timestamp()
+			# TODO : fix error
+			# request.header('If-Modified-Since') return datetime
+			timestamp = request.header('If-Modified-Since').timestamp()
 			if timestamp and timestamp >= self.timestamp():
 				response = ResponseNotModified()
-				for k, v in self.headers(request).items():
-					response.header(k, v)
 				writer.response(response)
 				return
 

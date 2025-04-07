@@ -1,16 +1,20 @@
 # -*- coding: utf-8 -*-
 
 from ..Route import Route
-from ..RouteRun import RouteRun
+from ..RequestFactory import RequestFactory
 
 from ..Request import Request
-from ..Properties import RequestServerSentEventsRunner
+from ..Properties import  RequestServerSentEventsRunner
+from ..Validator import (
+	Origin,
+	Auth,
+	Parameter,
+	QueryString,
+	Header,
+)
 from ..Filters import *
 from ..RequestReader import RequestReader
 from ..ResponseWriter import ResponseWriter
-from ..CORS import CORS
-
-from Liquirizia.Validator import Validator
 
 from ..Extends import ServerSentEvents
 
@@ -21,7 +25,7 @@ __all__ = (
 )
 
 
-class RouteRequestServerSentEvents(Route, RouteRun):
+class RouteRequestServerSentEvents(Route, RequestFactory):
 	"""Route Request Stream Chunked Class"""
 
 	def __init__(
@@ -29,18 +33,19 @@ class RouteRequestServerSentEvents(Route, RouteRun):
 		obj: Type[RequestServerSentEventsRunner],
 		method: str,
 		url: str,
-		parameter: Validator = None,
-		header: Validator = None,
-		qs: Validator = None,
-		onRequest: RequestFilter = None,
-		cors=CORS(),
+		origin: Origin = None,
+		auth: Auth = None,
+		parameter: Parameter = None,
+		qs: QueryString = None,
+		header: Header = None,
 	):
-		super(RouteRequestServerSentEvents, self).__init__(method, url, cors=cors)
+		super(RouteRequestServerSentEvents, self).__init__(method, url)
 		self.object = obj
-		self.onRequest = onRequest
+		self.origin = origin
+		self.auth = auth
 		self.parameter = parameter
-		self.header = header
 		self.qs = qs
+		self.header = header
 		return
 
 	def run(
@@ -49,27 +54,11 @@ class RouteRequestServerSentEvents(Route, RouteRun):
 		reader: RequestReader,
 		writer: ResponseWriter,
 	):
-		if self.parameter:
-			request.params = self.parameter(request.params)
-
-		if self.header:
-			headers = {}
-			for k, v in request.headers():
-				headers[k] = v
-			headers = self.header(headers)
-			for k, v in headers.items():
-				request.header(k, v)
-
-		if self.qs:
-			request.args = self.qs(request.args)
-
-		if self.onRequest:
-			request, response = self.onRequest(request)
-			if response:
-				writer.response(response)
-				return
-
-		obj = self.object(request)
-		obj.run(ServerSentEvents(writer))
+		if self.origin: self.origin(request)
+		if self.auth: self.auth(request)
+		if self.parameter: self.parameter(request)
+		if self.qs: self.qs(request)
+		if self.header: self.header(request)
+		o = self.object(request)
+		o.run(ServerSentEvents(writer))
 		return
-	

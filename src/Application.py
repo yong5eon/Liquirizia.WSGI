@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from .Configuration import Configuration
 from .Request import Request
 from .Router import Router
-from .RouteOptions import RouteOptions
 from .Routes import (
+	RouteOptions,
 	RouteFile,
 	RouteFileSystemObject,
 	RouteRequest,
@@ -12,50 +11,47 @@ from .Routes import (
 	RouteRequestWebSocket,
 	RouteRequestServerSentEvents,
 )
-from .Decoder import Decoder
-from .Decoders import (
-	TextDecoder,
-	FormUrlEncodedDecoder,
-	JavaScriptObjectNotationDecoder,
-)
 from .Properties import (
 	RequestRunner,
 	RequestStreamRunner,
 	RequestWebSocketRunner,
 	RequestServerSentEventsRunner,
 )
+from .Validator import (
+	Origin,
+	Auth,
+	Parameter,
+	QueryString,
+	Header,
+	Body,
+)
 from .Filters import (
 	RequestFilter,
 	ResponseFilter,
 )
-from .CORS import CORS
-
-from Liquirizia.Validator import Validator
 from Liquirizia.FileSystemObject import Connection
-
 from .Request import Request
 from .RequestReader import RequestReader
 from .ResponseWriter import ResponseWriter
 from .Error import Error
-
-from .Responses import ResponseError
 from .Errors import (
 	InternalServerError,
 	ServiceUnavailableError,
 	MethodNotAllowedError,
 	NotFoundError,
 )
+from .Responses import ResponseError
+from .Description import Response
 from .Utils import ToHeader
 
 from .Handler import Handler
 
-from urllib.parse import unquote
 from platform import system
 from os import walk
 from os.path import splitext
 from uuid import uuid4
 
-from typing import Type, Dict, Callable, Sequence
+from typing import Type, Dict, Callable, Sequence, Union
 
 __all__ = (
 	'Application'
@@ -64,14 +60,13 @@ __all__ = (
 
 class Application(object):
 	"""WSGI Application Class"""
-
 	def __init__(
 		self, 
-		conf: Configuration = Configuration(),
+		headers: Dict[str, str] = None,
 		handler: Handler = None,
 	):
 		self.router = Router()
-		self.config = conf
+		self.headers = headers if headers else {}
 		self.requestHandler = handler
 		return
 
@@ -88,12 +83,12 @@ class Application(object):
 			for k, v in env.items():
 				if k[0:5] == 'HTTP_':
 					k = ToHeader(k[5:])
-					k = self.config.toHeaderName(k)
+					k = self.toHeaderName(k)
 					headers[k] = v
 					continue
 				if k in ['CONTENT_TYPE', 'CONTENT_LENGTH'] and v:
 					k = ToHeader(k)
-					k = self.config.toHeaderName(k)
+					k = self.toHeaderName(k)
 					headers[k] = v
 					continue
 
@@ -125,25 +120,7 @@ class Application(object):
 				headers=headers,
 				id=env['REQUEST_ID'],
 			)
-			cors = CORS(
-				origin=self.config.cors.origin,
-				headers=self.config.cors.headers,
-				exposeHeaders=self.config.cors.exposeHeaders,
-				credentials=self.config.cors.credentials,
-				age=self.config.cors.age,
-			)
-			if hasattr(runner, 'cors') and getattr(runner, 'cors'):
-				if runner.cors.origin: cors.origin.extend(runner.cors.origin)
-				if runner.cors.headers: cors.headers.extend(runner.cors.headers)
-				if runner.cors.credentials: cors.credentials = runner.cors.credentials
-				if runner.cors.exposeHeaders: cors.exposeHeaders.extend(runner.cors.exposeHeaders)
-				if runner.cors.age and runner.cors.age > cors.age : cors.age = runner.cors.age
-			writer = ResponseWriter(
-				request,
-				send,
-				self.requestHandler,
-				cors,
-			)
+			writer = ResponseWriter(request, send, self.requestHandler)
 			try:
 				if self.requestHandler: 
 					request, response = self.requestHandler.onRequest(request)
@@ -159,7 +136,6 @@ class Application(object):
 					response = self.requestHandler.onRequestError(request, e)
 				else:
 					response = ResponseError(e)
-				for k, v in cors.toHeaders().items(): response.header(k, v)
 				write = send(str(response), response.headers())
 				write(response.body if response.body else b'')
 			except Exception as e:
@@ -167,7 +143,6 @@ class Application(object):
 					response = self.requestHandler.onRequestException(request, e)
 				else:
 					response = ResponseError(InternalServerError(str(e), error=e))
-				for k, v in cors.toHeaders().items(): response.header(k, v)
 				write = send(str(response), response.headers())
 				write(response.body if response.body else b'')
 		except Error as e:
@@ -186,20 +161,25 @@ class Application(object):
 			write(response.body if response.body else b'')
 		return
 	
+	def toHeaderName(self, key) -> str:
+		if not self.headers:
+			return key
+		if not isinstance(self.headers, dict):
+			return key
+		return self.headers.get(key, key)
+	
 	def addFile(
 		self,
 		path,
 		url,
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
-		cors: CORS = CORS(),
 	):
 		self.router.add(RouteFile(
 			url,
 			path,
 			onRequest=onRequest,
 			onResponse=onResponse,
-			cors=cors,
 		))
 		return
 
@@ -209,7 +189,6 @@ class Application(object):
 		prefix,
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
-		cors: CORS = CORS(),
 	):
 		if system().upper() == 'WINDOWS':
 			path = path.replace('/', '\\')
@@ -230,7 +209,6 @@ class Application(object):
 					path=file,
 					onRequest=onRequest,
 					onResponse=onResponse,
-					cors=cors,
 				))
 		return
 
@@ -240,14 +218,12 @@ class Application(object):
 		prefix,
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
-		cors: CORS = CORS(),
 	):
 		self.router.add(RouteFileSystemObject(
 			fso=fso,
 			prefix=prefix,
 			onRequest=onRequest,
 			onResponse=onResponse,
-			cors=cors,
 		))
 		return
 
@@ -256,31 +232,29 @@ class Application(object):
 		object: Type[RequestRunner],
 		method: str,
 		url: str,
-		parameter: Validator = None,
-		header: Validator = None,
-		qs: Validator = None,
-		content: Validator = None,
-		contentParsers: Sequence[Decoder] = (
-			TextDecoder('utf-8'),
-			FormUrlEncodedDecoder('utf-8'),
-			JavaScriptObjectNotationDecoder('utf-8'),
-		),
+		origin: Origin = None,
+		auth: Auth = None,
+		parameter: Parameter = None,
+		qs: QueryString = None,
+		header: Header = None,
+		body: Body = None,
+		response: Union[Response, Sequence[Response]] = None,
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
-		cors: CORS = CORS(),
 	):
 		self.router.add(RouteRequest(
 			obj=object,
 			method=method,
 			url=url,
+			origin=origin,
+			auth=auth,
 			parameter=parameter,
-			header=header,
 			qs=qs,
-			content=content,
-			contentParsers=contentParsers,
+			header=header,
+			body=body,
+			response=response,
 			onRequest=onRequest,
 			onResponse=onResponse,
-			cors=cors,
 		))
 		return
 
@@ -289,19 +263,21 @@ class Application(object):
 		object: Type[RequestStreamRunner],
 		method: str,
 		url: str,
-		parameter: Validator = None,
-		header: Validator = None,
-		qs: Validator = None,
-		cors: CORS = CORS(),
+		origin: Origin = None,
+		auth: Auth = None,
+		parameter: Parameter = None,
+		qs: QueryString = None,
+		header: Header = None,
 	):
 		self.router.add(RouteRequestStream(
 			obj=object,
 			method=method,
 			url=url,
+			origin=origin,
+			auth=auth,
 			parameter=parameter,
-			header=header,
 			qs=qs,
-			cors=cors,
+			header=header,
 		))
 		return
 
@@ -309,18 +285,20 @@ class Application(object):
 		self,
 		object: Type[RequestWebSocketRunner],
 		url: str,
-		parameter: Validator = None,
-		header: Validator = None,
-		qs: Validator = None,
-		cors: CORS = CORS(),
+		origin: Origin = None,
+		auth: Auth = None,
+		parameter: Parameter = None,
+		qs: QueryString = None,
+		header: Header = None,
 	):
 		self.router.add(RouteRequestWebSocket(
 			obj=object,
 			url=url,
+			origin=origin,
+			auth=auth,
 			parameter=parameter,
-			header=header,
 			qs=qs,
-			cors=cors,
+			header=header,
 		))
 		return
 
@@ -328,17 +306,19 @@ class Application(object):
 		self,
 		object: Type[RequestServerSentEventsRunner],
 		url: str,
-		parameter: Validator = None,
-		header: Validator = None,
-		qs: Validator = None,
-		cors: CORS = CORS(),
+		origin: Origin = None,
+		auth: Auth = None,
+		parameter: Parameter = None,
+		qs: QueryString = None,
+		header: Header = None,
 	):
 		self.router.add(RouteRequestServerSentEvents(
 			obj=object,
 			url=url,
+			origin=origin,
+			auth=auth,
 			parameter=parameter,
-			header=header,
 			qs=qs,
-			cors=cors,
+			header=header,
 		))
 		return
