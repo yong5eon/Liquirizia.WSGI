@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from ..Decoder import Decoder
+from ..Error import Error
 from ..Errors import BadRequestError
 
 from urllib.parse import parse_qs, unquote_plus
@@ -11,28 +12,28 @@ from typing import Any
 __all__ = (
 	'TextDecoder',
 	'FormUrlEncodedDecoder',
-	'JavaScriptObjectNotataionDecoder',
+	'JavaScriptObjectNotationDecoder',
 )
 
 
 class TextDecoder(Decoder):
-	def __init__(self, charset: str ='utf-8'):
-		self.chs = charset
+	def __init__(self, charset: str ='utf-8', error: Error = None):
+		self.charset = charset
+		self.error = error
 		return
 	def __call__(self, body: bytes) -> Any:
 		try:
 			return body.decode(self.charset)
 		except Exception as e:
+			if self.error:
+				raise self.error(str(e), error=e)
 			raise BadRequestError(str(e), error=e)
-	@property
-	def format(self): return 'text/plain'
-	@property
-	def charset(self): return self.chs
 
 
 class FormUrlEncodedDecoder(Decoder):
-	def __init__(self, charset: str = 'utf-8'):
-		self.chs = charset
+	def __init__(self, charset: str = 'utf-8', error: Error = None):
+		self.charset = charset
+		self.error = error
 		return
 	def __call__(self, body: bytes) -> Any:
 		try:
@@ -53,23 +54,20 @@ class FormUrlEncodedDecoder(Decoder):
 					q[key] = unquote_plus(value)
 			return q
 		except Exception as e:
+			if self.error:
+				raise self.error(str(e), error=e)
 			raise BadRequestError(str(e), error=e)
-	@property
-	def format(self): return 'application/x-www-form-urlencoded'
-	@property
-	def charset(self): return self.chs
 
 
 class JavaScriptObjectNotationDecoder(Decoder):
-	def __init__(self, charset: str = 'utf-8'):
-		self.chs = charset
+	def __init__(self, charset: str = 'utf-8', error: Error = None):
+		self.charset = charset
+		self.error = error
 		return
 	def __call__(self, body: bytes) -> Any:
 		try:
 			return loads(body, cls=JSONDecoder)
 		except Exception as e:
+			if self.error:
+				raise self.error(str(e), error=e)
 			raise BadRequestError(str(e), error=e)
-	@property
-	def format(self): return 'application/json'
-	@property
-	def charset(self): return self.chs
