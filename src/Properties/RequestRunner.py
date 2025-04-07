@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from .Properties import Properties
-
 from ..Request import Request
 from ..Response import Response
 
@@ -14,9 +12,6 @@ __all__ = (
 
 class RequestRunner(metaclass=ABCMeta):
 	"""Request Runner Interface"""
-
-	__properties__: Properties = None
-
 	@abstractmethod
 	def __init__(self, request: Request):
 		raise NotImplementedError('{} must be implemented __init__'.format(self.__class__.__name__))
