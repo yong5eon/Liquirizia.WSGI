@@ -20,8 +20,8 @@ class ResponseText(Response):
 			message=message,
 			headers=headers,
 			body=encode(body),
-			format=encode.format,
-			charset=encode.charset,
+			format='text/plain',
+			charset='utf-8',
 		)
 		return
 
@@ -34,8 +34,8 @@ class ResponseHTML(Response):
 			message=message,
 			headers=headers,
 			body=encode(body),
-			format=encode.format,
-			charset=encode.charset,
+			format='text/html',
+			charset='utf-8',
 		)
 		return
 
@@ -49,7 +49,7 @@ class ResponseJSON(Response):
 			message=message,
 			headers=headers,
 			body=encode(body),
-			format=encode.format,
-			charset=encode.charset,
+			format='application/json',
+			charset='utf-8',
 		)
 		return
