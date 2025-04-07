@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from Liquirizia.WSGI.Properties import RequestProperties, RequestRunner
+from Liquirizia.WSGI.Properties import RequestRunner
+from Liquirizia.WSGI import RequestProperties
 from Liquirizia.WSGI import Request
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Description import Descriptor, Tag

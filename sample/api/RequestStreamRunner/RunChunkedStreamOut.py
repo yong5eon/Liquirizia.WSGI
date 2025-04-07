@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from Liquirizia.WSGI.Properties import (
+from Liquirizia.WSGI.Properties import RequestStreamRunner
+from Liquirizia.WSGI import (
 	RequestStreamProperties,
-	RequestStreamRunner,
+	Request,
+	RequestReader,
+	ResponseWriter,
 )
-from Liquirizia.WSGI import Request, RequestReader, ResponseWriter
 from Liquirizia.WSGI.Extends import ChunkedStreamWriter
-from Liquirizia.WSGI.Description import *
 from Liquirizia.WSGI.Encoders import TextEncoder
 
 from time import sleep
@@ -15,24 +16,13 @@ __all__ = (
 	'RunChunkedStreamOut'
 )
 
-@RequestDescription(
-	summary='청크드 출력 스트림 샘플',
-	description='1초 간격으로 0에서 9까지 송출',
-	tags='RequestStreamRunner - Chunked',
-	responses=(
-		Response(
-			status=200,
-			description='완료',
-			content=Content(
-				format='text/plain',
-				example='0123456789',
-			),
-		),
-	),
-)
+
 @RequestStreamProperties(
 	method='GET',
 	url='/api/run/stream/chunked',
+	summary='청크드 출력 스트림 샘플',
+	description='1초 간격으로 0에서 9까지 송출',
+	tags='RequestStreamRunner - Chunked',
 )
 class RunChunkedStreamOut(RequestStreamRunner):
 	def __init__(self, request: Request):
@@ -40,7 +30,7 @@ class RunChunkedStreamOut(RequestStreamRunner):
 		return
 
 	def run(self, reader: RequestReader, writer: ResponseWriter):
-		writer = ChunkedStreamWriter(writer)
+		writer: ChunkedStreamWriter = ChunkedStreamWriter(writer)
 		writer.begin(format='text/plain', charset='utf-8')
 		encode = TextEncoder('utf-8')
 		for i in range(0, 10):

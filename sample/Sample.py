@@ -2,7 +2,6 @@
 
 from Liquirizia.WSGI import (
 		Application, 
-		Configuration,
 		Handler,
 		Request,
 		Response,
@@ -92,7 +91,7 @@ class SampleHandler(Handler):
 		tb += '\n'
 		tb += ''.join(format_tb(e.__traceback__)).strip().replace(' ' * 4, ' ' * 2)
 		print(tb)
-		return ResponseInternalServerError(body=tb, format='text/plain', charset='utf-8')
+		return ResponseInternalServerError(body=tb.encode(), format='text/plain', charset='utf-8')
 	def onError(self, env, error: Error):
 		print('{} - {} - ERROR            - {} - {}'.format(
 			datetime.now().isoformat(),
@@ -113,16 +112,14 @@ class SampleHandler(Handler):
 		tb += '\n'
 		tb += ''.join(format_tb(e.__traceback__)).strip().replace(' ' * 4, ' ' * 2)
 		print(tb)
-		return ResponseServiceUnavailable(body=tb, format='text/plain', charset='utf-8')
+		return ResponseServiceUnavailable(body=tb.encode(), format='text/plain', charset='utf-8')
 
 
 aps = Application(
 	handler=SampleHandler(),
-	conf=Configuration(
-		headers={
-			'X_TOKEN': 'X-Token',
-		},
-	)
+	headers={
+		'X_TOKEN': 'X-Token',
+	},
 )
 
 descriptor = Descriptor(
@@ -140,7 +137,7 @@ descriptor = Descriptor(
 	# version='3.0.0'
 )
 
-Load(path='sample/api')
+Load(mod='api')
 
 # apply swagger-ui
 import sys
@@ -151,12 +148,6 @@ from swagger_ui import supported_list
 sys.modules['swagger_ui.handlers.Liquirizia'] = DocumentHandler
 supported_list.append('Liquirizia')
 
-from Liquirizia.WSGI import Application, Configuration
-from Liquirizia.WSGI.Description import (
-	Descriptor,
-	Information,
-	Contact,
-)
 from swagger_ui import api_doc
 
 api_doc(
