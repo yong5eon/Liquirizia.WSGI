@@ -15,7 +15,7 @@ __all__ = (
 
 @RequestProperties(
 	method='GET',
-	url='/api/doc',
+	url='/doc/spec',
 )
 class RunGet(RequestRunner):
 	def __init__(self, request: Request):

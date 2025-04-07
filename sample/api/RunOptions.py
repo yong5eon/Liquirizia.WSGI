@@ -16,14 +16,13 @@ __all__ = (
 
 @RequestProperties(
 	method='GET',
-	url='/api/options',
+	url='/options',
 	qs=QueryString(
 		{
 			'p': IsString(error=BadRequestError('경로(p) 는 문자열을 필요로 합니다')),
 		},
 		requires=('p',),
 		requiresError=BadRequestError('질의에 경로(p) 는 필수 입니다.'),
-		error=BadRequestError('질의를 필요로 합니다.')
 	),
 )
 class RunOptions(RequestRunner):

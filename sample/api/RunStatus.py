@@ -15,7 +15,7 @@ __all__ = (
 
 @RequestProperties(
 	method='GET',
-	url='/',
+	url='/status',
 )
 class RunGet(RequestRunner):
 	def __init__(self, request: Request):

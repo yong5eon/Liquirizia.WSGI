@@ -10,8 +10,8 @@
 <body>
 	<article>
 		<div class="container">
-			<h2>요청 테스트</h2>
-			<h3>URL 패턴: <span>/api/run/:a/:b</span>, 요청 URL: <span>/api/run/${INTEGER}/${INTEGER}</span></h3>
+			<h2>RequestRunner</h2>
+			<h3>URL: <span>/api/run/:a/:b</span>, 요청 URL: <span>/api/run/${INTEGER}/${INTEGER}</span></h3>
 			<form id="frm-test">
 				<div class="form-group row">
 					<label class="col-form-label col-3 text-right">요청 방식</label>
@@ -61,8 +61,42 @@
 			</blockquote>
 		</div>
 		<div class="container">
-			<h2>요청 컨텐츠 검증 테스트</h2>
-			<h3>URL 패턴: <span>/api/run/${TYPE}</span></h3>
+			<h2>RequestStreamRunner - Stream Out</h2>
+			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestStreamOut">테스트</button>
+			<blockquote class="blockquote" id="frmTestStreamOutResult">
+				<p class="mb-0"></p>
+				<pre class="mb-0"></pre>
+			</blockquote>
+		</div>
+		<div class="container">
+			<h2>RequestStreamRunner - Chunked Stream Out</h2>
+			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestChunkedStreamOut">테스트</button>
+			<blockquote class="blockquote" id="frmTestChunkedStreamOutResult">
+				<p class="mb-0"></p>
+				<pre class="mb-0"></pre>
+			</blockquote>
+		</div>
+		<div class="container">
+			<h2>RequestServerSentEventsRunner</h2>
+			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestServerSentEventStart">테스트</button>
+			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestServerSentEventStop" style="display: none;">테스트 종료</button>
+			<blockquote class="blockquote" id="frmTestServerSentEvent">
+				<p class="mb-0"></p>
+				<pre class="mb-0"></pre>
+			</blockquote>
+		</div>
+		<div class="container">
+			<h2>RequestWebSocketRunner</h2>
+			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestWebSocketStart">시작</button>
+			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestWebSocketSend" style="display: none;">테스트</button>
+			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestWebSocketStop" style="display: none;">종료</button>
+			<blockquote class="blockquote" id="frm-test-websocket-result">
+				<pre class="mb-0"></pre>
+			</blockquote>
+		</div>
+		<div class="container">
+			<h2>Content Validation</h2>
+			<h3>URL: <span>/api/run/${TYPE}</span></h3>
 			<form id="frm-test-2">
 				<div class="form-group row">
 					<label class="col-form-label col-3 text-right">켄텐츠 유형</label>
@@ -107,40 +141,7 @@
 				<pre class="mb-0"></pre>
 			</blockquote>
 		</div>
-		<div class="container">
-			<h2>스트림 출력 테스트</h2>
-			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestStreamOut">테스트</button>
-			<blockquote class="blockquote" id="frmTestStreamOutResult">
-				<p class="mb-0"></p>
-				<pre class="mb-0"></pre>
-			</blockquote>
-		</div>
-		<div class="container">
-			<h2>청크 스트림 출력 테스트</h2>
-			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestChunkedStreamOut">테스트</button>
-			<blockquote class="blockquote" id="frmTestChunkedStreamOutResult">
-				<p class="mb-0"></p>
-				<pre class="mb-0"></pre>
-			</blockquote>
-		</div>
-		<div class="container">
-			<h2>서버 센트 이벤트(Server Sent Event) 테스트</h2>
-			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestServerSentEventStart">테스트</button>
-			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestServerSentEventStop" style="display: none;">테스트 종료</button>
-			<blockquote class="blockquote" id="frmTestServerSentEvent">
-				<p class="mb-0"></p>
-				<pre class="mb-0"></pre>
-			</blockquote>
-		</div>
-		<div class="container">
-			<h2>웹 소켓 테스트</h2>
-			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestWebSocketStart">시작</button>
-			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestWebSocketSend" style="display: none;">테스트</button>
-			<button class="btn btn-primary btn-sm btn-block" type="button" id="btnTestWebSocketStop" style="display: none;">종료</button>
-			<blockquote class="blockquote" id="frm-test-websocket-result">
-				<pre class="mb-0"></pre>
-			</blockquote>
-		</div>
+
 		<div class="container">
 			<h2>필터 테스트</h2>
 			<img src="/thumbs/sample" class="img-fluid">
