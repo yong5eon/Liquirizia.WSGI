@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.Validator import Validator, Pattern
-from .Validators import (
-	IsObject,
+from Liquirizia.Validator.Patterns import IsDataObject
+from Liquirizia.Validator.Patterns.DataObject import (
+	IsRequiredIn,
+	IsMappingOf,
 )
+from .Validators import IsObject
 from .Description import (
 	Value,
 	Schema,
@@ -36,7 +39,6 @@ __all__ = (
 	'QueryString',
 	'Header',
 	'Body',
-	'Content',
 )
 
 
@@ -148,13 +150,9 @@ class Parameter(object):
 	def __init__(
 		self,
 		parameters : Dict[str, Union[Pattern, Sequence[Pattern]]],
-		error: Error = None,
 		schema: Dict[str, Value] = None,
 	):
-		self.va = Validator(IsObject(
-			mappings=parameters,
-			error=error if error else BadRequestError('Invalid parameters'),
-		))
+		self.va = Validator(IsDataObject(IsMappingOf(parameters)))
 		self.schema = schema
 		return
 	def __call__(self, request: Request):
@@ -169,7 +167,6 @@ class QueryString(object):
 		qs: Dict[str, Union[Pattern, Sequence[Pattern]]],
 		requires: Union[str, Sequence[str]] = None,
 		requiresError: Error = None,
-		error: Error = None,
 		schema: Dict[str, Value] = None,
 	):
 		if not requiresError:
@@ -181,11 +178,9 @@ class QueryString(object):
 				))
 			else:
 				requiresError = BadRequestError('Missing required query string')
-		self.va = Validator(IsObject(
-			mappings=qs,
-			requires=requires,
-			requiresError=requiresError,
-			error=error if error else BadRequestError('Invalid query string'),
+		self.va = Validator(IsDataObject(
+			IsRequiredIn(*requires if requires else [], error=requiresError),
+			IsMappingOf(qs),
 		))
 		self.schema = schema
 		return
@@ -201,7 +196,6 @@ class Header(object):
 		headers: Dict[str, Union[Pattern, Sequence[Pattern]]],
 		requires: Union[str, Sequence[str]] = None,
 		requiresError: Error = None,
-		error: Error = None,
 		schema: Dict[str, Value] = None,
 	):
 		if not requiresError:
@@ -217,7 +211,6 @@ class Header(object):
 			mappings=headers,
 			requires=requires,
 			requiresError=requiresError,
-			error=error if error else BadRequestError('Invalid headers'),
 		))
 		self.schema = schema
 		return
@@ -231,46 +224,23 @@ class Header(object):
 		return
 
 
-class Content(object):
-	"""Content Validator"""
-	def __init__(
-		self,
-		decode: Decoder,
-		va: Pattern,
-		format: str = None,
-		schema: Union[Value, Schema] = None,
-	):
-		self.decode = decode
-		self.va = Validator(va)
-		self.format = format
-		self.schema = schema
-		return
-	def __call__(self, content: bytes):
-		decoded = self.decode(content)
-		return self.va(decoded)
-
-
 class Body(object):
 	"""Body Validator"""
 	def __init__(
 		self,
-		content: Union[Content, Sequence[Content]],
+		content: Pattern,
+		formats: Dict[str, Decoder],
 		error: Error = None,
 	):
-		self.content = content
-		if not isinstance(content, (list, tuple)):
-			self.content = [content]
+		self.va = Validator(content)
+		self.formats = formats
 		self.error = error
 		return
 	def __call__(self, request: Request, content: bytes):
 		type: ContentType = request.header('Content-Type')
-		content = None
-		for content in self.content:
-			if type.format == content.format:
-				content = content
-				break
-		if not content:
+		if type.format not in self.formats.keys():
 			if self.error:
 				raise self.error
 			raise UnsupportedMediaTypeError('Unsupported Media Type {}'.format(type.format))
-		return content(content)
+		content = self.formats[type.format](content)
+		return self.va(content)

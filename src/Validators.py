@@ -97,7 +97,7 @@ class IsBoolean(IsTypeOf):
 	):
 		return super().__init__(
 			bool,
-			patterns,
+			patterns=patterns,
 			required=required,
 			error=error,
 			requiredError=requiredError,
@@ -114,11 +114,11 @@ class ToBoolean(IsTypeOf):
 	):
 		return super().__init__(
 			bool,
-			patterns,
 			eval=bool,
+			patterns=patterns,
 			required=required,
 			error=error,
-			returnedError=requiredError,
+			requiredError=requiredError,
 		)
 
 
@@ -132,10 +132,10 @@ class IsInteger(IsTypeOf):
 	):
 		return super().__init__(
 			int,
-			patterns,
+			patterns=patterns,
 			required=required,
 			error=error,
-			returnedError=requiredError,
+			requiredError=requiredError,
 		)
 
 
@@ -149,11 +149,11 @@ class ToInteger(IsTypeOf):
 	):
 		return super().__init__(
 			int,
-			patterns,
 			eval=int,
+			patterns=patterns,
 			required=required,
 			error=error,
-			returnedError=requiredError,
+			requiredError=requiredError,
 		)
 
 
@@ -167,7 +167,7 @@ class IsNumber(IsTypeOf):
 	):
 		return super().__init__(
 			float,
-			patterns,
+			patterns=patterns,
 			required=required,
 			error=error,
 			requiredError=requiredError,
@@ -184,11 +184,11 @@ class ToNumber(IsTypeOf):
 	):
 		return super().__init__(
 			float,
-			patterns,
 			eval=float,
+			patterns=patterns,
 			required=required,
 			error=error,
-			returnedError=requiredError,
+			requiredError=requiredError,
 		)
 
 
@@ -202,7 +202,7 @@ class IsString(IsTypeOf):
 	):
 		return super().__init__(
 			str,
-			patterns,
+			patterns=patterns,
 			required=required,
 			error=error,
 			requiredError=requiredError,
@@ -219,11 +219,11 @@ class ToString(IsTypeOf):
 	):
 		return super().__init__(
 			str,
-			patterns,
 			eval=str,
+			patterns=patterns,
 			required=required,
 			error=error,
-			returnedError=requiredError,
+			requiredError=requiredError,
 		)
 
 
@@ -325,7 +325,6 @@ class ToArray(IsIterable):
 	def __init__(
 		self,
 		*patterns: Iterable[Pattern],
-		eval: Evaluate = list,
 		min: int = None,
 		max: int = None,
 		size: int = None,
@@ -337,7 +336,7 @@ class ToArray(IsIterable):
 		requiredError: Error = None,
 	):
 		return super().__init__(
-			eval=eval,
+			eval=list,
 			patterns=patterns,
 			min=min,
 			max=max,
@@ -438,8 +437,8 @@ class IsObject(IsMapping):
 			requires=requires,
 			required=required,
 			error=error,
+			requiresError=requiresError,
 			requiredError=requiredError,
-			requiresError=requiresError
 		)
 
 
@@ -447,7 +446,6 @@ class ToObject(IsMapping):
 	def __init__(
 		self,
 		mappings: Dict[str, Union[Validator, Pattern, Sequence[Pattern]]] = {},
-		eval: Evaluate = dict,
 		requires: Union[str, Sequence[str]] = None,
 		required: bool = True,
 		error: Error = None,
@@ -455,11 +453,11 @@ class ToObject(IsMapping):
 		requiredError: Error = None,
 	):
 		return super().__init__(
-			eval=eval,
+			eval=dict,
 			mappings=mappings,
 			requires=requires,
 			required=required,
 			error=error,
+			requiresError=requiresError,
 			requiredError=requiredError,
-			requiresError=requiresError
 		)
