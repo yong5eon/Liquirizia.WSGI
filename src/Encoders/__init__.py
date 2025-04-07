@@ -14,12 +14,8 @@ __all__ = (
 
 class TextEncoder(Encoder):
 	def __init__(self, charset: str ='utf-8'):
-		self.chs = charset
+		self.charset = charset
 		return
 	def __call__(self, body: Any) -> bytes:
 		return str(body).encode(self.charset)
-	@property
-	def format(self): return 'text/plain'
-	@property
-	def charset(self): return self.chs
 

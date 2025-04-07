@@ -35,7 +35,7 @@ class TypeEncoder(JSONEncoder):
 class JavaScriptObjectNotationEncoder(Encoder):
 	"""Encoder Class for JSON"""
 	def __init__(self, charset: str = 'utf-8', ensure_ascii: bool = False):
-		self.chs = charset
+		self.charset = charset
 		self.ea = ensure_ascii
 		return
 	def __call__(self, obj):
