@@ -2,14 +2,15 @@
 
 from Liquirizia.WSGI.Properties import RequestRunner
 from Liquirizia.WSGI import (
-	Request,
 	RequestProperties,
+	Request,
 )
 from Liquirizia.WSGI.Validator import *
-from Liquirizia.WSGI.Validators import *
 from Liquirizia.WSGI.Decoders import *
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
+
+from Liquirizia.Validator.Patterns import *
 
 __all__ = (
 	'RunPost'
@@ -20,12 +21,13 @@ __all__ = (
 	method='POST',
 	url='/api/content/array',
 	body=Body(
-		content=Content(
-			decode=JavaScriptObjectNotationDecoder(),
-			va=ToArray(error=BadRequestError('잘못된 본문 정보 입니다.')),
+		content=IsArray(
+			error=BadRequestError('잘못된 배열 이어야 합니다.'),
 		),
-		description='컨텐츠 검증 샘플 - 배열',
-		required=True,
+		formats={
+			'application/json': JavaScriptObjectNotationDecoder(),
+			'text/plain': TextEvaluateDecoder(),
+		},
 	),
 	summary='컨텐츠 검증 샘플 - 배열',
 	description='컨텐츠 검증 샘플 - 배열',

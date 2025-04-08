@@ -20,7 +20,7 @@ __all__ = (
 @RequestStreamProperties(
 	method='GET',
 	url='/api/run/stream/chunked',
-	summary='청크드 출력 스트림 샘플',
+	summary='Sample of Chunked Stream Output with GET',
 	description='1초 간격으로 0에서 9까지 송출',
 	tags='RequestStreamRunner - Chunked',
 )

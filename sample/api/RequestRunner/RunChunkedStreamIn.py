@@ -21,7 +21,7 @@ __all__ = (
 @RequestStreamProperties(
 	method='PUT',
 	url='/api/run/stream/chunked',
-	summary='청크드 입력 스트림 샘플',
+	summary='Sample of Chunked Stream Input with PUT',
 	description='클라이언트에서 스트림으로 입력한 값을 그대로 반환',
 	tags='RequestStreamRunner - Chunked',
 )

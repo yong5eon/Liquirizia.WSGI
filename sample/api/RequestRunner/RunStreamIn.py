@@ -1,39 +1,27 @@
 # -*- coding: utf-8 -*-
 
-from Liquirizia.WSGI.Properties import (
+from Liquirizia.WSGI.Properties import RequestStreamRunner
+from Liquirizia.WSGI import (
 	RequestStreamProperties,
-	RequestStreamRunner,
+	RequestReader,
+	ResponseWriter,
 )
-from Liquirizia.WSGI import RequestReader, ResponseWriter
 from Liquirizia.WSGI.Responses import (
 	ResponseBadRequest,
 	ResponseBuffer,
 )
-from Liquirizia.WSGI.Description import *
-
 
 __all__ = (
 	'RunStreamIn'
 )
 
 
-@RequestDescription(
-	summary='입력 스트림 샘플',
-	description='클라이언트에서 스트림으로 입력한 값을 그대로 반환',
-	tags='RequestStreamRunner',
-	responses=(
-		Response(
-			status=200,
-			description='완료',
-			content=Content(
-				format='*/*',
-			),
-		),
-	),
-)
 @RequestStreamProperties(
 	method='PUT',
 	url='/api/run/stream',
+	summary='Sample of Stream Input with PUT',
+	description='클라이언트에서 스트림으로 입력한 값을 그대로 반환',
+	tags='RequestStreamRunner',
 )
 class RunStreamIn(RequestStreamRunner):
 	def __init__(self, request):

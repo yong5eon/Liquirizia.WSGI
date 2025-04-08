@@ -1,29 +1,23 @@
 # -*- coding: utf-8 -*-
 
-from Liquirizia.WSGI.Properties import RequestWebSocketProperties, RequestWebSocketRunner
-from Liquirizia.WSGI import Request
+from Liquirizia.WSGI.Properties import RequestWebSocketRunner
+from Liquirizia.WSGI import (
+	RequestWebSocketProperties,
+	Request,
+)
 from Liquirizia.WSGI.Extends import WebSocket
-from Liquirizia.WSGI.Description import *
 
 __all__ = (
 	'RunWebSocket'
 )
 
 
-@RequestDescription(
-	summary='웹 소켓 샘플',
-	description='소켓으로 받은 요청을 그대로 송출',
-	tags='RequestWebSocketRunner',
-	responses=(
-		Response(
-			status=101,
-			description='프로토콜 전환',
-		),
-	),
-)
 @RequestWebSocketProperties(
 	method='GET',
 	url='/api/run/socket',
+	summary='Sample of WebSocket',
+	description='소켓으로 받은 요청을 그대로 송출',
+	tags='RequestWebSocketRunner',
 )
 class RunWebSocket(RequestWebSocketRunner):
 	def __init__(self, request: Request):

@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from Liquirizia.WSGI.Properties import RequestStreamProperties, RequestStreamRunner
-from Liquirizia.WSGI import Request, RequestReader, ResponseWriter
-from Liquirizia.WSGI.Description import *
+from Liquirizia.WSGI.Properties import RequestStreamRunner
+from Liquirizia.WSGI import (
+	RequestStreamProperties,
+	Request,
+	RequestReader,
+	ResponseWriter,
+)
 
 from time import sleep
 
@@ -10,24 +14,12 @@ __all__ = (
 	'RunStreamOut'
 )
 
-@RequestDescription(
-	description='1초 간격으로 0에서 9까지 송출',
-	summary='출력 스트림 샘플',
-	tags='RequestStreamRunner',
-	responses=(
-		Response(
-			status=200,
-			description='완료',
-			content=Content(
-				format='text/plain',
-				example='0123456789',
-			),
-		),
-	),
-)
 @RequestStreamProperties(
 	method='GET',
 	url='/api/run/stream',
+	summary='Sample of Stream Output with GET',
+	description='1초 간격으로 0에서 9까지 송출',
+	tags='RequestStreamRunner',
 )
 class RunStreamOut(RequestStreamRunner):
 	def __init__(self, request: Request):

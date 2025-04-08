@@ -19,7 +19,6 @@ from Liquirizia.FileSystemObject.Implements.FileSystem import (
 		Connection as FileSystemObject,
 )
 
-from api.Format import *
 
 from filters import ToJPEG
 from os.path import dirname, realpath
@@ -32,7 +31,7 @@ PATH = dirname(realpath(__file__))
 FileSystemObjectHelper.Set(
 	'Sample',
 	FileSystemObject,
-	FileSystemObjectConfiguration('sample/res/images')
+	FileSystemObjectConfiguration('res/images')
 )
 
 class SampleHandler(Handler):
@@ -125,7 +124,7 @@ aps = Application(
 descriptor = Descriptor(
 	info=Information(
 		title='Liquirizia.WSGI Sample API',
-		version=open('VERSION', 'rt').read().strip(),
+		version=open('../VERSION', 'rt').read().strip(),
 		summary='Sample API Document',
 		description='Sample API',
 		contact=Contact(
@@ -139,6 +138,7 @@ descriptor = Descriptor(
 
 Load(mod='api')
 
+from api.Format import *
 # apply swagger-ui
 import sys
 import DocumentHandler
@@ -191,16 +191,16 @@ api_doc(
 )
 
 # add resources to router
-aps.addFile('sample/res/html/welcome.html', '/')
-aps.addFile('sample/res/favicon.ico', '/favicon.ico')
-aps.addFiles('sample/res/css', '/css')
+aps.addFile('res/html/welcome.html', '/')
+aps.addFile('res/favicon.ico', '/favicon.ico')
+aps.addFiles('res/css', '/css')
 aps.addFileSystemObject(
 	FileSystemObjectHelper.Get('Sample'),
 	prefix='/thumbs',
 	onRequest=RequestFilters(ToJPEG()),
 )
-aps.addFile('sample/res/html/swagger.html', '/doc/swagger')
-aps.addFile('sample/res/html/redoc.html', '/doc/redoc')
+aps.addFile('res/html/swagger.html', '/doc/swagger')
+aps.addFile('res/html/redoc.html', '/doc/redoc')
 
 
 if __name__ == '__main__':

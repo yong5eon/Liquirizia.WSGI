@@ -1,22 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from Liquirizia.WSGI.Properties import (
-	RequestProperties,
-	String as StringValidator,
-	RequestRunner,
-)
-from Liquirizia.WSGI import Request, CORS
+from Liquirizia.WSGI.Properties import RequestRunner
+from Liquirizia.WSGI import RequestProperties, Request
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import BadRequestError
-from Liquirizia.WSGI.Description import (
-	RequestDescription,
-	Body,
-	Response,
-	Content,
-	Object,
-	ObjectProperties,
-	String,
-)
+from Liquirizia.WSGI.Validator import *
+from Liquirizia.WSGI.Decoders import *
 
 from Liquirizia.Validator.Patterns import *
 
@@ -25,55 +14,19 @@ __all__ = (
 )
 
 
-@RequestDescription(
-	summary='컨텐츠 검증 샘플 - 문자열',
-	description='컨텐츠 검증 샘플 - 문자열',
-	tags='RequestRunner - Content Validation',
-	body=Body(
-		content=(
-			Content(
-				format='application/json',
-				schema=String(),
-				example='',
-			),
-			Content(
-				format='application/x-www-form',
-				schema=String(),
-				example='',
-			),
-		),
-	),
-	responses=(
-		Response(
-			status=200,
-			description='완료',
-			content=Content(
-				format='application/json',
-				schema=Object(
-					properties=ObjectProperties(
-						content=String(),
-					),
-				),
-				example={
-					'content': '',
-				},
-			),
-		),
-	),
-)
 @RequestProperties(
 	method='POST',
 	url='/api/content/string',
-	cors=CORS(
-		headers=[
-			'Content-Type',
-			'Content-Length',
-		],
+	body=Body(
+		content=IsString(error=BadRequestError('본문은 문자열 이어야 합니다.')),
+		formats={
+			'application/json': JavaScriptObjectNotationDecoder(),
+			'text/plain': TextEvaluateDecoder(),
+		},
 	),
-	content=StringValidator(
-		required=True,
-		error=BadRequestError('잘못된 본문 정보 입니다.'),
-	),
+	summary='컨텐츠 검증 샘플 - 문자열',
+	description='컨텐츠 검증 샘플 - 문자열',
+	tags='RequestRunner - Content Validation',
 )
 class RunPost(RequestRunner):
 	def __init__(self, request: Request):
