@@ -18,7 +18,7 @@ __all__ = (
 	url='/api/content/object',
 	body=Body(
 		content=IsObject(error=BadRequestError('본문은 오브젝트 형태여야 합니다.')),
-		formats={
+		decoders={
 			'application/json': JavaScriptObjectNotationDecoder(),
 			'text/plain': TextEvaluateDecoder(),
 		},

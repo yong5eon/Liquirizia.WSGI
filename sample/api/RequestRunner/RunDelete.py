@@ -8,6 +8,7 @@ from Liquirizia.WSGI import	Request
 
 from Liquirizia.Validator.Patterns import *
 from Liquirizia.Validator.Patterns.Object import *
+from Liquirizia.Description import *
 
 __all__ = (
 	'RunDelete'
@@ -27,6 +28,10 @@ __all__ = (
 				IsGreaterThan(100, error=BadRequestError('파라미터 b 는 100 보다 커야 합니다.')),
 				error=BadRequestError('파라미터 b 는 정수를 필요로 합니다.'),
 			),
+		},
+		format={
+			'a': Integer('파라미터 a', min=100),
+			'b': Integer('파라미터 b', min=100),
 		}
 	),
 	qs=QueryString(
@@ -46,6 +51,11 @@ __all__ = (
 		},
 		requires=('a', 'b'),
 		requiresError=BadRequestError('질의 a 와 b 는 필수 입니다.'),
+		format={
+			'a': Integer('질의 a', min=5),
+			'b': Number('질의 b', min=9),
+			'c': String('질의 c', default='안녕', required=False),
+		}
 	),
 	header=Header(
 		{
@@ -73,12 +83,18 @@ __all__ = (
 			),
 			error=BadRequestError('본문은 오브젝트 형식의 값을 필요로 합니다.'),
 		),
-		formats={
+		decoders={
 			'application/json': JavaScriptObjectNotationDecoder(error=BadRequestError('올바르지 않은 JSON 형식입니다.')),
 			'application/x-www-form-urlencoded': FormUrlEncodedDecoder(error=BadRequestError('올바르지 않은 FormUrlEncoded 형식입니다.')),
 		},
 		error=BadRequestError('알 수 없는 형식입니다.'),
-		unsupportedError=UnsupportedMediaTypeError('지원하지 않는 미디어 타입입니다.')
+		unsupportedError=UnsupportedMediaTypeError('지원하지 않는 미디어 타입입니다.'),
+		format=Object(
+			properties=Properties(
+				a=Integer('본문 a', max=5),
+				b=Number('본문 b', max=9),
+			)
+		)
 	),
 	summary='Sample of DELETE',
 	description='Sample of DELETE',

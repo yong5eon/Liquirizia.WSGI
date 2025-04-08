@@ -138,7 +138,6 @@ descriptor = Descriptor(
 
 Load(mod='api')
 
-from api.Format import *
 # apply swagger-ui
 import sys
 import DocumentHandler
@@ -161,16 +160,7 @@ api_doc(
 			Tag('RequestServerSentEventsRunner', description='Server-Sent Events 요청 처리 예제'),
 			Tag('RequestWebSocketRunner', description='WebSocket 요청 처리 예제'),
 		),
-		schemas=(
-			FormatError,
-			FormatRequest,
-			FormatResponse,	
-			FormatData,
-			FormatParameters,
-			FormatQueryString,
-			FormatContent,
-			FormatExtra,
-		),
+		schemas=(),
 		url=lambda url: {
 			'/api/content/bool': '11',
 			'/api/content/integer': '12',
@@ -180,8 +170,8 @@ api_doc(
 			'/api/content/object': '14',
 		}.get(url, '99'),
 		method=lambda o: {
-			'GET': 1,
-			'POST': 2,
+			'POST': 1,
+			'GET': 2,
 			'PUT': 3,
 			'DELETE': 4,
 		}.get(o.upper(), 9),

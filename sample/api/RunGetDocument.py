@@ -7,8 +7,6 @@ from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
 from Liquirizia.WSGI.Description import Descriptor, Tag
 
-from api.Format import *
-
 __all__ = (
 	'RunGetDocument'
 )
@@ -33,16 +31,7 @@ class RunGet(RequestRunner):
 				Tag('RequestServerSentEventsRunner', description='Server-Sent Events 요청 처리 예제'),
 				Tag('RequestWebSocketRunner', description='WebSocket 요청 처리 예제'),
 			),
-			schemas=(
-				FormatError,
-				FormatRequest,
-				FormatResponse,	
-				FormatData,
-				FormatParameters,
-				FormatQueryString,
-				FormatContent,
-				FormatExtra,
-			),
+			schemas=(),
 			url=lambda url: {
 				'/api/content/bool': '11',
 				'/api/content/integer': '12',

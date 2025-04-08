@@ -6,8 +6,6 @@ from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
 
-from .Format import *
-
 __all__ = (
 	'RunStatus'
 )

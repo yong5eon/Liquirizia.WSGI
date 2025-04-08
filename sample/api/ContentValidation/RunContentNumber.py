@@ -18,7 +18,7 @@ __all__ = (
 	url='/api/content/number',
 	body=Body(
 		content=IsNumber(error=BadRequestError('본문은 실수를 필요로 합니다.')),
-		formats={
+		decoders={
 			'application/json': JavaScriptObjectNotationDecoder(),
 			'text/plain': TextEvaluateDecoder(),
 		},

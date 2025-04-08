@@ -17,7 +17,7 @@ __all__ = (
 	url='/api/content/bool',
 	body=Body(
 		content=IsBoolean(error=BadRequestError('불린언 형식이 아닙니다.')),
-		formats={
+		decoders={
 			'application/json': JavaScriptObjectNotationDecoder(),
 			'text/plain': TextEvaluateDecoder(),
 		},

@@ -18,7 +18,7 @@ __all__ = (
 	url='/api/content/string',
 	body=Body(
 		content=IsString(error=BadRequestError('본문은 문자열 이어야 합니다.')),
-		formats={
+		decoders={
 			'application/json': JavaScriptObjectNotationDecoder(),
 			'text/plain': TextEvaluateDecoder(),
 		},

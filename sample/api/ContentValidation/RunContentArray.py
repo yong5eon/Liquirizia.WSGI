@@ -20,7 +20,7 @@ __all__ = (
 		content=IsArray(
 			error=BadRequestError('잘못된 배열 이어야 합니다.'),
 		),
-		formats={
+		decoders={
 			'application/json': JavaScriptObjectNotationDecoder(),
 			'text/plain': TextEvaluateDecoder(),
 		},

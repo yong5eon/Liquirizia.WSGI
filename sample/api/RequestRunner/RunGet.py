@@ -7,6 +7,7 @@ from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
 
 from Liquirizia.Validator.Patterns import *
+from Liquirizia.Description import *
 
 __all__ = (
 	'RunGet'
@@ -26,6 +27,10 @@ __all__ = (
 				IsGreaterThan(100, error=BadRequestError('파라미터 b 는 100 보다 커야 합니다.')),
 				error=BadRequestError('파라미터 b 는 정수를 필요로 합니다.'),
 			),
+		},
+		format={
+			'a': Integer('파라미터 a', min=100),
+			'b': Integer('파라미터 b', min=100),
 		}
 	),
 	qs=QueryString(
@@ -45,6 +50,11 @@ __all__ = (
 		},
 		requires=('a', 'b'),
 		requiresError=BadRequestError('질의 a 와 b 는 필수 입니다.'),
+		format={
+			'a': Integer('질의 a', min=5),
+			'b': Number('질의 b', min=9),
+			'c': String('질의 c', default='안녕', required=False),
+		}
 	),
 	header=Header(
 		{
@@ -54,6 +64,9 @@ __all__ = (
 		},
 		requires=('X-Token',),
 		requiresError=BadRequestError('헤더 X-Token 은 필수 입니다.'),
+		format={
+			'X-Token': String('헤더 X-Token'),
+		}
 	),
 	summary='Sample of GET',
 	description='Sample of GET',
