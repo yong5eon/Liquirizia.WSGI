@@ -19,6 +19,7 @@ __all__ = (
 class ResponseOK(Response):
 	"""Response 200 OK Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super().__init__(
 			status=200,
 			message='OK',
@@ -33,6 +34,7 @@ class ResponseOK(Response):
 class ResponseCreated(Response):
 	"""Response 201 Created Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super().__init__(
 			status=201,
 			message='Created',
@@ -47,6 +49,7 @@ class ResponseCreated(Response):
 class ResponseAccepted(Response):
 	"""Response 202 Accepted Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super().__init__(
 			status=202,
 			message='Accepted',
@@ -61,6 +64,7 @@ class ResponseAccepted(Response):
 class ResponseNoContent(Response):
 	"""Response 204 No Content Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super().__init__(
 			status=204,
 			message='No Content',
