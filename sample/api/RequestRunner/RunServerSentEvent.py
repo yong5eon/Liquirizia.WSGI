@@ -20,7 +20,6 @@ __all__ = (
 @RequestServerSentEventsProperties(
 	method='GET',
 	url='/api/run/stream/sse',
-	summary='Sample of Server Sent Events',
 	description='1초 간격으로 0에서 1000사이의 랜덤한 숫자를 송출',
 	tags='RequestServerSentEventsRunner',
 )

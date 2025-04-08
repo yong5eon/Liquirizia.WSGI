@@ -97,10 +97,13 @@ __all__ = (
 				a=Integer('본문 a', max=5),
 				b=Number('본문 b', max=9),
 			)
-		)
+		),
+		example={
+			'a': 1,
+			'b': 2.0,
+		}
 	),
-	summary='Sample of POST',
-	description='Sample of POST',
+	summary='POST 요청을 처리하는 예제',
 	tags='RequestRunner',
 )
 class RunPost(RequestRunner):

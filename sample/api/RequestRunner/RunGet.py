@@ -68,8 +68,7 @@ __all__ = (
 			'X-Token': String('헤더 X-Token'),
 		}
 	),
-	summary='Sample of GET',
-	description='Sample of GET',
+	summary='GET 요청을 처리하는 예제',
 	tags='RequestRunner',
 )
 class RunGet(RequestRunner):

@@ -9,6 +9,7 @@ from Liquirizia.WSGI import	(
 	RequestReader,
 	ResponseWriter,
 )
+from Liquirizia.WSGI.Extends import ChunkedStreamReader
 
 __all__ = (
 	'RunChunkedStreamIn'
@@ -18,7 +19,6 @@ __all__ = (
 @RequestStreamProperties(
 	method='PUT',
 	url='/api/run/stream/chunked',
-	summary='Sample of Chunked Stream Input with PUT',
 	description='클라이언트에서 스트림으로 입력한 값을 그대로 반환',
 	tags='RequestStreamRunner - Chunked',
 )

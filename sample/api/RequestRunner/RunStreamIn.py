@@ -18,7 +18,6 @@ __all__ = (
 @RequestStreamProperties(
 	method='PUT',
 	url='/api/run/stream',
-	summary='Sample of Stream Input with PUT',
 	description='클라이언트에서 스트림으로 입력한 값을 그대로 반환',
 	tags='RequestStreamRunner',
 )

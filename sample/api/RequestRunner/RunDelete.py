@@ -96,8 +96,7 @@ __all__ = (
 			)
 		)
 	),
-	summary='Sample of DELETE',
-	description='Sample of DELETE',
+	summary='DELETE 요청을 처리하는 예제',
 	tags='RequestRunner',
 )
 class RunDelete(RequestRunner):

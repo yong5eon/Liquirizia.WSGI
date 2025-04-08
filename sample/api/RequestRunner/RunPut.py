@@ -99,8 +99,7 @@ __all__ = (
 			)
 		)
 	),
-	summary='Sample of PUT',
-	description='Sample of PUT',
+	summary='PUT 요청을 처리하는 예제',
 	tags='RequestRunner',
 )
 class RunPut(RequestRunner):

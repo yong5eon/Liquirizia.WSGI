@@ -15,7 +15,6 @@ __all__ = (
 @RequestWebSocketProperties(
 	method='GET',
 	url='/api/run/socket',
-	summary='Sample of WebSocket',
 	description='소켓으로 받은 요청을 그대로 송출',
 	tags='RequestWebSocketRunner',
 )

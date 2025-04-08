@@ -9,6 +9,7 @@ from Liquirizia.WSGI import	(
 	RequestReader,
 	ResponseWriter,
 )
+from Liquirizia.WSGI.Extends import ChunkedStreamWriter
 
 from time import sleep
 
@@ -20,7 +21,6 @@ __all__ = (
 @RequestStreamProperties(
 	method='GET',
 	url='/api/run/stream/chunked',
-	summary='Sample of Chunked Stream Output with GET',
 	description='1초 간격으로 0에서 9까지 송출',
 	tags='RequestStreamRunner - Chunked',
 )
