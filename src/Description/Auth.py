@@ -8,9 +8,9 @@ __all__ = (
 	'OAuth2Credentials',
 	'OAuth2Code',
 	'HTTP',
-	'KeyHeader',
-	'KeyQuery',
-	'KeyCookie',
+	'Header',
+	'Query',
+	'Cookie',
 	'TLS',
 	'OpenIdConnect',
 )
@@ -73,8 +73,8 @@ class OAuth2Password(Authorization):
 					'scopes': scopes
 				}
 			},
-			description=description,
 		)
+		if description: self['description'] = description
 		return
 	
 class OAuth2Implict(Authorization):
@@ -94,8 +94,8 @@ class OAuth2Implict(Authorization):
 					'scopes': scopes
 				}
 			},
-			description=description,
 		)
+		if description: self['description'] = description
 		return
 
 class OAuth2Credentials(Authorization):
@@ -115,8 +115,8 @@ class OAuth2Credentials(Authorization):
 					'scopes': scopes
 				}
 			},
-			description=description,
 		)
+		if description: self['description'] = description
 		return
 
 class OAuth2Code(Authorization):
@@ -138,8 +138,8 @@ class OAuth2Code(Authorization):
 					'scopes': scopes
 				}
 			},
-			description=description,
 		)
+		if description: self['description'] = description
 		return
 	
 class HTTP(Authorization):
@@ -153,11 +153,11 @@ class HTTP(Authorization):
 			type='http',
 			scheme=format,
 			bearerFormat=bearerFormat,
-			description=description,
 		)
+		if description: self['description'] = description
 		return
 
-class KeyHeader(Authorization):
+class Header(Authorization):
 	def __init__(
 		self,
 		name: str,
@@ -166,12 +166,12 @@ class KeyHeader(Authorization):
 		super().__init__(
 			type='apiKey',
 			name=name,
-			description=description,
 		)
+		if description: self['description'] = description
 		self['in'] = 'header'
 		return
 
-class KeyQuery(Authorization):
+class Query(Authorization):
 	def __init__(
 		self,
 		name: str,
@@ -180,12 +180,12 @@ class KeyQuery(Authorization):
 		super().__init__(
 			type='apiKey',
 			name=name,
-			description=description,
 		)
+		if description: self['description'] = description
 		self['in'] = 'query'
 		return
 
-class KeyCookie(Authorization):
+class Cookie(Authorization):
 	def __init__(
 		self,
 		name: str,
@@ -194,8 +194,8 @@ class KeyCookie(Authorization):
 		super().__init__(
 			type='apiKey',
 			name=name,
-			description=description,
 		)
+		if description: self['description'] = description
 		self['in'] = 'cookie'
 		return
 
@@ -206,8 +206,8 @@ class TLS(Authorization):
 	):
 		super().__init__(
 			type='mutualTLS',
-			description=description,
 		)
+		if description: self['description'] = description
 		return
 	
 class OpenIdConnect(Authorization):
@@ -219,7 +219,7 @@ class OpenIdConnect(Authorization):
 		super().__init__(
 			type='openIdConnect',
 			openIdConnectUrl=url,
-			description=description,
 		)
+		if description: self['description'] = description
 		return
 	

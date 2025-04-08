@@ -20,13 +20,13 @@ from .Auth import (
 	OAuth2Credentials,
 	OAuth2Code,
 	HTTP,
-	KeyHeader,
-	KeyQuery,
-	KeyCookie,
+	Header,
+	Query,
+	Cookie,
 	TLS,
 	OpenIdConnect,
 )
-from .Documentation import (
+from .Document import (
 	Document,
 	Path,
 	Information,
@@ -56,9 +56,9 @@ __all__ = (
 	'OAuth2Credentials',
 	'OAuth2Code',
 	'HTTP',
-	'KeyHeader',
-	'KeyQuery',
-	'KeyCookie',
+	'Header',
+	'Query',
+	'Cookie',
 	'TLS',
 	'OpenIdConnect',
 	# Documentation
