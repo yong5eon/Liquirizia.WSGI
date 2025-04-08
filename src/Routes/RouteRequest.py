@@ -118,10 +118,10 @@ class RouteRequest(Route, RequestFactory):
 			if match or self.origin.all:
 				response.header('Access-Control-Allow-Origin', origin)
 				response.header('Vary', 'Origin')
-		# set Access-Control-Allow-Credentials if auth is not None
-		# Access-Control-Allow-Credentials: true
-		if self.auth and not self.origin.all:
-			response.header('Access-Control-Allow-Credentials', 'true')
+			# set Access-Control-Allow-Credentials if auth is not None
+			# Access-Control-Allow-Credentials: true
+			if self.auth and not self.origin.all:
+				response.header('Access-Control-Allow-Credentials', 'true')
 		# set Access-Control-Expose-Headers
 		# Access-Control-Expose-Headers: X-Custom-Header, Content-Length
 		if headers:
