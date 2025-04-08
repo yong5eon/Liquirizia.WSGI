@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from Liquirizia.WSGI.Properties import RequestStreamRunner
-from Liquirizia.WSGI import (
-	RequestStreamProperties,
+from Liquirizia.WSGI.Properties import *
+from Liquirizia.WSGI.Decoders import *
+from Liquirizia.WSGI.Responses import *
+from Liquirizia.WSGI.Errors import *
+from Liquirizia.WSGI import	(
+	Request,
 	RequestReader,
 	ResponseWriter,
-)
-from Liquirizia.WSGI.Responses import (
-	ResponseBadRequest,
-	ResponseBuffer,
 )
 
 __all__ = (
@@ -24,7 +23,7 @@ __all__ = (
 	tags='RequestStreamRunner',
 )
 class RunStreamIn(RequestStreamRunner):
-	def __init__(self, request):
+	def __init__(self, request: Request):
 		self.request = request
 		return
 
