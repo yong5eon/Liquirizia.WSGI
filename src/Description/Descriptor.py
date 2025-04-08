@@ -5,7 +5,7 @@ from Liquirizia.Template import Singleton
 from .Description import (
 	Description,
 )
-from .Documentation import (
+from .Document import (
 	Document,
 	Information,
 	Path,
