@@ -94,36 +94,41 @@ class HTTP(Auth):
 		scheme: str,
 		auth: Authorization,
 		format: str = None,
+		optional: bool = False,
 		schemeError: Error = None,
-		schemeParameters: Dict[str, Any] = None,
+		schemeErrorParameters: Dict[str, Any] = None,
 		error: Error = None,
 	):
 		self.scheme = scheme
 		self.authorization = auth
 		self.format = format
+		self.optional = optional
 		self.schemeError = schemeError
-		self.schemeParameters = schemeParameters
+		self.schemeErrorParameters = schemeErrorParameters
 		self.error = error
 		return
 	def __call__(self, request: Request):
 		authorization: AuthorizationHeader = request.header('Authorization')
-		if not authorization:
+		if not self.optional and not authorization:
 			if self.error:
 				raise self.error
 			raise UnauthorizedError('Authorization not found')
 		if not authorization.scheme == self.scheme:
 			if self.schemeError:
 				raise self.schemeError
-			raise UnauthorizedError(
-				'Authorization scheme not supported',
-				headers={
+			headers = None
+			if self.schemeErrorParameters:
+				headers = {
 					'WWW-Authenticate': '{} {}'.format(
 						self.scheme,
 						','.join([
-							'{}="{}"'.format(k, v) for k, v in self.schemeParameters.items()
-						]) if self.schemeParameters else '',
+							'{}="{}"'.format(k, v) for k, v in self.schemeErrorParameters.items()
+						]),
 					),
-				},
+				}
+			raise UnauthorizedError(
+				'Authorization scheme not supported',
+				headers=headers,
 			)
 		request.session = self.authorization(authorization.credentials)
 		return
@@ -132,19 +137,34 @@ class HTTP(Auth):
 class Cookie(Auth):
 	def __init__(
 		self,
+		name: str,
 		auth: Authorization,
+		optional: bool = False,
 		error: Error = None,
 	):
+		self.name = name
 		self.authorization = auth
+		self.optional = optional
 		self.error = error
 		return
 	def __call__(self, request: Request) -> Any:
 		cookies = request.header('Cookie')
-		if not cookies:
+		if self.optional and not cookies:
 			if self.error:
 				raise self.error
 			raise UnauthorizedError('Cookie not found')
-		request.session = self.authorization(cookies)
+		_ = None
+		for cookie in cookies:
+			if cookie.name == self.name:
+				_ = cookie
+				break
+		if not _:
+			if self.optional:
+				return
+			if self.error:
+				raise self.error
+			raise UnauthorizedError('Cookie {} not found'.format(self.name))
+		request.session = self.authorization(_)
 		return
 
 
@@ -235,6 +255,7 @@ class Body(object):
 		error: Error = None,
 		unsupportedError: Error = None,
 		format: Union[Value, Schema] = None,
+		example: Any = None,
 		required: bool = True,
 	):
 		self.va = Validator(content)
@@ -242,6 +263,7 @@ class Body(object):
 		self.error = error
 		self.unsupportedError = unsupportedError
 		self.format = format
+		self.example = example
 		self.required = required
 		return
 	def __call__(self, request: Request, content: bytes):
