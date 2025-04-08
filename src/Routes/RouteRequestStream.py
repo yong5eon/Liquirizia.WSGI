@@ -3,8 +3,8 @@
 from ..Route import Route
 from ..RequestFactory import RequestFactory
 from ..Request import Request
-from ..Properties import RequestStreamRunner
-from ..Validator import (
+from ..Properties import (
+	RequestStreamRunner,
 	Origin,
 	Auth,
 	Parameter,

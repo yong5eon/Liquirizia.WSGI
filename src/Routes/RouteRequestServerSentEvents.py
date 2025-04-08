@@ -2,10 +2,9 @@
 
 from ..Route import Route
 from ..RequestFactory import RequestFactory
-
 from ..Request import Request
-from ..Properties import  RequestServerSentEventsRunner
-from ..Validator import (
+from ..Properties import (
+	RequestServerSentEventsRunner,
 	Origin,
 	Auth,
 	Parameter,

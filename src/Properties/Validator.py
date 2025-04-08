@@ -10,20 +10,20 @@ from Liquirizia.Validator.Patterns.Object import (
 	IsRequiredIn as IsRequiredInObject,
 	IsMappingOf as IsMappingOfObject,
 )
-from .Description import (
+from ..Description import (
 	Value,
 	Schema,
 )
-from .Decoder import Decoder
-from .Request import Request
-from .Error import Error
-from .Errors import (
+from ..Decoder import Decoder
+from ..Request import Request
+from ..Error import Error
+from ..Errors import (
 	UnauthorizedError,
 	ForbiddenError,
 	BadRequestError,
 	UnsupportedMediaTypeError,
 )
-from .Headers import (
+from ..Headers import (
 	Authorization as AuthorizationHeader,
 	Cookie,
 	ContentType,
@@ -153,7 +153,7 @@ class Parameter(object):
 	def __init__(
 		self,
 		parameters : Dict[str, Union[Pattern, Sequence[Pattern]]],
-		schema: Dict[str, Value] = None,
+		schema: Dict[str, Union[Value, Schema]] = None,
 	):
 		self.va = Validator(IsDataObject(IsMappingOfDataObject(parameters)))
 		self.schema = schema
@@ -170,7 +170,7 @@ class QueryString(object):
 		qs: Dict[str, Union[Pattern, Sequence[Pattern]]],
 		requires: Union[str, Sequence[str]] = None,
 		requiresError: Error = None,
-		schema: Dict[str, Value] = None,
+		schema: Dict[str, Union[Value, Schema]] = None,
 	):
 		if not requiresError:
 			if requires:
@@ -199,7 +199,7 @@ class Header(object):
 		headers: Dict[str, Union[Pattern, Sequence[Pattern]]],
 		requires: Union[str, Sequence[str]] = None,
 		requiresError: Error = None,
-		schema: Dict[str, Value] = None,
+		schema: Dict[str, Union[Value, Schema]] = None,
 	):
 		if not requiresError:
 			if requires:
@@ -234,11 +234,13 @@ class Body(object):
 		formats: Dict[str, Decoder],
 		error: Error = None,
 		unsupportedError: Error = None,
+		schema: Dict[str, Union[Value, Schema]] = None,
 	):
 		self.va = Validator(content)
 		self.formats = formats
 		self.error = error
 		self.unsupportedError = unsupportedError
+		self.schema = schema
 		return
 	def __call__(self, request: Request, content: bytes):
 		type: ContentType = request.header('Content-Type')

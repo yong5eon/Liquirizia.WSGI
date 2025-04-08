@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from .Properties import (
-	RequestRunner,
-	RequestStreamRunner,
-	RequestServerSentEventsRunner,
-	RequestWebSocketRunner,
-)
+from .RequestRunner import RequestRunner
+from .RequestStreamRunner import RequestStreamRunner
+from .RequestServerSentEventsRunner import RequestServerSentEventsRunner
+from .RequestWebSocketRunner import RequestWebSocketRunner
 from .Validator import (
 	Origin,
 	Auth,
@@ -15,18 +13,12 @@ from .Validator import (
 	QueryString,
 	Body,
 )
-from .Router import Router
-from .Routes import (
-	RouteRequest,
-	RouteRequestStream,
-	RouteRequestServerSentEvents,
-	RouteRequestWebSocket,
-)
-from .Filters import (
+from ..Router import Router
+from ..Filters import (
 	RequestFilter,
 	ResponseFilter,
 )
-from .Description import Response
+from ..Description import Response
 from typing import Type, Sequence, Union
 
 __all__ = (
@@ -189,6 +181,7 @@ class RequestProperties(object):
 		return
 	
 	def __call__(self, obj: Type[RequestRunner]):
+		from ..Routes import RouteRequest
 		router = Router()
 		router.add(RouteRequest(
 			obj=obj,
@@ -231,6 +224,7 @@ class RequestStreamProperties(object):
 		return
 	
 	def __call__(self, obj: Type[RequestStreamRunner]):
+		from ..Routes import RouteRequestStream
 		router = Router()
 		router.add(RouteRequestStream(
 			obj=obj,
@@ -270,6 +264,7 @@ class RequestServerSentEventsProperties(object):
 		return
 	
 	def __call__(self, obj: Type[RequestServerSentEventsRunner]):
+		from ..Routes import RouteRequestServerSentEvents
 		router = Router()
 		router.add(RouteRequestServerSentEvents(
 			obj=obj,
@@ -309,6 +304,7 @@ class RequestWebSocketProperties(object):
 		return
 	
 	def __call__(self, obj: Type[RequestWebSocketRunner]):
+		from ..Routes import RouteRequestWebSocket
 		router = Router()
 		router.add(RouteRequestWebSocket(
 			obj=obj,
