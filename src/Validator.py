@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.Validator import Validator, Pattern
-from Liquirizia.Validator.Patterns import IsDataObject
+from Liquirizia.Validator.Patterns import IsDataObject, IsObject
 from Liquirizia.Validator.Patterns.DataObject import (
-	IsRequiredIn,
-	IsMappingOf,
+	IsRequiredIn as IsRequiredInDataObject,
+	IsMappingOf as IsMappingOfDataObject,
 )
-from .Validators import IsObject
+from Liquirizia.Validator.Patterns.Object import (
+	IsRequiredIn as IsRequiredInObject,
+	IsMappingOf as IsMappingOfObject,
+)
 from .Description import (
 	Value,
 	Schema,
@@ -152,7 +155,7 @@ class Parameter(object):
 		parameters : Dict[str, Union[Pattern, Sequence[Pattern]]],
 		schema: Dict[str, Value] = None,
 	):
-		self.va = Validator(IsDataObject(IsMappingOf(parameters)))
+		self.va = Validator(IsDataObject(IsMappingOfDataObject(parameters)))
 		self.schema = schema
 		return
 	def __call__(self, request: Request):
@@ -179,8 +182,8 @@ class QueryString(object):
 			else:
 				requiresError = BadRequestError('Missing required query string')
 		self.va = Validator(IsDataObject(
-			IsRequiredIn(*requires if requires else [], error=requiresError),
-			IsMappingOf(qs),
+			IsRequiredInDataObject(*requires if requires else [], error=requiresError),
+			IsMappingOfDataObject(qs),
 		))
 		self.schema = schema
 		return
@@ -208,9 +211,8 @@ class Header(object):
 			else:
 				requiresError = BadRequestError('Missing required headers')
 		self.va = Validator(IsObject(
-			mappings=headers,
-			requires=requires,
-			requiresError=requiresError,
+			IsRequiredInObject(*requires if requires else [], error=requiresError),
+			IsMappingOfObject(headers),
 		))
 		self.schema = schema
 		return
@@ -231,16 +233,22 @@ class Body(object):
 		content: Pattern,
 		formats: Dict[str, Decoder],
 		error: Error = None,
+		unsupportedError: Error = None,
 	):
 		self.va = Validator(content)
 		self.formats = formats
 		self.error = error
+		self.unsupportedError = unsupportedError
 		return
 	def __call__(self, request: Request, content: bytes):
 		type: ContentType = request.header('Content-Type')
-		if type.format not in self.formats.keys():
+		if not type:
 			if self.error:
 				raise self.error
+			raise BadRequestError('Content-Type not found')
+		if type.format not in self.formats.keys():
+			if self.unsupportedError:
+				raise self.unsupportedError
 			raise UnsupportedMediaTypeError('Unsupported Media Type {}'.format(type.format))
 		content = self.formats[type.format](content)
 		return self.va(content)
