@@ -11,6 +11,7 @@ from typing import Any
 
 __all__ = (
 	'TextDecoder',
+	'TextEvaluateDecoder',
 	'FormUrlEncodedDecoder',
 	'JavaScriptObjectNotationDecoder',
 )
@@ -26,8 +27,23 @@ class TextDecoder(Decoder):
 			return body.decode(self.charset)
 		except Exception as e:
 			if self.error:
-				raise self.error(str(e), error=e)
+				raise self.error
 			raise BadRequestError(str(e), error=e)
+
+
+class TextEvaluateDecoder(Decoder):
+	def __init__(self, charset: str ='utf-8', error: Error = None):
+		self.charset = charset
+		self.error = error
+		return
+	def __call__(self, body: bytes) -> Any:
+		try:
+			return eval(body.decode(self.charset))
+		except Exception as e:
+			if self.error:
+				raise self.error
+			raise BadRequestError(str(e), error=e)
+
 
 
 class FormUrlEncodedDecoder(Decoder):
@@ -55,7 +71,7 @@ class FormUrlEncodedDecoder(Decoder):
 			return q
 		except Exception as e:
 			if self.error:
-				raise self.error(str(e), error=e)
+				raise self.error
 			raise BadRequestError(str(e), error=e)
 
 
@@ -69,5 +85,5 @@ class JavaScriptObjectNotationDecoder(Decoder):
 			return loads(body, cls=JSONDecoder)
 		except Exception as e:
 			if self.error:
-				raise self.error(str(e), error=e)
+				raise self.error
 			raise BadRequestError(str(e), error=e)
