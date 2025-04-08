@@ -77,9 +77,6 @@ class Auth(object):
 class Description(object):
 	def __init__(
 		self,
-		summary: str,
-		description: str,
-		tags: Optional[Union[str, Sequence[str]]] = None,
 		method: str = None,
 		url: str = None,
 		auth: Auth = None,
@@ -88,13 +85,10 @@ class Description(object):
 		headers: Optional[Dict[str, Value]] = None,
 		body: Body = None,
 		responses: Optional[Union[Response,Sequence[Response]]] = None,
+		summary: str = None,
+		description: str = None,
+		tags: Optional[Union[str, Sequence[str]]] = None,
 	):
-		self.summary = summary
-		self.description = description
-		self.tags = tags
-		if self.tags:
-			if isinstance(self.tags, str):
-				self.tags = [self.tags]
 		self.method = method
 		self.url = url
 		self.auth = auth
@@ -106,4 +100,10 @@ class Description(object):
 		if self.responses:
 			if not isinstance(self.responses, Sequence):
 				self.responses = [self.responses]
+		self.summary = summary
+		self.description = description
+		self.tags = tags
+		if self.tags:
+			if isinstance(self.tags, str):
+				self.tags = [self.tags]
 		return
