@@ -13,7 +13,8 @@ from ..Description import (
 	Content as ContentDescription,
 	Schema,
 )
-from ..Types import Value
+
+from Liquirizia.Description import Value
 
 from uuid import uuid4
 
@@ -76,59 +77,56 @@ class Path(Documentation):
 	):
 		parameters = []
 		for k, v in description.parameters.items() if description.parameters else []:
-			parameters.append({
+			_ = {
 				'name': k,
 				'in': 'path',
-				'description': v['description'] if 'description' in v.keys() else None,
-				'schema': {
-					'type': v['type'] if 'type' in v.keys() else None,
-					'format': v['format'] if 'format' in v.keys() else None,
-					'minimum': v['min'] if 'min' in v.keys() else None,
-					'maximum': v['max'] if 'max' in v.keys() else None,
-					'default': v['default'] if 'default' in v.keys() else None,
-					'enum': v['enum'] if 'enum' in v.keys() else None,
-				},
-				'required': v['required'] if 'required' in v.keys() else None,
-				'deprecated': v['deprecated'] if 'deprecated' in v.keys() else None,
-			})
+				'schema': {},
+			}
+			if 'description' in v.keys(): _['description'] = v['description']
+			if 'type' in v.keys(): _['schema']['type'] = v['type']
+			if 'format' in v.keys(): _['schema']['format'] = v['format']
+			if 'min' in v.keys(): _['schema']['minimum'] = v['min']
+			if 'max' in v.keys(): _['schema']['maximum'] = v['max']
+			if 'default' in v.keys(): _['schema']['default'] = v['default']
+			if 'enum' in v.keys(): _['schema']['enum'] = v['enum']
+			if 'required' in v.keys(): _['required'] = v['required']
+			parameters.append(_)
 		for k, v in description.qs.items() if description.qs else []:
-			parameters.append({
+			_ = {
 				'name': k,
 				'in': 'query',
-				'description': v['description'] if 'description' in v.keys() else None,
-				'schema': {
-					'type': v['type'] if 'type' in v.keys() else None,
-					'format': v['format'] if 'format' in v.keys() else None,
-					'minimum': v['min'] if 'min' in v.keys() else None,
-					'maximum': v['max'] if 'max' in v.keys() else None,
-					'default': v['default'] if 'default' in v.keys() else None,
-					'enum': v['enum'] if 'enum' in v.keys() else None,
-				},
-				'required': v['required'] if 'required' in v.keys() else None,
-				'deprecated': v['deprecated'] if 'deprecated' in v.keys() else None,
-			})
+				'schema': {},
+			}
+			if 'description' in v.keys(): _['description'] = v['description']
+			if 'type' in v.keys(): _['schema']['type'] = v['type']
+			if 'format' in v.keys(): _['schema']['format'] = v['format']
+			if 'min' in v.keys(): _['schema']['minimum'] = v['min']
+			if 'max' in v.keys(): _['schema']['maximum'] = v['max']
+			if 'default' in v.keys(): _['schema']['default'] = v['default']
+			if 'enum' in v.keys(): _['schema']['enum'] = v['enum']
+			if 'required' in v.keys(): _['required'] = v['required']
+			parameters.append(_)
 		for k, v in description.headers.items() if description.headers else []:
-			parameters.append({
+			_ = {
 				'name': k,
 				'in': 'header',
-				'description': v['description'] if 'description' in v.keys() else None,
-				'schema': {
-					'type': v['type'] if 'type' in v.keys() else None,
-					'format': v['format'] if 'format' in v.keys() else None,
-					'minimum': v['min'] if 'min' in v.keys() else None,
-					'maximum': v['max'] if 'max' in v.keys() else None,
-					'default': v['default'] if 'default' in v.keys() else None,
-					'enum': v['enum'] if 'enum' in v.keys() else None,
-				},
-				'required': v['required'] if 'required' in v.keys() else None,
-				'deprecated': v['deprecated'] if 'deprecated' in v.keys() else None,
-			})
+				'schema': {},
+			}
+			if 'description' in v.keys(): _['description'] = v['description']
+			if 'type' in v.keys(): _['schema']['type'] = v['type']
+			if 'format' in v.keys(): _['schema']['format'] = v['format']
+			if 'min' in v.keys(): _['schema']['minimum'] = v['min']
+			if 'max' in v.keys(): _['schema']['maximum'] = v['max']
+			if 'default' in v.keys(): _['schema']['default'] = v['default']
+			if 'enum' in v.keys(): _['schema']['enum'] = v['enum']
+			if 'required' in v.keys(): _['required'] = v['required']
+			parameters.append(_)
 		authenticates = []
 		if description.auth:
 			if description.auth.optional:
 				authenticates.append({})
 			authenticates.append({description.auth.name: []})
-		responses = sorted(description.responses, key=lambda x: x.status)
+		responses = sorted(description.responses if description.responses else [], key=lambda x: x.status)
 		super().__init__(
 			operationId=id if id else uuid4().hex,
 			summary=description.summary,

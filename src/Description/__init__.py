@@ -6,19 +6,6 @@ from ..Properties import (
 	RequestServerSentEventsRunner,
 	RequestWebSocketRunner,
 )
-from .Value import (
-	Value,
-	Schema,
-)
-from .Types import (
-	Boolean,
-	Integer,
-	Number,
-	String,
-	Array,
-	Object,
-	ObjectProperties,
-)
 from .Description import (
 	Description,
 	Content,
@@ -48,6 +35,7 @@ from .Documentation import (
 	Tag,
 )
 
+from Liquirizia.Description import Value, Schema
 from typing import Type, Union, Optional, Sequence, Dict
 
 __all__ = (
@@ -55,17 +43,6 @@ __all__ = (
 	'RequestDescription',
 	# Descriptor
 	'Descriptor',
-	# Value
-	'Value',
-	'Schema',
-	# Types
-	'Boolean',
-	'Integer',
-	'Number',
-	'String',
-	'Array',
-	'Object',
-	'ObjectProperties',
 	# Description
 	'Description',
 	'Schema',

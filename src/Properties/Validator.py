@@ -10,7 +10,7 @@ from Liquirizia.Validator.Patterns.Object import (
 	IsRequiredIn as IsRequiredInObject,
 	IsMappingOf as IsMappingOfObject,
 )
-from ..Description import (
+from Liquirizia.Description import (
 	Value,
 	Schema,
 )
@@ -153,10 +153,10 @@ class Parameter(object):
 	def __init__(
 		self,
 		parameters : Dict[str, Union[Pattern, Sequence[Pattern]]],
-		schema: Dict[str, Union[Value, Schema]] = None,
+		format: Dict[str, Union[Value, Schema]] = None,
 	):
 		self.va = Validator(IsDataObject(IsMappingOfDataObject(parameters)))
-		self.schema = schema
+		self.format = format
 		return
 	def __call__(self, request: Request):
 		request.params = self.va(request.params)
@@ -170,7 +170,7 @@ class QueryString(object):
 		qs: Dict[str, Union[Pattern, Sequence[Pattern]]],
 		requires: Union[str, Sequence[str]] = None,
 		requiresError: Error = None,
-		schema: Dict[str, Union[Value, Schema]] = None,
+		format: Dict[str, Union[Value, Schema]] = None,
 	):
 		if not requiresError:
 			if requires:
@@ -185,7 +185,7 @@ class QueryString(object):
 			IsRequiredInDataObject(*requires if requires else [], error=requiresError),
 			IsMappingOfDataObject(qs),
 		))
-		self.schema = schema
+		self.format = format
 		return
 	def __call__(self, request: Request):
 		request.args = self.va(request.args)
@@ -199,7 +199,7 @@ class Header(object):
 		headers: Dict[str, Union[Pattern, Sequence[Pattern]]],
 		requires: Union[str, Sequence[str]] = None,
 		requiresError: Error = None,
-		schema: Dict[str, Union[Value, Schema]] = None,
+		format: Dict[str, Union[Value, Schema]] = None,
 	):
 		if not requiresError:
 			if requires:
@@ -214,7 +214,7 @@ class Header(object):
 			IsRequiredInObject(*requires if requires else [], error=requiresError),
 			IsMappingOfObject(headers),
 		))
-		self.schema = schema
+		self.format = format 
 		return
 	def __call__(self, request: Request):
 		headers = {}
@@ -231,16 +231,18 @@ class Body(object):
 	def __init__(
 		self,
 		content: Pattern,
-		formats: Dict[str, Decoder],
+		decoders: Dict[str, Decoder],
 		error: Error = None,
 		unsupportedError: Error = None,
-		schema: Dict[str, Union[Value, Schema]] = None,
+		format: Union[Value, Schema] = None,
+		required: bool = True,
 	):
 		self.va = Validator(content)
-		self.formats = formats
+		self.decoders = decoders
 		self.error = error
 		self.unsupportedError = unsupportedError
-		self.schema = schema
+		self.format = format
+		self.required = required
 		return
 	def __call__(self, request: Request, content: bytes):
 		type: ContentType = request.header('Content-Type')
@@ -248,9 +250,9 @@ class Body(object):
 			if self.error:
 				raise self.error
 			raise BadRequestError('Content-Type not found')
-		if type.format not in self.formats.keys():
+		if type.format not in self.decoders.keys():
 			if self.unsupportedError:
 				raise self.unsupportedError
 			raise UnsupportedMediaTypeError('Unsupported Media Type {}'.format(type.format))
-		content = self.formats[type.format](content)
+		content = self.decoders[type.format](content)
 		return self.va(content)

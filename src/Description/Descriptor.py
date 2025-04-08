@@ -11,7 +11,7 @@ from .Documentation import (
 	Path,
 	Tag,
 )
-from .Value import Schema
+from Liquirizia.Description import Schema
 
 from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
