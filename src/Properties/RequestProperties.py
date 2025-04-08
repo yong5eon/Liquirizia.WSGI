@@ -7,6 +7,8 @@ from .RequestWebSocketRunner import RequestWebSocketRunner
 from .Validator import (
 	Origin,
 	Auth,
+	HTTP,
+	Cookie,
 	Parameter,
 	QueryString,
 	Header,
@@ -24,6 +26,9 @@ from ..Description import (
 	Response,
 	Body as BodyDescription,
 	Content as ContentDescription,
+	Auth as Authorization,
+	HTTP as HTTPAuthorization,
+	Cookie as CookieAuthorization,
 )
 from typing import Type, Sequence, Union
 
@@ -47,10 +52,10 @@ class RequestProperties(object):
 		qs: QueryString = None,
 		header: Header = None,
 		body: Body = None,
+		response: Response = None,
 		summary: str = None,
 		description: str = None,
 		tags: Union[str, Sequence[str]] = None,
-		response: Response = None,
 		onRequest: RequestFilter = None,
 		onResponse : ResponseFilter = None,
 	):
@@ -69,7 +74,6 @@ class RequestProperties(object):
 		self.description = description
 		self.tags = tags
 		return
-	
 	def __call__(self, obj: Type[RequestRunner]):
 		from ..Routes import RouteRequest
 		router = Router()
@@ -92,14 +96,31 @@ class RequestProperties(object):
 			contents.append(ContentDescription(
 				format=format,
 				schema=self.body.format,
+				example=self.body.example,
 			))
+		auth = None
+		if self.auth:
+			if isinstance(self.auth, HTTP):
+				auth = Authorization(
+					name=self.auth.__class__.__name__,
+					format=HTTPAuthorization(
+						format=self.auth.scheme,
+						bearerFormat=self.auth.format,
+					),
+					optional=self.auth.optional,
+				)
+			if isinstance(self.auth, Cookie):
+				auth = Authorization(
+					name=self.auth.__class__.__name__,
+					format=CookieAuthorization(
+						name=self.auth.name,
+					),
+					optional=self.auth.optional,
+				)
 		descriptor.add(Description(
-			summary=self.summary,
-			description=self.description,
-			tags=self.tags,
 			method=self.method,
 			url=self.url,
-			# auth=self.auth,
+			auth=auth,
 			parameters=self.parameter.format if self.parameter else None,
 			qs=self.qs.format if self.qs else None,
 			headers=self.header.format if self.header else None,
@@ -108,6 +129,9 @@ class RequestProperties(object):
 				required=self.body.required,
 			) if self.body else None,
 			responses=self.response,
+			summary=self.summary,
+			description=self.description,
+			tags=self.tags,
 		))
 		return obj
 
@@ -123,6 +147,7 @@ class RequestStreamProperties(object):
 		parameter: Parameter = None,
 		qs: QueryString = None,
 		header: Header = None,
+		response: Response = None,
 		summary: str = None,
 		description: str = None,
 		tags: Union[str, Sequence[str]] = None,
@@ -134,8 +159,11 @@ class RequestStreamProperties(object):
 		self.parameter = parameter
 		self.qs = qs
 		self.header = header
+		self.response = response
+		self.summary = summary
+		self.description = description
+		self.tags = tags
 		return
-	
 	def __call__(self, obj: Type[RequestStreamRunner]):
 		from ..Routes import RouteRequestStream
 		router = Router()
@@ -148,6 +176,19 @@ class RequestStreamProperties(object):
 			parameter=self.parameter,
 			qs=self.qs,
 			header=self.header,
+		))
+		descriptor = Descriptor()
+		descriptor.add(Description(
+			method=self.method,
+			url=self.url,
+			# auth=self.auth,
+			parameters=self.parameter.format if self.parameter else None,
+			qs=self.qs.format if self.qs else None,
+			headers=self.header.format if self.header else None,
+			responses=self.response,
+			summary=self.summary,
+			description=self.description,
+			tags=self.tags,
 		))
 		return obj
 
@@ -163,6 +204,7 @@ class RequestServerSentEventsProperties(object):
 		parameter: Parameter = None,
 		qs: QueryString = None,
 		header: Header = None,
+		response: Response = None,
 		summary: str = None,
 		description: str = None,
 		tags: Union[str, Sequence[str]] = None,
@@ -174,8 +216,11 @@ class RequestServerSentEventsProperties(object):
 		self.parameter = parameter
 		self.qs = qs
 		self.header = header
+		self.response = response
+		self.summary = summary
+		self.description = description
+		self.tags = tags
 		return
-	
 	def __call__(self, obj: Type[RequestServerSentEventsRunner]):
 		from ..Routes import RouteRequestServerSentEvents
 		router = Router()
@@ -188,6 +233,19 @@ class RequestServerSentEventsProperties(object):
 			parameter=self.parameter,
 			qs=self.qs,
 			header=self.header,
+		))
+		descriptor = Descriptor()
+		descriptor.add(Description(
+			method=self.method,
+			url=self.url,
+			# auth=self.auth,
+			parameters=self.parameter.format if self.parameter else None,
+			qs=self.qs.format if self.qs else None,
+			headers=self.header.format if self.header else None,
+			responses=self.response,
+			summary=self.summary,
+			description=self.description,
+			tags=self.tags,
 		))
 		return obj
 
@@ -203,6 +261,7 @@ class RequestWebSocketProperties(object):
 		parameter: Parameter = None,
 		qs: QueryString = None,
 		header: Header = None,
+		response: Response = None,
 		summary: str = None,
 		description: str = None,
 		tags: Union[str, Sequence[str]] = None,
@@ -214,8 +273,11 @@ class RequestWebSocketProperties(object):
 		self.parameter = parameter
 		self.qs = qs
 		self.header = header
+		self.response = response
+		self.summary = summary
+		self.description = description
+		self.tags = tags
 		return
-	
 	def __call__(self, obj: Type[RequestWebSocketRunner]):
 		from ..Routes import RouteRequestWebSocket
 		router = Router()
@@ -227,6 +289,19 @@ class RequestWebSocketProperties(object):
 			parameter=self.parameter,
 			qs=self.qs,
 			header=self.header,
+		))
+		descriptor = Descriptor()
+		descriptor.add(Description(
+			method=self.method,
+			url=self.url,
+			# auth=self.auth,
+			parameters=self.parameter.format if self.parameter else None,
+			qs=self.qs.format if self.qs else None,
+			headers=self.header.format if self.header else None,
+			responses=self.response,
+			summary=self.summary,
+			description=self.description,
+			tags=self.tags,
 		))
 		return obj
 
