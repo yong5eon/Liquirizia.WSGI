@@ -162,7 +162,7 @@ api_doc(
 			Tag('RequestWebSocketRunner', description='WebSocket 요청 처리 예제'),
 			Tag('Content Validation', description='일반적인 요청 처리 시 본문으로 전달되는 컨텐츠의 유효성 검사 예제'),
 			Tag('Auth', description='인증 처리 예제'),
-			Tag('ETC', description='기타'),
+			Tag('Common'),
 		),
 		schemas=(),
 		sortUrl=lambda url: {

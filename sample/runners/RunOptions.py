@@ -78,7 +78,7 @@ class SplitHeaders(Pattern):
 			)
 		),
 	),
-	tags='ETC',
+	tags='Common',
 )
 class RunOptions(RequestRunner):
 	def __init__(self, request: Request):

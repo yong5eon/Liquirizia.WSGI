@@ -20,7 +20,7 @@ __all__ = (
 		status=200,
 		description='성공',
 	),
-	tags='ETC',
+	tags='Common',
 )
 class RunGet(RequestRunner):
 	def __init__(self, request: Request):
