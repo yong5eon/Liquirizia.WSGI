@@ -1,22 +1,26 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
+from Liquirizia.WSGI.Properties.Validator import *
 from Liquirizia.WSGI.Decoders import *
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
+from Liquirizia.WSGI.Description import	Response, Content
 
 from Liquirizia.Validator.Patterns import *
 from Liquirizia.Validator.Patterns.Object import *
 from Liquirizia.Description import *
 
+from ..Model import *
+
 __all__ = (
-	'RunPost'
+	'RunPut'
 )
 
 
 @RequestProperties(
-	method='POST',
+	method='PUT',
 	url='/api/run/:a/:b',
 	parameter=Parameter(
 		{
@@ -57,20 +61,8 @@ __all__ = (
 			'c': String('질의 c', default='안녕', required=False),
 		}
 	),
-	header=Header(
-		{
-			'X-Token': IsString(
-				error=BadRequestError('헤더 X-Token 은 문자열을 필요로 합니다'),
-			),
-		},
-		requires=('X-Token',),
-		requiresError=BadRequestError('헤더 X-Token 은 필수 입니다.'),
-		format={
-			'X-Token': String('헤더 X-Token'),
-		}
-	),
 	body=Body(
-		content=IsObject(
+		IsObject(
 			IsRequiredIn('a', 'b', error=BadRequestError('본문에는 a 와 b 값이 있어야 합니다.')),
 			IsMappingOf(
 				{
@@ -97,16 +89,36 @@ __all__ = (
 				a=Integer('본문 a', max=5),
 				b=Number('본문 b', max=9),
 			)
-		),
-		example={
-			'a': 1,
-			'b': 2.0,
-		}
+		)
 	),
-	summary='POST 요청을 처리하는 예제',
+	response=(
+		Response(
+			status=200,
+			description='성공',
+			content=Content(
+				format='application/json',
+				schema=Object(
+					properties=Properties(
+						status=Integer('상태코드'),
+						message=String('메세지'),
+						data=FORMAT_DATA,
+					)
+				)
+			),
+		),
+		Response(
+			status=400,
+			description='잘못된 요청',
+			content=Content(
+				format='text/plain',
+				schema=String('원인'),
+			),
+		),
+	),
+	summary='PUT 요청을 처리하는 예제',
 	tags='RequestRunner',
 )
-class RunPost(RequestRunner):
+class RunPut(RequestRunner):
 	def __init__(self, request: Request):
 		self.request = request
 		return
@@ -131,7 +143,7 @@ class RunPost(RequestRunner):
 						'b': b,
 					}
 				},
-				'ret': (self.request.parameters.a + self.request.qs.b + a) * (self.request.parameters.b + self.request.qs.b + b), 
+				'ret': (self.request.parameters.a + self.request.qs.b * a) * (self.request.parameters.b + self.request.qs.b * b), 
 			},
 		},
 		headers={

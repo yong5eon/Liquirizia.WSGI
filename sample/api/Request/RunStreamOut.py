@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
+from Liquirizia.WSGI.Properties.Validator import *
 from Liquirizia.WSGI.Decoders import *
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
@@ -9,6 +10,8 @@ from Liquirizia.WSGI import	(
 	RequestReader,
 	ResponseWriter,
 )
+from Liquirizia.WSGI.Description import Response, Content
+from Liquirizia.Description import *
 
 from time import sleep
 
@@ -19,6 +22,19 @@ __all__ = (
 @RequestStreamProperties(
 	method='GET',
 	url='/api/run/stream',
+	response=Response(
+		status=200,
+		description='OK',
+		content=Content(
+			format='text/plain',
+			schema=String(),
+			example='0123456789'
+		),
+		headers={
+			'Content-Type': String(),
+			'Content-Length': Integer(),
+		},
+	),
 	description='1초 간격으로 0에서 9까지 송출',
 	tags='RequestStreamRunner',
 )

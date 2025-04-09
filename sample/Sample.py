@@ -118,6 +118,7 @@ aps = Application(
 	handler=SampleHandler(),
 	headers={
 		'X_TOKEN': 'X-Token',
+		'CREDENTIALS': 'Credentials',
 	},
 )
 
@@ -154,21 +155,29 @@ api_doc(
 	config=Descriptor().toDocument(
 		tags=(
 			Tag('RequestRunner', description='일반적인 요청 처리 예제'),
-			Tag('RequestRunner - Content Validation', description='일반적인 요청 처리 시 본문으로 전달되는 컨텐츠의 유효성 검사 예제'),
 			Tag('RequestStreamRunner', description='스트림 요청 처리 예제'),
 			Tag('RequestStreamRunner - Chunked', description='청크 스트림 요청 처리 예제'),
 			Tag('RequestServerSentEventsRunner', description='Server-Sent Events 요청 처리 예제'),
 			Tag('RequestWebSocketRunner', description='WebSocket 요청 처리 예제'),
+			Tag('Content Validation', description='일반적인 요청 처리 시 본문으로 전달되는 컨텐츠의 유효성 검사 예제'),
+			Tag('Auth', description='인증 처리 예제'),
+			Tag('ETC', description='기타'),
 		),
 		schemas=(),
 		url=lambda url: {
-			'/api/content/bool': '11',
-			'/api/content/integer': '12',
-			'/api/content/number': '13',
-			'/api/content/string': '14',
-			'/api/content/array': '14',
-			'/api/content/object': '14',
-		}.get(url, '99'),
+			# content validation
+			'/api/content/bool': 1,
+			'/api/content/integer': 2,
+			'/api/content/number': 3,
+			'/api/content/string': 4,
+			'/api/content/array': 5,
+			'/api/content/object': 6,
+			# auth
+			'/api/auth/http': 1,
+			'/api/auth/header': 2,
+			'/api/auth/cookie': 3,
+			'/api/auth/query': 4,
+		}.get(url, 99),
 		method=lambda o: {
 			'POST': 1,
 			'GET': 2,

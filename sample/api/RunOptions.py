@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
+from Liquirizia.WSGI.Properties.Validator import *
 from Liquirizia.WSGI.Decoders import *
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
@@ -23,6 +24,7 @@ __all__ = (
 		requires=('p',),
 		requiresError=BadRequestError('질의에 경로(p) 는 필수 입니다.'),
 	),
+	tags='ETC',
 )
 class RunOptions(RequestRunner):
 	def __init__(self, request: Request):

@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
+from Liquirizia.WSGI.Properties.Validator import *
 from Liquirizia.WSGI.Decoders import *
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
 from Liquirizia.WSGI.Extends import ServerSentEvents
+
+from Liquirizia.WSGI.Description import Response, Content
+from Liquirizia.Description import *
 
 from time import sleep
 from random import randrange
@@ -20,6 +24,17 @@ __all__ = (
 @RequestServerSentEventsProperties(
 	method='GET',
 	url='/api/run/stream/sse',
+	response=Response(
+		status=200,
+		description='OK',
+		content=Content(
+			format='text/event-stream',
+			schema=String(),
+		),
+		headers={
+			'Content-Type': String(default='text/event-stream', enum='text/event-stream'),
+		},
+	),
 	description='1초 간격으로 0에서 1000사이의 랜덤한 숫자를 송출',
 	tags='RequestServerSentEventsRunner',
 )

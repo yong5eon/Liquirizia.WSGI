@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
+from Liquirizia.WSGI.Properties.Validator import *
 from Liquirizia.WSGI.Decoders import *
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
-from Liquirizia.WSGI.Description import Descriptor, Tag
+from Liquirizia.WSGI.Description import Descriptor, Tag, Response, Content
+from Liquirizia.Description import *
 
 __all__ = (
 	'RunGetDocument'
@@ -14,7 +16,16 @@ __all__ = (
 
 @RequestProperties(
 	method='GET',
-	url='/doc/spec',
+	url='/api/doc',
+	response=Response(
+		status=200,
+		description='성공',
+		content=Content(
+			format='application/json',
+			schema=Object(),
+		),
+	),
+	tags='ETC',
 )
 class RunGet(RequestRunner):
 	def __init__(self, request: Request):
@@ -25,11 +36,13 @@ class RunGet(RequestRunner):
 		return ResponseJSON(Descriptor().toDocument(
 			tags=(
 				Tag('RequestRunner', description='일반적인 요청 처리 예제'),
-				Tag('RequestRunner - Content Validation', description='일반적인 요청 처리 시 본문으로 전달되는 컨텐츠의 유효성 검사 예제'),
 				Tag('RequestStreamRunner', description='스트림 요청 처리 예제'),
 				Tag('RequestStreamRunner - Chunked', description='청크 스트림 요청 처리 예제'),
 				Tag('RequestServerSentEventsRunner', description='Server-Sent Events 요청 처리 예제'),
 				Tag('RequestWebSocketRunner', description='WebSocket 요청 처리 예제'),
+				Tag('Content Validation', description='일반적인 요청 처리 시 본문으로 전달되는 컨텐츠의 유효성 검사 예제'),
+				Tag('Auth', description='인증 처리 예제'),
+				Tag('ETC', description='기타'),
 			),
 			schemas=(),
 			url=lambda url: {
