@@ -83,9 +83,9 @@ class RequestProperties(object):
 		self.tags = tags
 		return
 	def __call__(self, obj: Type[RequestRunner]):
-		from ..Routes import RouteRequest
+		from ..Runners import RunRequest
 		router = Router()
-		router.add(RouteRequest(
+		router.add(RunRequest(
 			obj=obj,
 			method=self.method,
 			url=self.url,
@@ -192,9 +192,9 @@ class RequestStreamProperties(object):
 		self.tags = tags
 		return
 	def __call__(self, obj: Type[RequestStreamRunner]):
-		from ..Routes import RouteRequestStream
+		from ..Runners import RunRequestStream
 		router = Router()
-		router.add(RouteRequestStream(
+		router.add(RunRequestStream(
 			obj=obj,
 			method=self.method,
 			url=self.url,
@@ -296,9 +296,9 @@ class RequestServerSentEventsProperties(object):
 		self.tags = tags
 		return
 	def __call__(self, obj: Type[RequestServerSentEventsRunner]):
-		from ..Routes import RouteRequestServerSentEvents
+		from ..Runners import RunRequestServerSentEvents
 		router = Router()
-		router.add(RouteRequestServerSentEvents(
+		router.add(RunRequestServerSentEvents(
 			obj=obj,
 			method=self.method,
 			url=self.url,
@@ -388,9 +388,9 @@ class RequestWebSocketProperties(object):
 		self.tags = tags
 		return
 	def __call__(self, obj: Type[RequestWebSocketRunner]):
-		from ..Routes import RouteRequestWebSocket
+		from ..Runners import RunRequestWebSocket
 		router = Router()
-		router.add(RouteRequestWebSocket(
+		router.add(RunRequestWebSocket(
 			obj=obj,
 			url=self.url,
 			origin=self.origin,

@@ -19,12 +19,12 @@ from datetime import timezone
 from re import compile
 
 __all__ = (
-	'RouteFileSystemObject'
+	'RunFileSystemObject'
 )
 
 
-class RouteFileSystemObject(Route, RequestFactory):
-	"""File System Object Route Class"""
+class RunFileSystemObject(Route, RequestFactory):
+	"""Run File System Object Class"""
 	"""
 	TODO : Do something according to follows
 	- Origin
@@ -40,7 +40,7 @@ class RouteFileSystemObject(Route, RequestFactory):
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
 	):
-		super(RouteFileSystemObject, self).__init__('GET', '{}'.format(prefix))
+		super().__init__('GET', '{}'.format(prefix))
 		self.prefix = prefix
 		self.fso = fso
 		self.regex = compile('^{}/'.format(prefix))

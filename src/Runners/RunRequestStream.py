@@ -19,12 +19,12 @@ from ..ResponseWriter import ResponseWriter
 from typing import Type
 
 __all__ = (
-	'RouteRequestStream'
+	'RunRequestStream'
 )
 
 
-class RouteRequestStream(Route, RequestFactory):
-	"""Route Request Stream Class"""
+class RunRequestStream(Route, RequestFactory):
+	"""Run Request Stream Class"""
 	def __init__(
 		self,
 		obj: Type[RequestStreamRunner],
@@ -36,7 +36,7 @@ class RouteRequestStream(Route, RequestFactory):
 		qs: QueryString = None,
 		header: Header = None,
 	):
-		super(RouteRequestStream, self).__init__(method, url)
+		super().__init__(method, url)
 		self.object = obj
 		self.origin = origin
 		self.auth = auth

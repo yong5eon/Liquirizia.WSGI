@@ -25,12 +25,12 @@ from os import stat
 from os.path import split
 
 __all__ = (
-	'RouteFile'
+	'RunFile'
 )
 
 
-class RouteFile(Route, RequestFactory):
-	"""File Route Class"""
+class RunFile(Route, RequestFactory):
+	"""Run File Class"""
 	"""
 	TODO : Do something according to follows
 	- Origin
@@ -46,7 +46,7 @@ class RouteFile(Route, RequestFactory):
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
 	):
-		super(RouteFile, self).__init__('GET', url)
+		super().__init__('GET', url)
 		self.onRequest = onRequest
 		self.onResponse = onResponse
 		self.path = path

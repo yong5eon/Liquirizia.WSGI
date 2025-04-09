@@ -10,12 +10,12 @@ from ..Responses import *
 from ..Description import Descriptor
 
 __all__ = (
-	'RouteOptions'
+	'RunOptions'
 )
 
 
-class RouteOptions(RequestFactory):
-	"""Route Options Class"""
+class RunOptions(RequestFactory):
+	"""Run Options Class"""
 	def run(
 		self,
 		request: Request,

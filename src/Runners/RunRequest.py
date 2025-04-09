@@ -23,12 +23,12 @@ from collections.abc import Mapping, Sequence
 from typing import Type, Sequence, Union
 
 __all__ = (
-	'RouteRequest'
+	'RunRequest'
 )
 
 
-class RouteRequest(Route, RequestFactory):
-	"""Route Request Class"""
+class RunRequest(Route, RequestFactory):
+	"""Run Request Class"""
 	def __init__(
 		self,
 		obj: Type[RequestRunner],
@@ -44,7 +44,7 @@ class RouteRequest(Route, RequestFactory):
 		onRequest: RequestFilter = None,
 		onResponse: ResponseFilter = None,
 	):
-		super(RouteRequest, self).__init__(method, url)
+		super().__init__(method, url)
 		self.object = obj
 		self.origin = origin
 		self.auth = auth
