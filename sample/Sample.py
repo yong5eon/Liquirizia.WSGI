@@ -117,7 +117,7 @@ class SampleHandler(Handler):
 aps = Application(
 	handler=SampleHandler(),
 	headers={
-		'X_TOKEN': 'X-Token',
+		'X_APP_ID': 'X-App-Id',
 		'CREDENTIALS': 'Credentials',
 	},
 )

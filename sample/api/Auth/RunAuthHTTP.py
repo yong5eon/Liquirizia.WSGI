@@ -12,28 +12,13 @@ from Liquirizia.WSGI.Description import Response, Content
 from Liquirizia.Validator.Patterns import *
 from Liquirizia.Description import *
 
-from dataclasses import dataclass, asdict
+from ..Session import GetSession
+from dataclasses import asdict
 
 __all__ = (
 	'RunAuthHTTP'
 )
 
-@dataclass
-class Session(object):
-	credentials: str
-	extra: dict = None
-
-
-class Auth(Authenticate):
-	def __call__(self, credentials: str):
-		if credentials != '1':
-			return
-		return Session(
-			credentials=credentials,
-			extra={
-				'id': 0,
-			},
-		)
 
 @RequestProperties(
 	method='GET',
@@ -41,7 +26,7 @@ class Auth(Authenticate):
 	auth=HTTPAuthenticate(
 		scheme='Bearer',
 		format='JWT',
-		auth=Auth(),
+		auth=GetSession(),
 		schemeError=UnauthorizedError('스키마가 올바르지 않습니다,'),
 		schemeErrorParameters={
 			'realm': '로그인',
@@ -80,5 +65,4 @@ class RunAuthHTTP(RequestRunner):
 		return
 
 	def run(self):
-		print(self.request.session)
 		return ResponseJSON(asdict(self.request.session) if self.request.session else {})

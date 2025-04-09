@@ -12,35 +12,20 @@ from Liquirizia.WSGI.Description import Response, Content
 from Liquirizia.Validator.Patterns import *
 from Liquirizia.Description import *
 
-from dataclasses import dataclass, asdict
+from ..Session import GetSession
+from dataclasses import asdict
 
 __all__ = (
 	'RunAuthHeader',
 )
 
-@dataclass
-class Session(object):
-	credentials: str
-	extra: dict = None
-
-
-class Auth(Authenticate):
-	def __call__(self, credentials: str):
-		if credentials != '1':
-			return
-		return Session(
-			credentials=credentials,
-			extra={
-				'id': 0,
-			},
-		)
 
 @RequestProperties(
 	method='GET',
 	url='/api/auth/header',
 	auth=HeaderAuthenticate(
 		name='Credentials',
-		auth=Auth(),
+		auth=GetSession(),
 		error=UnauthorizedError('인증이 필요합니다.'),
 	),
 	response=(
@@ -75,5 +60,4 @@ class RunAuthHeader(RequestRunner):
 		return
 
 	def run(self):
-		print(self.request.session)
 		return ResponseJSON(asdict(self.request.session) if self.request.session else {})

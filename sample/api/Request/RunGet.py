@@ -2,6 +2,7 @@
 
 from Liquirizia.WSGI.Properties import *
 from Liquirizia.WSGI.Properties.Validator import *
+from Liquirizia.WSGI.Properties.Auth import HTTP as HTTPAuthenticate
 from Liquirizia.WSGI.Decoders import *
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
@@ -11,6 +12,7 @@ from Liquirizia.WSGI.Description import	Response, Content
 from Liquirizia.Validator.Patterns import *
 from Liquirizia.Description import *
 
+from ..Session import GetSession
 from ..Model import *
 
 __all__ = (
@@ -21,6 +23,18 @@ __all__ = (
 @RequestProperties(
 	method='GET',
 	url='/api/run/:a/:b',
+	origin=Origin(all=True),
+	auth=HTTPAuthenticate(
+		scheme='Bearer',
+		format='JWT',
+		optional=True,
+		auth=GetSession(),
+		schemeError=UnauthorizedError('스키마가 올바르지 않습니다,'),
+		schemeErrorParameters={
+			'realm': '로그인',
+		},
+		error=UnauthorizedError('인증이 필요합니다.'),
+	),
 	parameter=Parameter(
 		{
 			'a': ToInteger(
@@ -59,6 +73,14 @@ __all__ = (
 			'b': Number('질의 b', min=9),
 			'c': String('질의 c', default='안녕', required=False),
 		}
+	),
+	header=Header(
+		{
+			'X-App-Id': IsToNone(IsString()),
+		},
+		format={
+			'X-App-Id': String(required=False),
+		},
 	),
 	response=(
 		Response(
