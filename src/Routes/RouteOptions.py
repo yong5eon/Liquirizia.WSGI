@@ -24,9 +24,11 @@ class RouteOptions(RequestFactory):
 	):
 		router = Router()
 		if request.uri == '*': 
-			return ResponseNoContent(headers={
+			response = ResponseNoContent(headers={
 				'Allow': ', '.join(sorted(list(set(router.methods))))
 			})
+			writer.response(response)
+			return
 		_, patterns = router.matches(self.request.uri)
 		if not patterns:
 			raise NotFoundError('{} is not found in router'.format(self.request.uri))
