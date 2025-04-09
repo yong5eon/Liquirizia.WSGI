@@ -24,20 +24,16 @@ from ..Errors import (
 	UnsupportedMediaTypeError,
 )
 from ..Headers import (
-	Authorization as AuthorizationHeader,
-	Cookie,
 	ContentType,
 )
 
-from abc import ABCMeta, abstractmethod
+from abc import ABC, ABCMeta, abstractmethod
 from typing import Dict, Sequence, Union, Any
 
 __all__ = (
 	'Origin',
+	'Authenticate',
 	'Auth',
-	'Authorization',
-	'HTTP',
-	'Cookie',
 	'Parameter',
 	'QueryString',
 	'Header',
@@ -72,15 +68,7 @@ class Origin(object):
 		raise ForbiddenError('Origin {} is not allowed'.format(origin))
 
 
-class Auth(metaclass=ABCMeta):
-	@abstractmethod
-	def __call__(self, request: Request):
-		raise NotImplementedError('{} must be implemented __call__'.format(
-			self.__class__.__name__,
-		))
-
-
-class Authorization(metaclass=ABCMeta):
+class Authenticate(metaclass=ABCMeta):
 	@abstractmethod
 	def __call__(self, value: Any) -> Any:
 		raise NotImplementedError('{} must be implemented __call__'.format(
@@ -88,84 +76,20 @@ class Authorization(metaclass=ABCMeta):
 		))
 
 
-class HTTP(Auth):
+class Auth(ABC):
 	def __init__(
 		self,
-		scheme: str,
-		auth: Authorization,
-		format: str = None,
+		auth: Authenticate,
 		optional: bool = False,
-		schemeError: Error = None,
-		schemeErrorParameters: Dict[str, Any] = None,
 		error: Error = None,
 	):
-		self.scheme = scheme
-		self.authorization = auth
-		self.format = format
+		self.auth = auth
 		self.optional = optional
-		self.schemeError = schemeError
-		self.schemeErrorParameters = schemeErrorParameters
 		self.error = error
 		return
+	@abstractmethod
 	def __call__(self, request: Request):
-		authorization: AuthorizationHeader = request.header('Authorization')
-		if not self.optional and not authorization:
-			if self.error:
-				raise self.error
-			raise UnauthorizedError('Authorization not found')
-		if not authorization.scheme == self.scheme:
-			if self.schemeError:
-				raise self.schemeError
-			headers = None
-			if self.schemeErrorParameters:
-				headers = {
-					'WWW-Authenticate': '{} {}'.format(
-						self.scheme,
-						','.join([
-							'{}="{}"'.format(k, v) for k, v in self.schemeErrorParameters.items()
-						]),
-					),
-				}
-			raise UnauthorizedError(
-				'Authorization scheme not supported',
-				headers=headers,
-			)
-		request.session = self.authorization(authorization.credentials)
-		return
-
-
-class Cookie(Auth):
-	def __init__(
-		self,
-		name: str,
-		auth: Authorization,
-		optional: bool = False,
-		error: Error = None,
-	):
-		self.name = name
-		self.authorization = auth
-		self.optional = optional
-		self.error = error
-		return
-	def __call__(self, request: Request) -> Any:
-		cookies = request.header('Cookie')
-		if self.optional and not cookies:
-			if self.error:
-				raise self.error
-			raise UnauthorizedError('Cookie not found')
-		_ = None
-		for cookie in cookies:
-			if cookie.name == self.name:
-				_ = cookie
-				break
-		if not _:
-			if self.optional:
-				return
-			if self.error:
-				raise self.error
-			raise UnauthorizedError('Cookie {} not found'.format(self.name))
-		request.session = self.authorization(_)
-		return
+		raise NotImplementedError('{} must be implemented __call__'.format(self.__class__.__name__))
 
 
 class Parameter(object):
@@ -250,15 +174,15 @@ class Body(object):
 	"""Body Validator"""
 	def __init__(
 		self,
-		content: Pattern,
-		decoders: Dict[str, Decoder],
+		content: Pattern = None,
+		decoders: Dict[str, Decoder] = None,
 		error: Error = None,
 		unsupportedError: Error = None,
 		format: Union[Value, Schema] = None,
 		example: Any = None,
 		required: bool = True,
 	):
-		self.va = Validator(content)
+		self.va = Validator(content) if content else Validator()
 		self.decoders = decoders
 		self.error = error
 		self.unsupportedError = unsupportedError
@@ -272,9 +196,11 @@ class Body(object):
 			if self.error:
 				raise self.error
 			raise BadRequestError('Content-Type not found')
-		if type.format not in self.decoders.keys():
-			if self.unsupportedError:
-				raise self.unsupportedError
-			raise UnsupportedMediaTypeError('Unsupported Media Type {}'.format(type.format))
-		content = self.decoders[type.format](content)
-		return self.va(content)
+		if self.decoders:
+			if type.format not in self.decoders.keys():
+				if self.unsupportedError:
+					raise self.unsupportedError
+				raise UnsupportedMediaTypeError('Unsupported Media Type {}'.format(type.format))
+			content = self.decoders[type.format](content)
+			return self.va(content)
+		return content
