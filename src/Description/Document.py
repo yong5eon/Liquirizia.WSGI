@@ -101,11 +101,11 @@ class Response(Documentation):
 	def __init__(self, response: ResponseDescription):
 		super().__init__(description=response.description)
 		if response.content:
-			response['content'] = {
+			self['content'] = {
 				content.format: Content(content) for content in response.content
 			}
 		if response.headers:
-			response['headers'] = {
+			self['headers'] = {
 				k: ResponseHeader(v) for k, v in response.headers.items()
 			}
 		return
@@ -165,9 +165,8 @@ class Path(Documentation):
 			parameters.append(_)
 		authenticates = []
 		if description.auth:
-			if description.auth.optional:
-				authenticates.append({})
-			authenticates.append({description.auth.name: []})
+			if not description.auth.optional:
+				authenticates.append({description.auth.name: []})
 		responses = sorted(description.responses if description.responses else [], key=lambda x: x.status)
 		super().__init__(operationId=id if id else uuid4().hex)
 		if parameters: self['parameters'] = parameters
