@@ -3,13 +3,14 @@
 from ..Route import Route
 from ..RequestFactory import RequestFactory
 from ..Request import Request
-from ..Properties import (
-	RequestStreamRunner,
+from ..Properties import RequestStreamRunner
+from ..Properties.Validator import (
 	Origin,
 	Auth,
 	Parameter,
 	QueryString,
 	Header,
+	Body,
 )
 from ..Filters import *
 from ..RequestReader import RequestReader

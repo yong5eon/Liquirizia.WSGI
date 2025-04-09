@@ -16,6 +16,8 @@ from .Properties import (
 	RequestStreamRunner,
 	RequestWebSocketRunner,
 	RequestServerSentEventsRunner,
+)
+from .Properties.Validator import (
 	Origin,
 	Auth,
 	Parameter,
