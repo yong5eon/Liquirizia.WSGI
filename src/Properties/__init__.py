@@ -12,18 +12,6 @@ from .RequestProperties import (
 	RequestWebSocketProperties,
 )
 
-from .Validator import (
-	Origin,
-	Auth,
-	Authorization,
-	HTTP,
-	Cookie,
-	Parameter,
-	QueryString,
-	Header,
-	Body,
-)
-
 __all__ = (
 	# RequestRunner
 	'RequestRunner',
@@ -35,14 +23,4 @@ __all__ = (
 	'RequestStreamProperties',
 	'RequestServerSentEventsProperties',
 	'RequestWebSocketProperties',
-	# Validator
-	'Origin',
-	'Auth',
-	'Authorization',
-	'HTTP',
-	'Cookie',
-	'Parameter',
-	'QueryString',
-	'Header',
-	'Body',
 )
