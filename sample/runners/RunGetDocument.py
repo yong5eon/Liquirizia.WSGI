@@ -45,7 +45,7 @@ class RunGet(RequestRunner):
 				Tag('ETC', description='기타'),
 			),
 			schemas=(),
-			url=lambda url: {
+			sortUrl=lambda url: {
 				'/api/content/bool': '11',
 				'/api/content/integer': '12',
 				'/api/content/number': '13',
@@ -53,9 +53,9 @@ class RunGet(RequestRunner):
 				'/api/content/array': '14',
 				'/api/content/object': '14',
 			}.get(url, '99'),
-			method=lambda o: {
-				'GET': 1,
-				'POST': 2,
+			sortMethod=lambda o: {
+				'POST': 1,
+				'GET': 2,
 				'PUT': 3,
 				'DELETE': 4,
 			}.get(o.upper(), 9),

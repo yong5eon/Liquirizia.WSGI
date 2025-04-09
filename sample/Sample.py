@@ -20,7 +20,8 @@ from Liquirizia.FileSystemObject.Implements.FileSystem import (
 )
 
 
-from filters import ToJPEG
+from Filters import ToJPEG
+
 from os.path import dirname, realpath
 from sys import stderr
 from traceback import format_tb
@@ -137,7 +138,7 @@ descriptor = Descriptor(
 	# version='3.0.0'
 )
 
-Load(mod='api')
+Load(mod='runners')
 
 # apply swagger-ui
 import sys
@@ -164,7 +165,7 @@ api_doc(
 			Tag('ETC', description='기타'),
 		),
 		schemas=(),
-		url=lambda url: {
+		sortUrl=lambda url: {
 			# content validation
 			'/api/content/bool': 1,
 			'/api/content/integer': 2,
@@ -178,7 +179,7 @@ api_doc(
 			'/api/auth/cookie': 3,
 			'/api/auth/query': 4,
 		}.get(url, 99),
-		method=lambda o: {
+		sortMethod=lambda o: {
 			'POST': 1,
 			'GET': 2,
 			'PUT': 3,
