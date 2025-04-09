@@ -4,6 +4,8 @@ from Liquirizia.Template import Singleton
 
 from .Description import (
 	Description,
+	Response,
+	Content,
 )
 from .Document import (
 	Document,
@@ -11,7 +13,7 @@ from .Document import (
 	Path,
 	Tag,
 )
-from Liquirizia.Description import Schema
+from Liquirizia.Description import *
 
 from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
@@ -76,25 +78,28 @@ class Descriptor(Singleton):
 
 	def toDocument(
 		self,
-		path: str = None,
+		url: str = None,
+		method: str = None,
 		tags: Sequence[Tag] = None,
 		schemas: Sequence[Schema] = None,
-		url: SortKey = Url(),
-		method: SortKey = Method(),
+		sortUrl: SortKey = Url(),
+		sortMethod: SortKey = Method(),
 	) -> Document:
 		regex = compile(r':(\w+)')
 		routes = []
 		def cpr(o):
 			key, desc = o
-			return url(key)
+			return sortUrl(key)
 		def cpp(o):
 			m, path = o
-			return method(m)
-		if path:
-			if path in self.maps:
-				p= regex.sub(r"{\1}", path)
+			return sortMethod(m)
+		if url:
+			if url in self.maps.keys():
+				p= regex.sub(r"{\1}", url)
 				ps = OrderedDict()
-				for m, path in sorted(self.maps[path], key=cpp):
+				for m, path in sorted(self.maps[url], key=cpp):
+					if method and m != method.lower():
+						continue
 					ps[m] = path
 				routes.append((p, ps))
 			else:
