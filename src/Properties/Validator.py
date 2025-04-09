@@ -158,6 +158,7 @@ class Header(object):
 			IsRequiredInObject(*requires if requires else [], error=requiresError),
 			IsMappingOfObject(headers),
 		))
+		self.headers = headers.keys()
 		self.format = format 
 		return
 	def __call__(self, request: Request):
