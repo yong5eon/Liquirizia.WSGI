@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .Auth import Authorization
+from .Auth import Authenticate
 
 from Liquirizia.Description import Value, Schema
 from typing import Optional, Union, Sequence, Dict, Any
@@ -65,7 +65,7 @@ class Auth(object):
 	def __init__(
 		self,
 		name: str,
-		format: Authorization = None,
+		format: Authenticate = None,
 		optional: bool = False,
 	):
 		self.name = name

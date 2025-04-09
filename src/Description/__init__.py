@@ -14,18 +14,6 @@ from .Description import (
 	Response,
 )
 from .Descriptor import Descriptor
-from .Auth import (
-	OAuth2Password,
-	OAuth2Implict,
-	OAuth2Credentials,
-	OAuth2Code,
-	HTTP,
-	Header,
-	Query,
-	Cookie,
-	TLS,
-	OpenIdConnect,
-)
 from .Document import (
 	Document,
 	Path,
@@ -50,17 +38,6 @@ __all__ = (
 	'Body',
 	'Auth',
 	'Response',
-	# Authorization
-	'OAuth2Password',
-	'OAuth2Implict',
-	'OAuth2Credentials',
-	'OAuth2Code',
-	'HTTP',
-	'Header',
-	'Query',
-	'Cookie',
-	'TLS',
-	'OpenIdConnect',
 	# Documentation
 	'Document',
 	'Path',

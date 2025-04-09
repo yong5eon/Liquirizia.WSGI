@@ -3,6 +3,7 @@
 from typing import Any, Iterator, KeysView, ItemsView, ValuesView, Mapping
 
 __all__ = (
+	'Authenticate',
 	'OAuth2Password',
 	'OAuth2Implict',
 	'OAuth2Credentials',
@@ -15,7 +16,7 @@ __all__ = (
 	'OpenIdConnect',
 )
 
-class Authorization(Mapping):
+class Authenticate(Mapping):
 	def __init__(self, **kwargs):
 		self.__properties__ = kwargs
 		return
@@ -56,7 +57,7 @@ class Authorization(Mapping):
 	def get(self, key: object) -> Any:
 		return self.__properties__.get(key)
 
-class OAuth2Password(Authorization):
+class OAuth2Password(Authenticate):
 	def __init__(
 		self,
 		url: str,
@@ -77,7 +78,7 @@ class OAuth2Password(Authorization):
 		if description: self['description'] = description
 		return
 	
-class OAuth2Implict(Authorization):
+class OAuth2Implict(Authenticate):
 	def __init__(
 		self,
 		url: str,
@@ -98,7 +99,7 @@ class OAuth2Implict(Authorization):
 		if description: self['description'] = description
 		return
 
-class OAuth2Credentials(Authorization):
+class OAuth2Credentials(Authenticate):
 	def __init__(
 		self,
 		url: str,
@@ -119,7 +120,7 @@ class OAuth2Credentials(Authorization):
 		if description: self['description'] = description
 		return
 
-class OAuth2Code(Authorization):
+class OAuth2Code(Authenticate):
 	def __init__(
 		self,
 		url: str,
@@ -142,7 +143,7 @@ class OAuth2Code(Authorization):
 		if description: self['description'] = description
 		return
 	
-class HTTP(Authorization):
+class HTTP(Authenticate):
 	def __init__(
 		self,
 		format: str,
@@ -157,7 +158,7 @@ class HTTP(Authorization):
 		if description: self['description'] = description
 		return
 
-class Header(Authorization):
+class Header(Authenticate):
 	def __init__(
 		self,
 		name: str,
@@ -171,7 +172,7 @@ class Header(Authorization):
 		self['in'] = 'header'
 		return
 
-class Query(Authorization):
+class Query(Authenticate):
 	def __init__(
 		self,
 		name: str,
@@ -185,7 +186,7 @@ class Query(Authorization):
 		self['in'] = 'query'
 		return
 
-class Cookie(Authorization):
+class Cookie(Authenticate):
 	def __init__(
 		self,
 		name: str,
@@ -199,7 +200,7 @@ class Cookie(Authorization):
 		self['in'] = 'cookie'
 		return
 
-class TLS(Authorization):
+class TLS(Authenticate):
 	def __init__(
 		self,
 		description: str = None,
@@ -210,7 +211,7 @@ class TLS(Authorization):
 		if description: self['description'] = description
 		return
 	
-class OpenIdConnect(Authorization):
+class OpenIdConnect(Authenticate):
 	def __init__(
 		self,
 		url: str,
