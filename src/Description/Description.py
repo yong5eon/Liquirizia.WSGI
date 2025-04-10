@@ -100,6 +100,7 @@ class Description(object):
 		if self.responses:
 			if not isinstance(self.responses, Sequence):
 				self.responses = [self.responses]
+			self.responses = list(self.responses)
 		self.summary = summary
 		self.description = description
 		self.tags = tags

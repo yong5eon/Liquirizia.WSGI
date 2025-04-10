@@ -18,7 +18,7 @@ from Liquirizia.Description import *
 from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
 from re import compile
-from typing import Sequence, Any
+from typing import Sequence, Any, List, Iterable
 
 __all__ = (
 	'Descriptor',
@@ -50,11 +50,25 @@ class Method(SortKey):
 
 class Descriptor(Singleton):
 	"""Descriptor Class"""
-	def __init__(self, info: Information = Information(), version: str = '3.1.0'):
+	def __init__(
+		self,
+		info: Information = Information(),
+		version: str = '3.1.0',
+		errorResponses: List[Response] = None,
+		authErrorResponses: List[Response] = None,
+	):
 		self.infomation = info
 		self.version = version
 		self.maps = {}
 		self.authes = {}
+		self.errors = errorResponses if errorResponses else []
+		if not isinstance(self.errors, Iterable):
+			self.errors = [self.errors]
+		self.errors = [*self.errors]
+		self.authErrors = authErrorResponses if authErrorResponses else []
+		if not isinstance(self.authErrors, Iterable):
+			self.authErrors = [self.authErrors]
+		self.authErrors = [*self.authErrors]
 		return
 
 	def add(
@@ -63,6 +77,14 @@ class Descriptor(Singleton):
 	) -> 'Descriptor':
 		if description.url not in self.maps:
 			self.maps[description.url] = []
+		if description.auth and self.authErrors:
+			if not description.responses:
+				description.responses = []
+			description.responses.extend(self.authErrors)
+		if self.errors:
+			if not description.responses:
+				description.responses = []
+			description.responses.extend(self.errors)
 		self.maps[description.url].append((
 			description.method.lower(),
 			Path(description),
@@ -74,6 +96,14 @@ class Descriptor(Singleton):
 				fmt = dict(self.authes[description.auth.name])
 				fmt.update(description.auth.format)
 				self.authes[description.auth.name] = fmt
+		return self
+	
+	def addErrorResponse(self, response: Response) -> 'Descriptor':
+		self.errors.append(response)
+		return self
+	
+	def addAuthErrorResponse(self, response: Response) -> 'Descriptor':
+		self.authErrors.append(response)
 		return self
 
 	def toDocument(
