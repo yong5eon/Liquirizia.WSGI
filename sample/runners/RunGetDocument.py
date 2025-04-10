@@ -9,6 +9,8 @@ from Liquirizia.WSGI import	Request
 from Liquirizia.WSGI.Description import Descriptor, Tag, Response, Content
 from Liquirizia.Description import *
 
+from .Model import *
+
 __all__ = (
 	'RunGetDocument'
 )
@@ -44,7 +46,14 @@ class RunGet(RequestRunner):
 				Tag('Auth', description='인증 처리 예제'),
 				Tag('Common'),
 			),
-			schemas=(),
+			schemas=(
+				ToSchema(ParametersModel),
+				ToSchema(QueriesModel),
+				ToSchema(ContentModel),
+				ToSchema(ArgumentsModel),
+				ToSchema(DataModel),
+				ToSchema(ResponseModel),
+			),
 			sortUrl=lambda url: {
 				'/api/content/bool': '11',
 				'/api/content/integer': '12',

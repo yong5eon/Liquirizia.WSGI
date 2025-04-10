@@ -140,6 +140,9 @@ descriptor = Descriptor(
 
 Load(mod='runners')
 
+# import model
+from Liquirizia.Description import ToSchema
+from runners.Model import *
 # apply swagger-ui
 import sys
 import DocumentHandler
@@ -164,7 +167,14 @@ api_doc(
 			Tag('Auth', description='인증 처리 예제'),
 			Tag('Common'),
 		),
-		schemas=(),
+		schemas=(
+			ToSchema(ParametersModel),
+			ToSchema(QueriesModel),
+			ToSchema(ContentModel),
+			ToSchema(ArgumentsModel),
+			ToSchema(DataModel),
+			ToSchema(ResponseModel),
+		),
 		sortUrl=lambda url: {
 			# content validation
 			'/api/content/bool': 1,

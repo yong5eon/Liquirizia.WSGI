@@ -88,13 +88,7 @@ __all__ = (
 			description='성공',
 			content=Content(
 				format='application/json',
-				schema=Object(
-					properties=Properties(
-						status=Integer('상태코드'),
-						message=String('메세지'),
-						data=FORMAT_DATA,
-					)
-				)
+				schema=ToSchema(ResponseModel)
 			),
 		),
 		Response(
