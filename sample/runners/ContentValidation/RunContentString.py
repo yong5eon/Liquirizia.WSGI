@@ -28,22 +28,12 @@ __all__ = (
 		},
 		format=String(),
 	),
-	response=(
-		Response(
-			status=200,
-			description='성공',
-			content=Content(
-				format='application/json',
-				schema=String()
-			)
-		),
-		Response(
-			status=400,
-			description='잘못된 요청',
-			content=Content(
-				format='text/plain',
-				schema=String('원인')
-			)
+	response=Response(
+		status=200,
+		description='성공',
+		content=Content(
+			format='application/json',
+			schema=String()
 		)
 	),
 	summary='컨텐츠 검증 샘플 - 문자열',

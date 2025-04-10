@@ -113,30 +113,12 @@ __all__ = (
 			)
 		)
 	),
-	response=(
-		Response(
-			status=200,
-			description='성공',
-			content=Content(
-				format='application/json',
-				schema=ToSchema(ResponseModel)
-			),
-		),
-		Response(
-			status=400,
-			description='잘못된 요청',
-			content=Content(
-				format='text/plain',
-				schema=String('원인'),
-			),
-		),
-		Response(
-			status=403,
-			description='권한없음',
-			content=Content(
-				format='text/plain',
-				schema=String('원인'),
-			),
+	response=Response(
+		status=200,
+		description='성공',
+		content=Content(
+			format='application/json',
+			schema=ToSchema(ResponseModel)
 		),
 	),
 	summary='DELETE 요청을 처리하는 예제',

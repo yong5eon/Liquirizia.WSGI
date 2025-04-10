@@ -123,6 +123,9 @@ aps = Application(
 	},
 )
 
+from Liquirizia.WSGI.Description import *
+from Liquirizia.Description import *
+
 descriptor = Descriptor(
 	info=Information(
 		title='Liquirizia.WSGI Sample API',
@@ -136,6 +139,34 @@ descriptor = Descriptor(
 		)
 	),
 	# version='3.0.0'
+	errorResponses=(
+		Response(
+			status=400,
+			description='잘못된 요청',
+			content=Content(
+				format='text/plain',
+				schema=String('원인')
+			)
+		),
+	),
+	authErrorResponses=(
+		Response(
+			status=401,
+			description='인증 실패',
+			content=Content(
+				format='text/plain',
+				schema=String('원인')
+			)
+		),
+		Response(
+			status=403,
+			description='권한 없음',
+			content=Content(
+				format='text/plain',
+				schema=String('원인')
+			)
+		),
+	),
 )
 
 Load(mod='runners')

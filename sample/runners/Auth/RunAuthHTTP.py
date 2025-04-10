@@ -33,26 +33,16 @@ __all__ = (
 		},
 		error=UnauthorizedError('인증이 필요합니다.'),
 	),
-	response=(
-		Response(
-			status=200,
-			description='성공',
-			content=Content(
-				format='application/json',
-				schema=Object( # TODO: make Schema from Session dataclass
-					properties=Properties(
-						credentials=String(),
-						extra=Object(),
-					)
+	response=Response(
+		status=200,
+		description='성공',
+		content=Content(
+			format='application/json',
+			schema=Object( # TODO: make Schema from Session dataclass
+				properties=Properties(
+					credentials=String(),
+					extra=Object(),
 				)
-			)
-		),
-		Response(
-			status=401,
-			description='인증 실패',
-			content=Content(
-				format='text/plain',
-				schema=String('원인')
 			)
 		)
 	),

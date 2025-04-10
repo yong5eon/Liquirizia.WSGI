@@ -38,27 +38,17 @@ __all__ = (
 	body=Body(
 		format=Binary()
 	),
-	response=(
-		Response(
-			status=200,
-			description='성공',
-			content=Content(
-				format='*/*',
-				schema=Binary('본문'),
-			),
-			headers={
-				'Content-Type': String(),
-				'Content-Length': Integer(),
-			},
+	response=Response(
+		status=200,
+		description='성공',
+		content=Content(
+			format='*/*',
+			schema=Binary('본문'),
 		),
-		Response(
-			status=400,
-			description='잘못된 요청',
-			content=Content(
-				format='text/plain',
-				schema=String('원인'),
-			),
-		),
+		headers={
+			'Content-Type': String(),
+			'Content-Length': Integer(),
+		},
 	),
 	description='클라이언트에서 스트림으로 입력한 값을 그대로 반환',
 	tags='RequestStreamRunner - Chunked',

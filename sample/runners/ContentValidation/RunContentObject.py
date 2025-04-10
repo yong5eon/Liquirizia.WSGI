@@ -27,22 +27,12 @@ __all__ = (
 		},
 		format=Object(),
 	),
-	response=(
-		Response(
-			status=200,
-			description='성공',
-			content=Content(
-				format='application/json',
-				schema=Object()
-			)
-		),
-		Response(
-			status=400,
-			description='잘못된 요청',
-			content=Content(
-				format='text/plain',
-				schema=String('원인')
-			)
+	response=Response(
+		status=200,
+		description='성공',
+		content=Content(
+			format='application/json',
+			schema=Object()
 		)
 	),
 	summary='컨텐츠 검증 샘플 - 객체',
