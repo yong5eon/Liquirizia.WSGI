@@ -130,28 +130,27 @@ class RunPut(RequestRunner):
 		return
 
 	def run(self, a: int, b: float):
-		return ResponseJSON({
-			'status': 200,
-			'message': 'OK',
-			'data': {
-				'message': self.request.qs.c,
-				'args': {
-					'parameters': {
-						'a': self.request.parameters.a,
-						'b': self.request.parameters.b,
-					},
-					'qs': {
-						'a': self.request.qs.a,
-						'b': self.request.qs.b,
-					},
-					'content': {
-						'a': a,
-						'b': b,
-					}
-				},
-				'ret': (self.request.parameters.a + self.request.qs.b * a) * (self.request.parameters.b + self.request.qs.b * b), 
-			},
-		},
-		headers={
-			'X-Refresh-Token': self.request.header('X-Token')
-		})
+		_ = ResponseModel(
+			status=200,
+			message='OK',
+			data=DataModel(
+				message=self.request.qs.c,
+				args=ArgumentsModel(
+					parameters=ParametersModel(
+						a=self.request.parameters.a,
+						b=self.request.parameters.b,
+					),
+					qs=QueriesModel(
+						a=self.request.qs.a,
+						b=self.request.qs.b,
+						c=self.request.qs.c,
+					),
+					content=ContentModel(
+						a=a,
+						b=b,
+					),
+				),
+				ret=(self.request.parameters.a + self.request.qs.b * a) * (self.request.parameters.b + self.request.qs.b * b), 
+			),
+		)
+		return ResponseJSON(ToObject(_))
