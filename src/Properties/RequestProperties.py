@@ -18,6 +18,7 @@ from ..Auth import (
 	Cookie as CookieAuth,
 	Header as HeaderAuth,
 	Query as QueryAuth,
+	OAuth2 as OAuth2Auth,
 )
 from ..Router import Router
 from ..Filters import (
@@ -37,6 +38,7 @@ from ..Description.Auth import (
 	Cookie as CookieAuthenticate,
 	Header as HeaderAuthenticate,
 	Query as QueryAuthenticate,
+	OAuth2 as OAuth2Authenticate,
 )
 from typing import Type, Sequence, Union
 
@@ -131,6 +133,15 @@ class RequestProperties(object):
 					name=self.auth.__class__.__name__,
 					format=QueryAuthenticate(
 						name=self.auth.name,
+					),
+					optional=self.auth.optional,
+				)
+			if isinstance(self.auth, OAuth2Auth):
+				auth = Authenticate(
+					name='{}{}'.format(self.auth.__class__.__name__, str(self.auth.type)),
+					format=OAuth2Authenticate(
+						type=str(self.auth.type),
+						**self.auth.kwargs,
 					),
 					optional=self.auth.optional,
 				)
@@ -237,6 +248,15 @@ class RequestStreamProperties(object):
 					),
 					optional=self.auth.optional,
 				)
+			if isinstance(self.auth, OAuth2Auth):
+				auth = Authenticate(
+					name='{}{}'.format(self.auth.__class__.__name__, str(self.auth.type)),
+					format=OAuth2Authenticate(
+						type=str(self.auth.type),
+						**self.auth.kwargs,
+					),
+					optional=self.auth.optional,
+				)
 		descriptor.add(Description(
 			method=self.method,
 			url=self.url,
@@ -329,6 +349,15 @@ class RequestServerSentEventsProperties(object):
 					),
 					optional=self.auth.optional,
 				)
+			if isinstance(self.auth, OAuth2Auth):
+				auth = Authenticate(
+					name='{}{}'.format(self.auth.__class__.__name__, str(self.auth.type)),
+					format=OAuth2Authenticate(
+						type=str(self.auth.type),
+						**self.auth.kwargs,
+					),
+					optional=self.auth.optional,
+				)
 		descriptor.add(Description(
 			method=self.method,
 			url=self.url,
@@ -417,6 +446,15 @@ class RequestWebSocketProperties(object):
 					name=self.auth.__class__.__name__,
 					format=QueryAuthenticate(
 						name=self.auth.name,
+					),
+					optional=self.auth.optional,
+				)
+			if isinstance(self.auth, OAuth2Auth):
+				auth = Authenticate(
+					name='{}{}'.format(self.auth.__class__.__name__, str(self.auth.type)),
+					format=OAuth2Authenticate(
+						type=str(self.auth.type),
+						**self.auth.kwargs,
 					),
 					optional=self.auth.optional,
 				)

@@ -14,12 +14,15 @@ from .Headers import (
 )
 
 from typing import Dict, Any
+from enum import Enum
 
 __all__ = (
 	'HTTP',
 	'Cookie',
 	'Header',
 	'Query',
+	'OAuth2Type',
+	'OAuth2',
 )
 
 
@@ -30,15 +33,13 @@ class HTTP(Auth):
 		auth: Authenticate,
 		format: str = None,
 		optional: bool = False,
-		schemeError: Error = None,
-		schemeErrorParameters: Dict[str, Any] = None,
 		error: Error = None,
+		errorParameters: Dict[str, str] = None,	
 	):
 		super().__init__(auth, optional, error)
 		self.scheme = scheme
 		self.format = format
-		self.schemeError = schemeError
-		self.schemeErrorParameters = schemeErrorParameters
+		self.errorParameters = errorParameters
 		return
 	def __call__(self, request: Request):
 		authorization: AuthorizationHeader = request.header('Authorization')
@@ -47,31 +48,48 @@ class HTTP(Auth):
 				return
 			if self.error:
 				raise self.error
-			raise UnauthorizedError('Authorization not found')
+			headers = None
+			if self.errorParameters:
+				headers = {
+					'WWW-Authenticate': '{} {}'.format(
+						self.scheme,
+						', '.join([
+							'{}="{}"'.format(k, v) for k, v in self.errorParameters.items()
+						]),
+					),
+				}
+			raise UnauthorizedError('Authorization not found', headers=headers)
 		if authorization.scheme != self.scheme:
 			if self.schemeError:
 				raise self.schemeError
 			headers = None
-			if self.schemeErrorParameters:
+			if self.errorParameters:
 				headers = {
 					'WWW-Authenticate': '{} {}'.format(
 						self.scheme,
-						','.join([
-							'{}="{}"'.format(k, v) for k, v in self.schemeErrorParameters.items()
+						', '.join([
+							'{}="{}"'.format(k, v) for k, v in self.errorParameters.items()
 						]),
 					),
 				}
-			raise UnauthorizedError(
-				'Authorization scheme not supported',
-				headers=headers,
-			)
+			raise UnauthorizedError('Authorization scheme not supported', headers=headers)
 		session = self.auth(authorization.credentials)
 		if not session:
 			if self.optional:
 				return
 			if self.error:
 				raise self.error
-			raise UnauthorizedError('Authorization failed')
+			headers = None
+			if self.errorParameters:
+				headers = {
+					'WWW-Authenticate': '{} {}'.format(
+						self.scheme,
+						', '.join([
+							'{}="{}"'.format(k, v) for k, v in self.errorParameters.items()
+						]),
+					),
+				}
+			raise UnauthorizedError('Authorization failed', headers=headers)
 		request.session = session
 		return
 
@@ -175,3 +193,96 @@ class Query(Auth):
 		request.session = session
 		return
 
+
+class OAuth2Type(str, Enum):
+	Password = 'password'
+	Implicit = 'implicit'
+	ClientCredentials = 'clientCredentials'
+	AuthorizationCode = 'authorizationCode'
+	def __str__(self): return self.value
+
+
+class OAuth2(Auth):
+	def __init__(
+		self,
+		type: OAuth2Type,
+		scheme: str,
+		auth: Authenticate,
+		optional: bool = False,
+		error: Error = None,
+		authorizationUrl: str = None,
+		tokenUrl: str = None,
+		refreshUrl: str = None,
+		scope: Dict[str, str] = None,
+	):
+		super().__init__(auth, optional, error)
+		self.type = type
+		self.scheme = scheme
+		self.kwargs = {}
+		if authorizationUrl: self.kwargs['authorizationUrl'] = authorizationUrl
+		if tokenUrl: self.kwargs['tokenUrl'] = tokenUrl
+		if refreshUrl: self.kwargs['refreshUrl'] = refreshUrl
+		if scope: self.kwargs['scope'] = scope
+		return
+
+	def __call__(self, request: Request) -> Any:
+		authorization: AuthorizationHeader = request.header('Authorization')
+		if not authorization:
+			if self.optional:
+				return
+			if self.error:
+				raise self.error
+			kwargs = {
+				'error': 'invalid_request',
+				'error_description': 'Authorization not found',
+			}
+			kwargs.update(self.kwargs)
+			raise UnauthorizedError('Authorization not found', headers={
+				'WWW-Authenticate': '{} {}'.format(
+					self.scheme,
+					', '.join([
+						'{}="{}"'.format(k, v) for k, v in kwargs.items()
+					]),
+				),
+			})
+		if authorization.scheme != self.scheme:
+			if self.optional:
+				return
+			if self.error:
+				raise self.error
+			kwargs = {
+				'error': 'invalid_scheme',
+				'error_description': 'Authorization scheme not supported',
+			}
+			kwargs.update(self.kwargs)
+			headers = {
+				'WWW-Authenticate': '{} {}'.format(
+					self.scheme,
+					', '.join([
+						'{}="{}"'.format(k, v) for k, v in kwargs.items()
+					]),
+				),
+			}
+			raise UnauthorizedError('Authorization scheme not supported', headers=headers)
+		session = self.auth(authorization.credentials)
+		if not session:
+			if self.optional:
+				return
+			if self.error:
+				raise self.error
+			kwargs = {
+				'error': 'invalid_token',
+				'error_description': 'Authorization failed',
+			}
+			kwargs.update(self.kwargs)
+			headers = {
+				'WWW-Authenticate': '{} {}'.format(
+					self.scheme,
+					', '.join([
+						'{}="{}"'.format(k, v) for k, v in kwargs.items()
+					]),
+				),
+			}
+			raise UnauthorizedError('Authorization failed', headers=headers)
+		request.session = session
+		return
