@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Properties.Validator import *
-from Liquirizia.WSGI.Decoders import *
+from Liquirizia.WSGI.Validators import *
+from Liquirizia.WSGI.ContentReaders import *
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
 from Liquirizia.WSGI.Description import	Response, Content
-
 
 from Liquirizia.Validator.Patterns import *
 from Liquirizia.Description import *
@@ -21,11 +20,9 @@ __all__ = (
 	method='POST',
 	url='/api/content/string',
 	body=Body(
-		content=IsString(error=BadRequestError('본문은 문자열 이어야 합니다.')),
-		decoders={
-			'application/json': JavaScriptObjectNotationDecoder(),
-			'text/plain': TextEvaluateDecoder(),
-		},
+		type='application/json',
+		reader=JavaScriptObjectNotationContentReader(),
+		content=IsString(),
 		format=String(),
 	),
 	response=Response(

@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Properties.Validator import *
-from Liquirizia.WSGI.Properties.Auth import Header as HeaderAuthenticate
-from Liquirizia.WSGI.Decoders import *
+from Liquirizia.WSGI.Auth import Header
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
@@ -23,10 +21,9 @@ __all__ = (
 @RequestProperties(
 	method='GET',
 	url='/api/auth/header',
-	auth=HeaderAuthenticate(
+	auth=Header(
 		name='Credentials',
 		auth=GetSession(),
-		error=UnauthorizedError('인증이 필요합니다.'),
 	),
 	response=Response(
 		status=200,

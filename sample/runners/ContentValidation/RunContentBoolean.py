@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Properties.Validator import *
-from Liquirizia.WSGI.Decoders import *
+from Liquirizia.WSGI.Validators import *
+from Liquirizia.WSGI.ContentReaders import *
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
@@ -19,11 +19,9 @@ __all__ = (
 	method='POST',
 	url='/api/content/bool',
 	body=Body(
-		content=IsBoolean(error=BadRequestError('불린언 형식이 아닙니다.')),
-		decoders={
-			'application/json': JavaScriptObjectNotationDecoder(),
-			'text/plain': TextEvaluateDecoder(),
-		},
+		type='application/json',
+		reader=JavaScriptObjectNotationContentReader(),
+		content=IsBoolean(),
 		format=Boolean()
 	),
 	response=Response(

@@ -91,7 +91,7 @@ class SampleHandler(Handler):
 		tb += '\n'
 		tb += ''.join(format_tb(e.__traceback__)).strip().replace(' ' * 4, ' ' * 2)
 		print(tb)
-		return ResponseInternalServerError(body=tb.encode(), format='text/plain', charset='utf-8')
+		return ResponseBadRequest(body=tb.encode(), format='text/plain', charset='utf-8')
 	def onError(self, env, error: Error):
 		print('{} - {} - ERROR            - {} - {}'.format(
 			datetime.now().isoformat(),
@@ -112,7 +112,7 @@ class SampleHandler(Handler):
 		tb += '\n'
 		tb += ''.join(format_tb(e.__traceback__)).strip().replace(' ' * 4, ' ' * 2)
 		print(tb)
-		return ResponseServiceUnavailable(body=tb.encode(), format='text/plain', charset='utf-8')
+		return ResponseInternalServerError(body=tb.encode(), format='text/plain', charset='utf-8')
 
 
 aps = Application(
@@ -120,6 +120,8 @@ aps = Application(
 	headers={
 		'X_APP_ID': 'X-App-Id',
 		'CREDENTIALS': 'Credentials',
+		'CONTENT_FORMAT': 'Content-Format',
+		'CONTENT_CHARSET': 'Content-Charset',
 	},
 )
 
@@ -207,6 +209,9 @@ api_doc(
 			ToSchema(ResponseModel),
 		),
 		sortUrl=lambda url: {
+			# request runner
+			'/api/run/:a/:b': 1,
+			'/api/run/upload': 2,
 			# content validation
 			'/api/content/bool': 1,
 			'/api/content/integer': 2,

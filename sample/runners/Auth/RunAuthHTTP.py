@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Properties.Validator import *
-from Liquirizia.WSGI.Properties.Auth import HTTP as HTTPAuthenticate
-from Liquirizia.WSGI.Decoders import *
+from Liquirizia.WSGI.Auth import HTTP
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
@@ -23,15 +21,10 @@ __all__ = (
 @RequestProperties(
 	method='GET',
 	url='/api/auth/http',
-	auth=HTTPAuthenticate(
+	auth=HTTP(
 		scheme='Bearer',
 		format='JWT',
 		auth=GetSession(),
-		schemeError=UnauthorizedError('스키마가 올바르지 않습니다,'),
-		schemeErrorParameters={
-			'realm': '로그인',
-		},
-		error=UnauthorizedError('인증이 필요합니다.'),
 	),
 	response=Response(
 		status=200,

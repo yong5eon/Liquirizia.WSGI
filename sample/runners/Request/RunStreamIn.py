@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Properties.Validator import *
-from Liquirizia.WSGI.Decoders import *
+from Liquirizia.WSGI.Validators import *
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	(
@@ -24,18 +23,14 @@ __all__ = (
 	url='/api/run/stream',
 	header=Header(
 		{
-			'Content-Type': IsString(error=BadRequestError('본문 유형(Content-Type)이 필요합니다.')),
-			'Content-Length': IsString(ToInteger(error=BadRequestError('본문 길이(Content-Length)는 정수이어야 합니다.')), error=BadRequestError('본문 길이(Content-Length)가 필요합니다.')),
+			'Content-Type': IsString(),
+			'Content-Length': IsString(ToInteger()),
 		},
 		requires=('Content-Type', 'Content-Length'),
-		requiresError=BadRequestError('헤더에 본문 유형(Content-Type)과 본문 길이(Content-Length)가 필요합니다.'),
 		format={
 			'Content-Type': String(),
 			'Content-Length': Integer(),
 		}
-	),
-	body=Body(
-		format=Binary()
 	),
 	response=Response(
 		status=200,

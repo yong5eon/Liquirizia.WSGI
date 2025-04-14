@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Properties.Validator import *
-from Liquirizia.WSGI.Decoders import *
+from Liquirizia.WSGI.Validators import *
+from Liquirizia.WSGI.ContentReaders import *
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
@@ -20,11 +20,9 @@ __all__ = (
 	method='POST',
 	url='/api/content/number',
 	body=Body(
-		content=IsNumber(error=BadRequestError('본문은 실수를 필요로 합니다.')),
-		decoders={
-			'application/json': JavaScriptObjectNotationDecoder(),
-			'text/plain': TextEvaluateDecoder(),
-		},
+		type='application/json',
+		reader=JavaScriptObjectNotationContentReader(),
+		content=IsNumber(),
 		format=Number(),
 	),
 	response=Response(

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from Liquirizia.WSGI.Properties.Auth import Authenticate
+from Liquirizia.WSGI.Auth import Authenticate
 from dataclasses import dataclass
 
 __all__ = (

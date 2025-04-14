@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Properties.Validator import *
-from Liquirizia.WSGI.Decoders import *
+from Liquirizia.WSGI.Validators import *
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	(
@@ -25,18 +24,14 @@ __all__ = (
 	url='/api/run/stream/chunked',
 	header=Header(
 		{
-			'Content-Type': IsString(error=BadRequestError('본문 유형(Content-Type)이 필요합니다.')),
-			'Transfer-Encoding': IsString(IsEqualTo('chunked', error=BadRequestError('전송방식(Transfer-Encoding)은 chunked 이어야 합니다.')), error=BadRequestError('전송방식(Transfer-Encoding)이 필요합니다.')),
+			'Content-Type': IsString(),
+			'Transfer-Encoding': IsString(IsEqualTo('chunked')),
 		},
 		requires=('Content-Type', 'Transfer-Encoding'),
-		requiresError=BadRequestError('헤더에 본문 유형(Content-Type)과 전송 방식(Transfer-Encoding)이 필요합니다.'),
 		format={
 			'Content-Type': String(),
 			'Transfer-Encoding': String(default='chunked', enum=('Chunked',)),
 		}
-	),
-	body=Body(
-		format=Binary()
 	),
 	response=Response(
 		status=200,

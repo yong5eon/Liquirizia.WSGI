@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Properties.Validator import *
-from Liquirizia.WSGI.Properties.Auth import Cookie as CookieAuthenticate
-from Liquirizia.WSGI.Decoders import *
+from Liquirizia.WSGI.Auth import Cookie
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
@@ -24,10 +22,9 @@ __all__ = (
 @RequestProperties(
 	method='GET',
 	url='/api/auth/cookie',
-	auth=CookieAuthenticate(
+	auth=Cookie(
 		name='credentials',
 		auth=GetSession(),
-		error=UnauthorizedError('인증이 필요합니다.'),
 	),
 	response=Response(
 		status=200,

@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Properties.Validator import *
-from Liquirizia.WSGI.Properties.Auth import Query as QueryAuth
-from Liquirizia.WSGI.Decoders import *
+from Liquirizia.WSGI.Auth import Query
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
@@ -23,10 +21,9 @@ __all__ = (
 @RequestProperties(
 	method='GET',
 	url='/api/auth/query',
-	auth=QueryAuth(
+	auth=Query(
 		name='credentials',
 		auth=GetSession(),
-		error=UnauthorizedError('인증이 필요합니다.'),
 	),
 	response=Response(
 		status=200,

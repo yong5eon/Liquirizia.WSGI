@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Properties.Validator import *
-from Liquirizia.WSGI.Decoders import *
+from Liquirizia.WSGI.Validators import *
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request, Router
@@ -34,13 +33,12 @@ class SplitHeaders(Pattern):
 	url='/options',
 	qs=QueryString(
 		{
-			'p': IsString(error=BadRequestError('경로(p) 는 문자열을 필요로 합니다')),
-			'method': IsToNone(IsString(error=BadRequestError('메소드(method) 는 문자열을 필요로 합니다'))),
-			'headers': IsToNone(IsString(SplitHeaders(','), error=BadRequestError('헤더(headers) 는 문자열을 필요로 합니다'))),
-			'origin': IsToNone(IsString(error=BadRequestError('오리진(origin) 는 문자열을 필요로 합니다'))),
+			'p': IsString(),
+			'method': IsToNone(IsString()),
+			'headers': IsToNone(IsString(SplitHeaders(','))),
+			'origin': IsToNone(IsString()),
 		},
 		requires=('p',),
-		requiresError=BadRequestError('질의에 경로(p) 는 필수 입니다.'),
 		format={
 			'p': String(format=StringFormat.uri),
 			'method': String(enum=('OPTIONS', 'POST', 'GET', 'PATCH', 'PUT', 'DELETE'), required=False),

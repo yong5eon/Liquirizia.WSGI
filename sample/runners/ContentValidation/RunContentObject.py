@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Properties.Validator import *
-from Liquirizia.WSGI.Decoders import *
+from Liquirizia.WSGI.Validators import *
+from Liquirizia.WSGI.ContentReaders import *
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
@@ -20,11 +20,9 @@ __all__ = (
 	method='POST',
 	url='/api/content/object',
 	body=Body(
-		content=IsObject(error=BadRequestError('본문은 오브젝트 형태여야 합니다.')),
-		decoders={
-			'application/json': JavaScriptObjectNotationDecoder(),
-			'text/plain': TextEvaluateDecoder(),
-		},
+		type='application/json',
+		reader=JavaScriptObjectNotationContentReader(),
+		content=IsObject(),
 		format=Object(),
 	),
 	response=Response(
