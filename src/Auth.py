@@ -60,8 +60,8 @@ class HTTP(Auth):
 				}
 			raise UnauthorizedError('Authorization not found', headers=headers)
 		if authorization.scheme != self.scheme:
-			if self.schemeError:
-				raise self.schemeError
+			if self.error:
+				raise self.error
 			headers = None
 			if self.errorParameters:
 				headers = {
