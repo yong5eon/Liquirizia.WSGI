@@ -14,16 +14,17 @@ from Liquirizia.Description import (
 	Value,
 	Schema,
 )
-from ..Decoder import Decoder
-from ..Request import Request
-from ..Error import Error
-from ..Errors import (
+from .Request import Request
+from .RequestReader import RequestReader
+from .ContentReader import ContentReader
+from .Error import Error
+from .Errors import (
 	UnauthorizedError,
 	ForbiddenError,
 	BadRequestError,
 	UnsupportedMediaTypeError,
 )
-from ..Headers import (
+from .Headers import (
 	ContentType,
 )
 
@@ -175,33 +176,35 @@ class Body(object):
 	"""Body Validator"""
 	def __init__(
 		self,
+		type: str,
+		reader: ContentReader,
 		content: Pattern = None,
-		decoders: Dict[str, Decoder] = None,
-		error: Error = None,
-		unsupportedError: Error = None,
 		format: Union[Value, Schema] = None,
 		example: Any = None,
 		required: bool = True,
+		error: Error = None,
+		typeError: Error = None,
 	):
+		self.type = type
+		self.reader = reader
 		self.va = Validator(content) if content else Validator()
-		self.decoders = decoders
-		self.error = error
-		self.unsupportedError = unsupportedError
 		self.format = format
 		self.example = example
 		self.required = required
+		self.typeError = typeError
+		self.error = error
 		return
-	def __call__(self, request: Request, content: bytes):
-		type: ContentType = request.header('Content-Type')
-		if not type:
+	def __call__(self, request: Request, reader: RequestReader) -> Any:
+		try:
+			type: ContentType = request.header('Content-Type')
+			if not type or type.format != self.type:
+				if self.typeError:
+					raise self.typeError
+				raise UnsupportedMediaTypeError('Content-Type not found')
+			return self.va(self.reader(reader, request.size))
+		except Exception as e:
+			if isinstance(e, Error):
+				raise e
 			if self.error:
 				raise self.error
-			raise BadRequestError('Content-Type not found')
-		if self.decoders:
-			if type.format not in self.decoders.keys():
-				if self.unsupportedError:
-					raise self.unsupportedError
-				raise UnsupportedMediaTypeError('Unsupported Media Type {}'.format(type.format))
-			content = self.decoders[type.format](content)
-			return self.va(content)
-		return content
+			raise BadRequestError(str(e), error=e)
