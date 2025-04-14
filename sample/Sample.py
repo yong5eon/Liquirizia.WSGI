@@ -93,18 +93,22 @@ class SampleHandler(Handler):
 		print(tb)
 		return ResponseBadRequest(body=tb.encode(), format='text/plain', charset='utf-8')
 	def onError(self, env, error: Error):
-		print('{} - {} - ERROR            - {} - {}'.format(
+		print('{} - {} - ERROR             - {} - {} {} - {}'.format(
 			datetime.now().isoformat(),
 			env['REQUEST_ID'][:16],
+			env['REMOTE_ADDR'],
+			env['REQUEST_METHOD'],
 			env['PATH_INFO'],
 			str(error)
 		))
 		print(error.traceback)
 		return ResponseError(error)
 	def onException(self, env, e: Exception):
-		print('{} - {} - EXCEPTION        - {} - {}'.format(
+		print('{} - {} - EXCEPTION        - {} - {} {} - {}'.format(
 			datetime.now().isoformat(),
 			env['REQUEST_ID'][:16],
+			env['REMOTE_ADDR'],
+			env['REQUEST_METHOD'],
 			env['PATH_INFO'],
 			str(e)
 		))
