@@ -4,7 +4,7 @@ from .RequestRunner import RequestRunner
 from .RequestStreamRunner import RequestStreamRunner
 from .RequestServerSentEventsRunner import RequestServerSentEventsRunner
 from .RequestWebSocketRunner import RequestWebSocketRunner
-from .Validator import (
+from ..Validators import (
 	Origin,
 	Auth,
 	Parameter,
@@ -13,11 +13,11 @@ from .Validator import (
 	QueryString,
 	Body,
 )
-from .Auth import (
-	HTTP,
-	Cookie,
-	Header,
-	Query,
+from ..Auth import (
+	HTTP as HTTPAuth,
+	Cookie as CookieAuth,
+	Header as HeaderAuth,
+	Query as QueryAuth,
 )
 from ..Router import Router
 from ..Filters import (
@@ -101,7 +101,7 @@ class RequestProperties(object):
 		descriptor = Descriptor()
 		auth = None
 		if self.auth:
-			if isinstance(self.auth, HTTP):
+			if isinstance(self.auth, HTTPAuth):
 				auth = Authenticate(
 					name=self.auth.__class__.__name__,
 					format=HTTPAuthenticate(
@@ -110,7 +110,7 @@ class RequestProperties(object):
 					),
 					optional=self.auth.optional,
 				)
-			if isinstance(self.auth, Cookie):
+			if isinstance(self.auth, CookieAuth):
 				auth = Authenticate(
 					name=self.auth.__class__.__name__,
 					format=CookieAuthenticate(
@@ -118,7 +118,7 @@ class RequestProperties(object):
 					),
 					optional=self.auth.optional,
 				)
-			if isinstance(self.auth, Header):
+			if isinstance(self.auth, HeaderAuth):
 				auth = Authenticate(
 					name=self.auth.__class__.__name__,
 					format=HeaderAuthenticate(
@@ -126,7 +126,7 @@ class RequestProperties(object):
 					),
 					optional=self.auth.optional,
 				)
-			if isinstance(self.auth, Query):
+			if isinstance(self.auth, QueryAuth):
 				auth = Authenticate(
 					name=self.auth.__class__.__name__,
 					format=QueryAuthenticate(
@@ -136,12 +136,11 @@ class RequestProperties(object):
 				)
 		contents = []
 		if self.body:
-			for format, _ in self.body.decoders.items() if self.body.decoders else [('*/*', None)]:
-				contents.append(ContentDescription(
-					format=format,
-					schema=self.body.format,
-					example=self.body.example,
-				))
+			contents.append(ContentDescription(
+				format=self.body.type,
+				schema=self.body.format,
+				example=self.body.example,
+			))
 		descriptor.add(Description(
 			method=self.method,
 			url=self.url,
@@ -172,7 +171,6 @@ class RequestStreamProperties(object):
 		parameter: Parameter = None,
 		qs: QueryString = None,
 		header: Header = None,
-		body: Body = None,
 		response: Union[Response, Sequence[Response]] = None,
 		summary: str = None,
 		description: str = None,
@@ -185,7 +183,6 @@ class RequestStreamProperties(object):
 		self.parameter = parameter
 		self.qs = qs
 		self.header = header
-		self.body = body
 		self.response = response
 		self.summary = summary
 		self.description = description
@@ -207,7 +204,7 @@ class RequestStreamProperties(object):
 		descriptor = Descriptor()
 		auth = None
 		if self.auth:
-			if isinstance(self.auth, HTTP):
+			if isinstance(self.auth, HTTPAuth):
 				auth = Authenticate(
 					name=self.auth.__class__.__name__,
 					format=HTTPAuthenticate(
@@ -216,7 +213,7 @@ class RequestStreamProperties(object):
 					),
 					optional=self.auth.optional,
 				)
-			if isinstance(self.auth, Cookie):
+			if isinstance(self.auth, CookieAuth):
 				auth = Authenticate(
 					name=self.auth.__class__.__name__,
 					format=CookieAuthenticate(
@@ -224,7 +221,7 @@ class RequestStreamProperties(object):
 					),
 					optional=self.auth.optional,
 				)
-			if isinstance(self.auth, Header):
+			if isinstance(self.auth, HeaderAuth):
 				auth = Authenticate(
 					name=self.auth.__class__.__name__,
 					format=HeaderAuthenticate(
@@ -232,7 +229,7 @@ class RequestStreamProperties(object):
 					),
 					optional=self.auth.optional,
 				)
-			if isinstance(self.auth, Query):
+			if isinstance(self.auth, QueryAuth):
 				auth = Authenticate(
 					name=self.auth.__class__.__name__,
 					format=QueryAuthenticate(
@@ -240,14 +237,6 @@ class RequestStreamProperties(object):
 					),
 					optional=self.auth.optional,
 				)
-		contents = []
-		if self.body:
-			for format, _ in self.body.decoders.items() if self.body.decoders else [('*/*', None)]:
-				contents.append(ContentDescription(
-					format=format,
-					schema=self.body.format,
-					example=self.body.example,
-				))
 		descriptor.add(Description(
 			method=self.method,
 			url=self.url,
@@ -255,10 +244,6 @@ class RequestStreamProperties(object):
 			parameters=self.parameter.format if self.parameter else None,
 			qs=self.qs.format if self.qs else None,
 			headers=self.header.format if self.header else None,
-			body=BodyDescription(
-				content=contents,
-				required=self.body.required,
-			) if self.body else None,
 			responses=self.response,
 			summary=self.summary,
 			description=self.description,
@@ -311,7 +296,7 @@ class RequestServerSentEventsProperties(object):
 		descriptor = Descriptor()
 		auth = None
 		if self.auth:
-			if isinstance(self.auth, HTTP):
+			if isinstance(self.auth, HTTPAuth):
 				auth = Authenticate(
 					name=self.auth.__class__.__name__,
 					format=HTTPAuthenticate(
@@ -320,7 +305,7 @@ class RequestServerSentEventsProperties(object):
 					),
 					optional=self.auth.optional,
 				)
-			if isinstance(self.auth, Cookie):
+			if isinstance(self.auth, CookieAuth):
 				auth = Authenticate(
 					name=self.auth.__class__.__name__,
 					format=CookieAuthenticate(
@@ -336,7 +321,7 @@ class RequestServerSentEventsProperties(object):
 					),
 					optional=self.auth.optional,
 				)
-			if isinstance(self.auth, Query):
+			if isinstance(self.auth, QueryAuth):
 				auth = Authenticate(
 					name=self.auth.__class__.__name__,
 					format=QueryAuthenticate(
@@ -402,7 +387,7 @@ class RequestWebSocketProperties(object):
 		descriptor = Descriptor()
 		auth = None
 		if self.auth:
-			if isinstance(self.auth, HTTP):
+			if isinstance(self.auth, HTTPAuth):
 				auth = Authenticate(
 					name=self.auth.__class__.__name__,
 					format=HTTPAuthenticate(
@@ -411,7 +396,7 @@ class RequestWebSocketProperties(object):
 					),
 					optional=self.auth.optional,
 				)
-			if isinstance(self.auth, Cookie):
+			if isinstance(self.auth, CookieAuth):
 				auth = Authenticate(
 					name=self.auth.__class__.__name__,
 					format=CookieAuthenticate(
@@ -419,7 +404,7 @@ class RequestWebSocketProperties(object):
 					),
 					optional=self.auth.optional,
 				)
-			if isinstance(self.auth, Header):
+			if isinstance(self.auth, HeaderAuth):
 				auth = Authenticate(
 					name=self.auth.__class__.__name__,
 					format=HeaderAuthenticate(
@@ -427,7 +412,7 @@ class RequestWebSocketProperties(object):
 					),
 					optional=self.auth.optional,
 				)
-			if isinstance(self.auth, Query):
+			if isinstance(self.auth, QueryAuth):
 				auth = Authenticate(
 					name=self.auth.__class__.__name__,
 					format=QueryAuthenticate(

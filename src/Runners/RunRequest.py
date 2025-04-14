@@ -4,7 +4,7 @@ from ..Route import Route
 from ..RequestFactory import RequestFactory
 from ..Request import Request
 from ..Properties import RequestRunner
-from ..Properties.Validator import (
+from ..Validators import (
 	Origin,
 	Auth,
 	Parameter,
@@ -68,13 +68,10 @@ class RunRequest(Route, RequestFactory):
 		if self.parameter: self.parameter(request)
 		if self.qs: self.qs(request)
 		if self.header: self.header(request)
-
 		content = None
-		if request.size:
-			content = reader.read(request.size)
-			if not content: raise BadRequestError('body is empty')
+		if self.body: content = self.body(request, reader)
 
-		if self.body: content = self.body(request, content)
+		o = self.object(request)
 
 		if self.onRequest:
 			request, response = self.onRequest(request)
@@ -82,10 +79,8 @@ class RunRequest(Route, RequestFactory):
 				writer.response(response)
 				return
 
-		o = self.object(request)
-
 		response = None
-		if content:
+		if content is not None:
 			if isinstance(content, Mapping):
 				response = o.run(**content)
 			elif not isinstance(content, (str, bytes)) and isinstance(content, Sequence):
