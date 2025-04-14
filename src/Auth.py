@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from .Validator import (
+from .Validators import (
 	Authenticate,
 	Auth,
 )
 
-from ..Request import Request
-from ..Error import Error
-from ..Errors import  UnauthorizedError
-from ..Headers import (
+from .Request import Request
+from .Error import Error
+from .Errors import  UnauthorizedError
+from .Headers import (
 	Authorization as AuthorizationHeader,
 	Cookie,
 )
