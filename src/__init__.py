@@ -10,6 +10,7 @@ from .Error import Error
 from .Cookie import Cookie
 from .ContentReader import ContentReader
 from .Encoder import Encoder
+from .Content import Content
 from .Handler import Handler
 from .Server import serve
 
@@ -24,6 +25,7 @@ __all__ = (
 	'Cookie',
 	'ContentReader',
 	'Encoder',
+	'Content',
 	'Handler',
 	'serve',
 )
