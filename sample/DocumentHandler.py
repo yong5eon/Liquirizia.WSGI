@@ -41,7 +41,9 @@ def handler(doc: ApplicationDocument):
 				def run(self):
 						def encoder(o):
 								if isinstance(o, Mapping): return dict(o)
-								return o
+								raise TypeError(
+										'Object of type {} is not JSON serializable'.format(type(o).__name__)
+								)
 						return Response(
 								status=200,
 								message='OK',

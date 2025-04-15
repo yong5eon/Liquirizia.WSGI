@@ -144,7 +144,6 @@ descriptor = Descriptor(
 			email='contact@email.com'
 		)
 	),
-	# version='3.0.0'
 	errorResponses=(
 		Response(
 			status=400,
@@ -184,12 +183,10 @@ from runners.Model import *
 import sys
 import DocumentHandler
 
-from swagger_ui import supported_list
+from swagger_ui import supported_list, api_doc
 
 sys.modules['swagger_ui.handlers.Liquirizia'] = DocumentHandler
 supported_list.append('Liquirizia')
-
-from swagger_ui import api_doc
 
 api_doc(
 	aps,
