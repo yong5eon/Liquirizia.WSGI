@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .Validators import (
-	Authenticate,
+	Authorization,
 	Auth,
 )
 
@@ -30,7 +30,7 @@ class HTTP(Auth):
 	def __init__(
 		self,
 		scheme: str,
-		auth: Authenticate,
+		auth: Authorization,
 		format: str = None,
 		optional: bool = False,
 		error: Error = None,
@@ -51,7 +51,7 @@ class HTTP(Auth):
 			headers = None
 			if self.errorParameters:
 				headers = {
-					'WWW-Authenticate': '{} {}'.format(
+					'WWW-Authorization': '{} {}'.format(
 						self.scheme,
 						', '.join([
 							'{}="{}"'.format(k, v) for k, v in self.errorParameters.items()
@@ -65,7 +65,7 @@ class HTTP(Auth):
 			headers = None
 			if self.errorParameters:
 				headers = {
-					'WWW-Authenticate': '{} {}'.format(
+					'WWW-Authorization': '{} {}'.format(
 						self.scheme,
 						', '.join([
 							'{}="{}"'.format(k, v) for k, v in self.errorParameters.items()
@@ -82,7 +82,7 @@ class HTTP(Auth):
 			headers = None
 			if self.errorParameters:
 				headers = {
-					'WWW-Authenticate': '{} {}'.format(
+					'WWW-Authorization': '{} {}'.format(
 						self.scheme,
 						', '.join([
 							'{}="{}"'.format(k, v) for k, v in self.errorParameters.items()
@@ -98,7 +98,7 @@ class Cookie(Auth):
 	def __init__(
 		self,
 		name: str,
-		auth: Authenticate,
+		auth: Authorization,
 		optional: bool = False,
 		error: Error = None,
 	):
@@ -139,7 +139,7 @@ class Header(Auth):
 	def __init__(
 		self,
 		name: str,
-		auth: Authenticate,
+		auth: Authorization,
 		optional: bool = False,
 		error: Error = None,
 	):
@@ -169,7 +169,7 @@ class Query(Auth):
 	def __init__(
 		self,
 		name: str,
-		auth: Authenticate,
+		auth: Authorization,
 		optional: bool = False,
 		error: Error = None,
 	):
@@ -207,7 +207,7 @@ class OAuth2(Auth):
 		self,
 		type: OAuth2Type,
 		scheme: str,
-		auth: Authenticate,
+		auth: Authorization,
 		optional: bool = False,
 		error: Error = None,
 		authorizationUrl: str = None,
@@ -238,7 +238,7 @@ class OAuth2(Auth):
 			}
 			kwargs.update(self.kwargs)
 			raise UnauthorizedError('Authorization not found', headers={
-				'WWW-Authenticate': '{} {}'.format(
+				'WWW-Authorization': '{} {}'.format(
 					self.scheme,
 					', '.join([
 						'{}="{}"'.format(k, v) for k, v in kwargs.items()
@@ -256,7 +256,7 @@ class OAuth2(Auth):
 			}
 			kwargs.update(self.kwargs)
 			headers = {
-				'WWW-Authenticate': '{} {}'.format(
+				'WWW-Authorization': '{} {}'.format(
 					self.scheme,
 					', '.join([
 						'{}="{}"'.format(k, v) for k, v in kwargs.items()
@@ -276,7 +276,7 @@ class OAuth2(Auth):
 			}
 			kwargs.update(self.kwargs)
 			headers = {
-				'WWW-Authenticate': '{} {}'.format(
+				'WWW-Authorization': '{} {}'.format(
 					self.scheme,
 					', '.join([
 						'{}="{}"'.format(k, v) for k, v in kwargs.items()
