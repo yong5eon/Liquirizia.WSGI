@@ -33,7 +33,7 @@ from typing import Dict, Sequence, Union, Any
 
 __all__ = (
 	'Origin',
-	'Authenticate',
+	'Authorization',
 	'Auth',
 	'Parameter',
 	'QueryString',
@@ -69,7 +69,7 @@ class Origin(object):
 		raise ForbiddenError('Origin {} is not allowed'.format(origin))
 
 
-class Authenticate(metaclass=ABCMeta):
+class Authorization(metaclass=ABCMeta):
 	@abstractmethod
 	def __call__(self, value: Any) -> Any:
 		raise NotImplementedError('{} must be implemented __call__'.format(
@@ -80,7 +80,7 @@ class Authenticate(metaclass=ABCMeta):
 class Auth(ABC):
 	def __init__(
 		self,
-		auth: Authenticate,
+		auth: Authorization,
 		optional: bool = False,
 		error: Error = None,
 	):

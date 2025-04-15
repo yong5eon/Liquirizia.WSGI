@@ -2,13 +2,17 @@
 
 from ..Encoder import Encoder
 
-from .JavaScriptObjectNotation import JavaScriptObjectNotationEncoder
+from .JavaScriptObjectNotation import (
+	JavaScriptObjectNotationEncoder,
+	JavaScriptObjectNotationTypeEncoder,
+)
 
 from typing import Any
 
 __all__ = (
 	'TextEncoder',
 	'JavaScriptObjectNotationEncoder',
+	'JavaScriptObjectNotationTypeEncoder',
 )
 
 

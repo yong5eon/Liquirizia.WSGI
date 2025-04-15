@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from Liquirizia.WSGI.Auth import Authenticate
+from Liquirizia.WSGI.Validators import Authorization
 from dataclasses import dataclass
 
 __all__ = (
@@ -14,7 +14,7 @@ class Session(object):
 	extra: dict = None
 
 
-class GetSession(Authenticate):
+class GetSession(Authorization):
 	def __call__(self, credentials: str):
 		if credentials != '1':
 			return

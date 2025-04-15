@@ -13,7 +13,7 @@ from ..Validators import (
 	QueryString,
 	Body,
 )
-from ..Auth import (
+from ..Authorizations import (
 	HTTP as HTTPAuth,
 	Cookie as CookieAuth,
 	Header as HeaderAuth,
