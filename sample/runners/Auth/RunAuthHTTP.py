@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Auth import HTTP
+from Liquirizia.WSGI.Authorizations import HTTP
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request

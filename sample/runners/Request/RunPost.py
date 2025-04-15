@@ -2,7 +2,7 @@
 
 from Liquirizia.WSGI.Properties import *
 from Liquirizia.WSGI.Validators import *
-from Liquirizia.WSGI.Auth import HTTP
+from Liquirizia.WSGI.Authorizations import HTTP
 from Liquirizia.WSGI.ContentReaders import *
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
