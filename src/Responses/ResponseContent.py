@@ -3,6 +3,7 @@
 from ..Response import Response
 from ..Encoders import *
 from ..Content import Content
+from ..Encoder import TypeEncoder
 
 from typing import Dict, Any
 
@@ -44,15 +45,23 @@ class ResponseHTML(Response):
 
 class ResponseJSON(Response):
 	"""Response JSON Class"""
-	def __init__(self, o: Any, status=200, message='OK', headers: Dict[str, Any ]= {}):
-		encode = JavaScriptObjectNotationEncoder('utf-8')
+	def __init__(
+			self,
+			o: Any,
+			typeenc: TypeEncoder = JavaScriptObjectNotationTypeEncoder(),
+			charset: str = 'utf-8',
+			status=200,
+			message='OK',
+			headers: Dict[str, Any ]= {},
+		):
+		encode = JavaScriptObjectNotationEncoder(charset=charset, typeenc=typeenc)
 		super().__init__(
 			status=status,
 			message=message,
 			headers=headers,
 			body=encode(o),
 			format='application/json',
-			charset='utf-8',
+			charset=charset,
 		)
 		return
 
