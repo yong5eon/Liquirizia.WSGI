@@ -47,7 +47,7 @@ class Response(object):
 	def __init__(
 		self,
 		status: int,
-		description: str,
+		description: str = None,
 		content: Optional[Union[Content, Sequence[Content]]] = None,
 		headers: Optional[Dict[str, Value]] = None,
 	):
