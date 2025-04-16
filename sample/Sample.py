@@ -227,6 +227,7 @@ api_doc(
 			'/api/auth/query': 4,
 		}.get(url, 99),
 		sortMethod=lambda o: {
+			'OPTIONS': 0,
 			'POST': 1,
 			'GET': 2,
 			'PUT': 3,

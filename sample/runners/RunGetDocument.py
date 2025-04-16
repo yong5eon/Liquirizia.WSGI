@@ -61,9 +61,11 @@ class RunGet(RequestRunner):
 				'/api/content/object': '14',
 			}.get(url, '99'),
 			sortMethod=lambda o: {
+				'OPTIONS': 0,
 				'POST': 1,
 				'GET': 2,
 				'PUT': 3,
 				'DELETE': 4,
 			}.get(o.upper(), 9),
+			# options=True,
 		))
