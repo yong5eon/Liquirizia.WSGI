@@ -36,16 +36,16 @@ class Url(SortKey):
 class Method(SortKey):
 	def __call__(self, o: str) -> str:
 		return {
-			'OPTIONS': '00',
-			'CONNECT': '10',
-			'POST': '21',
-			'HEAD': '30',
-			'GET': '31',
-			'PUT': '41',
-			'PATCH': '42',
-			'TRACE': '50',
-			'DELETE': '71',
-		}.get(o.upper(), '99')
+			'OPTIONS': 0,
+			'CONNECT': 1,
+			'POST': 2,
+			'HEAD': 3,
+			'GET': 4,
+			'PUT': 5,
+			'PATCH': 6,
+			'TRACE': 7,
+			'DELETE': 8,
+		}.get(o.upper(), 99)
 
 
 class Descriptor(Singleton):
@@ -114,6 +114,7 @@ class Descriptor(Singleton):
 		schemas: Sequence[Schema] = None,
 		sortUrl: SortKey = Url(),
 		sortMethod: SortKey = Method(),
+		options: bool = False,
 	) -> Document:
 		regex = compile(r':(\w+)')
 		routes = []
@@ -125,8 +126,51 @@ class Descriptor(Singleton):
 			return sortMethod(m)
 		if url:
 			if url in self.maps.keys():
-				p= regex.sub(r"{\1}", url)
+				p = regex.sub(r"{\1}", url)
 				ps = OrderedDict()
+				if options:
+					tags = []
+					for m, path in self.maps[url]:
+						if 'tags' in path.keys() and path['tags']:
+							tags.extend(path['tags'])
+					dsc = Description(
+						method='OPTIONS',
+						url=p,
+						headers={
+							'Origin': String(required=False),
+							'Access-Control-Request-Headers': String(required=False),
+							'Access-Control-Request-Method': String(required=False),
+						},
+						responses=(
+							Response(
+								status=200,
+								headers={
+									'Allow': String(),
+									'Access-Control-Allow-Origin': String(required=False),
+									'Access-Control-Allow-Headers': String(required=False),
+									'Access-Control-Allow-Methods': String(required=False),
+								},
+								content=Content(
+									format='application/json',
+									schema=Object(),
+								)
+							),
+							Response(
+								status=204,
+								headers={
+									'Allow': String(),
+									'Access-Control-Allow-Origin': String(required=False),
+									'Access-Control-Allow-Headers': String(required=False),
+									'Access-Control-Allow-Methods': String(required=False),
+								},
+							),
+							Response(status=400),
+							Response(status=403),
+							Response(status=404),
+						),
+						tags=tags if tags else None,
+					)
+					ps['options'] = Path(dsc)
 				for m, path in sorted(self.maps[url], key=cpp):
 					if method and m != method.lower():
 						continue
@@ -136,8 +180,51 @@ class Descriptor(Singleton):
 				return None
 		else:
 			for p, desc in sorted(self.maps.items(), key=cpr):
-				p= regex.sub(r"{\1}", p)
+				p = regex.sub(r"{\1}", p)
 				ps = OrderedDict()
+				if options:
+					tags = []
+					for m, path in desc:
+						if 'tags' in path.keys() and path['tags']:
+							tags.extend(path['tags'])
+					dsc = Description(
+						method='OPTIONS',
+						url=p,
+						headers={
+							'Origin': String(required=False),
+							'Access-Control-Request-Headers': String(required=False),
+							'Access-Control-Request-Method': String(required=False),
+						},
+						responses=(
+							Response(
+								status=200,
+								headers={
+									'Allow': String(),
+									'Access-Control-Allow-Origin': String(required=False),
+									'Access-Control-Allow-Headers': String(required=False),
+									'Access-Control-Allow-Methods': String(required=False),
+								},
+								content=Content(
+									format='application/json',
+									schema=Object(),
+								)
+							),
+							Response(
+								status=204,
+								headers={
+									'Allow': String(),
+									'Access-Control-Allow-Origin': String(required=False),
+									'Access-Control-Allow-Headers': String(required=False),
+									'Access-Control-Allow-Methods': String(required=False),
+								},
+							),
+							Response(status=400),
+							Response(status=403),
+							Response(status=404),
+						),
+						tags=tags if tags else None,
+					)
+					ps['options'] = Path(dsc)
 				for m, path in sorted(desc, key=cpp):
 					ps[m] = path
 				routes.append((p, ps))
