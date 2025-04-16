@@ -131,4 +131,5 @@ class RunOptions(RequestFactory):
 			response.header('Access-Control-Allow-Origin', ', '.join(origins))
 		if headers:
 			response.header('Access-Control-Allow-Headers', ', '.join(headers))
-		return response
+		writer.response(response)
+		return
