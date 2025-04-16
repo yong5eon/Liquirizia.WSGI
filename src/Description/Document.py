@@ -99,7 +99,8 @@ class Content(Documentation):
 
 class Response(Documentation):
 	def __init__(self, response: ResponseDescription):
-		super().__init__(description=response.description)
+		super().__init__()
+		if response.description: self['description'] = response.description
 		if response.content:
 			self['content'] = {
 				content.format: Content(content) for content in response.content
