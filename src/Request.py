@@ -41,11 +41,11 @@ class Request(object):
 			if len(v) == 0:
 				args[k] = None
 			elif len(v) == 1:
-				args[k] = unquote(v[0]) if len(v[0]) else None
+				args[k] = unquote(v[0]) if v[0] is not None else None
 			else:
 				for i, o in enumerate(v):
-					v[i] = o if len(o) else None
-				args[k] = unquote(v)
+					v[i] = unquote(o) if o is not None else None
+				args[k] = v
 		Querystring = CreateDataClass('Querystring', args)
 		self.args = ToDataClass(args, Querystring)
 		self.props = {}
