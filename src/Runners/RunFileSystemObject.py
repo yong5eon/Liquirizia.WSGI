@@ -4,7 +4,7 @@ from ..Route import Route
 from ..RequestFactory import RequestFactory
 
 from ..Request import Request
-from ..Filters import *
+from ..Properties import RequestFilter, ResponseFilter
 from ..RequestReader import RequestReader
 from ..ResponseWriter import ResponseWriter
 from ..Responses import (

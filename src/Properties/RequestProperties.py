@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .RequestRunner import RequestRunner
+from .RequestRunner import RequestRunner, RequestFilter, ResponseFilter
 from .RequestStreamRunner import RequestStreamRunner
 from .RequestServerSentEventsRunner import RequestServerSentEventsRunner
 from .RequestWebSocketRunner import RequestWebSocketRunner
@@ -21,10 +21,6 @@ from ..Authorizations import (
 	OAuth2 as OAuth2Auth,
 )
 from ..Router import Router
-from ..Filters import (
-	RequestFilter,
-	ResponseFilter,
-)
 from ..Description import (
 	Descriptor,
 	Description,
@@ -66,8 +62,8 @@ class RequestProperties(object):
 		summary: str = None,
 		description: str = None,
 		tags: Union[str, Sequence[str]] = None,
-		onRequest: RequestFilter = None,
-		onResponse : ResponseFilter = None,
+		onRequest: Union[RequestFilter, Sequence[RequestFilter]] = None,
+		onResponse : Union[ResponseFilter, Sequence[ResponseFilter]] = None,
 	):
 		self.method = method
 		self.url = url

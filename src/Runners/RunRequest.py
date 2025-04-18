@@ -3,7 +3,7 @@
 from ..Route import Route
 from ..RequestFactory import RequestFactory
 from ..Request import Request
-from ..Properties import RequestRunner
+from ..Properties import RequestRunner, RequestFilter, ResponseFilter
 from ..Validators import (
 	Origin,
 	Auth,
@@ -12,15 +12,13 @@ from ..Validators import (
 	Header,
 	Body,
 )
-from ..Filters import *
 from ..RequestReader import RequestReader
 from ..ResponseWriter import ResponseWriter
-from ..Errors import BadRequestError
 from ..Description import Response
 
 from collections.abc import Mapping, Sequence
 
-from typing import Type, Sequence, Union
+from typing import Type, Sequence, Union, Iterable
 
 __all__ = (
 	'RunRequest'
@@ -41,8 +39,8 @@ class RunRequest(Route, RequestFactory):
 		header: Header = None,
 		body: Body = None,
 		response: Union[Response, Sequence[Response]] = None,
-		onRequest: RequestFilter = None,
-		onResponse: ResponseFilter = None,
+		onRequest: Union[RequestFilter, Sequence[RequestFilter]] = None,
+		onResponse: Union[ResponseFilter, Sequence[ResponseFilter]] = None,
 	):
 		super().__init__(method, url)
 		self.object = obj
@@ -54,7 +52,13 @@ class RunRequest(Route, RequestFactory):
 		self.body = body
 		self.response = response
 		self.onRequest = onRequest
+		if self.onRequest:
+			if not isinstance(self.onRequest, Iterable):
+				self.onRequest = [self.onRequest]
 		self.onResponse = onResponse
+		if self.onResponse:
+			if not isinstance(self.onResponse, Iterable):
+				self.onResponse = [self.onResponse]
 		return
 
 	def run(
@@ -68,16 +72,18 @@ class RunRequest(Route, RequestFactory):
 		if self.parameter: self.parameter(request)
 		if self.qs: self.qs(request)
 		if self.header: self.header(request)
+
 		content = None
 		if self.body: content = self.body(request, reader)
 
 		o = self.object(request)
 
 		if self.onRequest:
-			request, response = self.onRequest(request)
-			if response:
-				writer.response(response)
-				return
+			for onRequest in self.onRequest:
+				request, response = self.onRequest(request)
+				if response:
+					writer.response(response)
+					return
 
 		response = None
 		if content is not None:
@@ -93,7 +99,8 @@ class RunRequest(Route, RequestFactory):
 			raise RuntimeError('{} must be return Response in run'.format(o.__class__.__name__))
 
 		if self.onResponse:
-			response = self.onResponse(response)
+			for onResponse in self.onResponse:
+				response = onResponse(request, response)
 
 		# set CORS headers
 		headers = []

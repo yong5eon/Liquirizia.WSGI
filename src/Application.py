@@ -13,6 +13,8 @@ from .Runners import (
 )
 from .Properties import (
 	RequestRunner,
+	RequestFilter,
+	ResponseFilter,
 	RequestStreamRunner,
 	RequestWebSocketRunner,
 	RequestServerSentEventsRunner,
@@ -24,10 +26,6 @@ from .Validators import (
 	QueryString,
 	Header,
 	Body,
-)
-from .Filters import (
-	RequestFilter,
-	ResponseFilter,
 )
 from Liquirizia.FileSystemObject import Connection
 from .Request import Request
@@ -172,8 +170,8 @@ class Application(object):
 		self,
 		path,
 		url,
-		onRequest: RequestFilter = None,
-		onResponse: ResponseFilter = None,
+		onRequest: Union[RequestFilter, Sequence[RequestFilter]] = None,
+		onResponse: Union[ResponseFilter, Sequence[ResponseFilter]] = None,
 	):
 		self.router.add(RunFile(
 			url,
@@ -187,8 +185,8 @@ class Application(object):
 		self,
 		path,
 		prefix,
-		onRequest: RequestFilter = None,
-		onResponse: ResponseFilter = None,
+		onRequest: Union[RequestFilter, Sequence[RequestFilter]] = None,
+		onResponse: Union[ResponseFilter, Sequence[ResponseFilter]] = None,
 	):
 		if system().upper() == 'WINDOWS':
 			path = path.replace('/', '\\')
@@ -216,8 +214,8 @@ class Application(object):
 		self,
 		fso: Connection,
 		prefix,
-		onRequest: RequestFilter = None,
-		onResponse: ResponseFilter = None,
+		onRequest: Union[RequestFilter, Sequence[RequestFilter]] = None,
+		onResponse: Union[ResponseFilter, Sequence[ResponseFilter]] = None,
 	):
 		self.router.add(RunFileSystemObject(
 			fso=fso,
@@ -239,8 +237,8 @@ class Application(object):
 		header: Header = None,
 		body: Body = None,
 		response: Union[Response, Sequence[Response]] = None,
-		onRequest: RequestFilter = None,
-		onResponse: ResponseFilter = None,
+		onRequest: Union[RequestFilter, Sequence[RequestFilter]] = None,
+		onResponse: Union[ResponseFilter, Sequence[ResponseFilter]] = None,
 	):
 		self.router.add(RunRequest(
 			obj=object,
