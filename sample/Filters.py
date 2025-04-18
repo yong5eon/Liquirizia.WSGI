@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from Liquirizia.WSGI.Filters import RequestFilter
+from Liquirizia.WSGI.Properties import RequestFilter
 from Liquirizia.WSGI import Request, Response
 
 from typing import Tuple, Optional

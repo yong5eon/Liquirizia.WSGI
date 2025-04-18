@@ -9,7 +9,7 @@ from Liquirizia.WSGI import (
 		serve,
 )
 from Liquirizia.WSGI.Responses import *
-from Liquirizia.WSGI.Filters import RequestFilters
+from Liquirizia.WSGI.Properties import RequestFilter
 from Liquirizia.WSGI.Description import Descriptor, Information, Contact, Tag
 from Liquirizia.WSGI.Utils import Load
 
@@ -245,7 +245,7 @@ aps.addFiles('res/css', '/css')
 aps.addFileSystemObject(
 	FileSystemObjectHelper.Get('Sample'),
 	prefix='/thumbs',
-	onRequest=RequestFilters(ToJPEG()),
+	onRequest=ToJPEG(),
 )
 aps.addFile('res/html/swagger.html', '/doc/swagger')
 aps.addFile('res/html/redoc.html', '/doc/redoc')
