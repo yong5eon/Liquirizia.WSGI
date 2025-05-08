@@ -40,7 +40,7 @@ from .Errors import (
 )
 from .Responses import ResponseError
 from .Description import Response
-from .Utils import ToHeader
+from .Utils import ToHeader, Loader
 
 from .Handler import Handler
 
@@ -157,7 +157,7 @@ class Application(object):
 				response = ResponseError(ServiceUnavailableError(str(e), error=e))
 			write = send(str(response), response.headers())
 			write(response.body if response.body else b'')
-		return
+		return b''
 	
 	def toHeaderName(self, key) -> str:
 		if not self.headers:
@@ -320,3 +320,8 @@ class Application(object):
 			header=header,
 		))
 		return
+
+	def load(self, mod: str = None, path: str = None, ext: str = 'py'):
+		"""Load module"""
+		load = Loader()
+		return load(mod=mod, path=path, ext=ext)
