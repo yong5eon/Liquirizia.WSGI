@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from .ContentReader import ContentReader, TypeReader
+from .Request import Request
 from .RequestReader import RequestReader
 from .Error import Error
-from .Errors import BadRequestError
+from .Errors import BadRequestError, UnsupportedMediaTypeError
+from .Headers import ContentType
 
 from urllib.parse import parse_qs, unquote_plus
 from json import loads, JSONDecoder
@@ -23,9 +25,9 @@ class ByteArrayContentReader(ContentReader):
 	def __init__(self, error: Error = None):
 		self.error = error
 		return
-	def __call__(self, reader: RequestReader, size: int = -1) -> Any:
+	def __call__(self, request: Request, reader: RequestReader) -> Any:
 		try:
-			return reader.read(size)
+			return reader.read(request.size)
 		except Exception as e:
 			if self.error:
 				raise self.error
@@ -33,13 +35,24 @@ class ByteArrayContentReader(ContentReader):
 
 
 class TextContentReader(ContentReader):
-	def __init__(self, charset: str ='utf-8', error: Error = None):
-		self.charset = charset
+	def __init__(
+		self,
+		error: Error = None,
+		typeerror: Error = None,
+	):
 		self.error = error
+		self.typeerror = typeerror
 		return
-	def __call__(self, reader: RequestReader, size: int = -1) -> Any:
+	def __call__(self, request: Request, reader: RequestReader) -> Any:
 		try:
-			return reader.read(size).decode(self.charset)
+			type: ContentType = request.header('Content-Type')
+			if not type:
+				if self.error: raise self.error
+				raise BadRequestError('Missing Content-Type header')
+			if not type.format.lower().startswith('text/'):
+				if self.typeerror: raise self.typeerror
+				raise UnsupportedMediaTypeError('Invalid Content-Type header')
+			return reader.read(request.size).decode(type.charset if type.charset else '')
 		except Exception as e:
 			if self.error:
 				raise self.error
@@ -47,13 +60,24 @@ class TextContentReader(ContentReader):
 
 
 class TextEvaluateContentReader(ContentReader):
-	def __init__(self, charset: str ='utf-8', error: Error = None):
-		self.charset = charset
+	def __init__(
+		self,
+		error: Error = None,
+		typeerror: Error = None,
+	):
 		self.error = error
+		self.typeerror = typeerror
 		return
-	def __call__(self, reader: RequestReader, size: int = -1) -> Any:
+	def __call__(self, request: Request, reader: RequestReader) -> Any:
 		try:
-			return eval(reader.read(size).decode(self.charset))
+			type: ContentType = request.header('Content-Type')
+			if not type:
+				if self.error: raise self.error
+				raise BadRequestError('Missing Content-Type header')
+			if not type.format.lower().startswith('text/'):
+				if self.typeerror: raise self.typeerror
+				raise UnsupportedMediaTypeError('Invalid Content-Type header')
+			return eval(reader.read(request.size).decode(type.charset if type.charset else ''))
 		except Exception as e:
 			if self.error:
 				raise self.error
@@ -61,13 +85,20 @@ class TextEvaluateContentReader(ContentReader):
 
 
 class FormUrlEncodedContentReader(ContentReader):
-	def __init__(self, charset: str = 'utf-8', error: Error = None):
-		self.charset = charset
+	def __init__(self, error: Error = None, typeerror: Error = None):
 		self.error = error
+		self.typeerror = typeerror
 		return
-	def __call__(self, reader: RequestReader, size: int = -1) -> Any:
+	def __call__(self, request: Request, reader: RequestReader) -> Any:
 		try:
-			content = reader.read(size).decode(self.charset)
+			type: ContentType = request.header('Content-Type')
+			if not type:
+				if self.error: raise self.error
+				raise BadRequestError('Missing Content-Type header')
+			if type.format.lower() != 'application/x-www-form-urlencoded':
+				if self.typeerror: raise self.typeerror
+				raise UnsupportedMediaTypeError('Invalid Content-Type header')
+			content = reader.read(request.size).decode(type.charset if type.charset else '')
 			qs = parse_qs(content, keep_blank_values=True)
 			q = {}
 			for (key, value) in qs.items():
@@ -112,15 +143,22 @@ class JavaScriptObjectNotationTypeDecoder(JSONDecoder):
 
 
 class JavaScriptObjectNotationContentReader(ContentReader):
-	def __init__(self, typereader: TypeReader = None, charset: str = 'utf-8', error: Error = None):
+	def __init__(self, typereader: TypeReader = None, error: Error = None, typeerror: Error = None):
 		self.typereader = typereader
-		self.charset = charset
 		self.error = error
+		self.typeerror = typeerror
 		return
-	def __call__(self, reader: RequestReader, size: int = -1) -> Any:
+	def __call__(self, request: Request, reader: RequestReader) -> Any:
 		try:
-			content = reader.read(size)
-			return loads(content.decode(self.charset), object_hook=JavaScriptObjectNotationTypeDecoder(typereader=self.typereader))
+			type: ContentType = request.header('Content-Type')
+			if not type:
+				if self.error: raise self.error
+				raise BadRequestError('Missing Content-Type header')
+			if type.format.lower() != 'application/json':
+				if self.typeerror: raise self.typeerror
+				raise UnsupportedMediaTypeError('Invalid Content-Type header')
+			content = reader.read(request.size)
+			return loads(content.decode(type.charset if type.charset else ''), object_hook=JavaScriptObjectNotationTypeDecoder(typereader=self.typereader))
 		except Exception as e:
 			if self.error:
 				raise self.error

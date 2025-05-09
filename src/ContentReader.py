@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from .Request import Request
 from .RequestReader import RequestReader
 from abc import ABCMeta, abstractmethod
 from typing import Any
@@ -13,7 +14,7 @@ __all__ = (
 class ContentReader(metaclass=ABCMeta):
 	"""Content Reader Interface"""
 	@abstractmethod
-	def __call__(self, reader: RequestReader, size: int = -1) -> Any:
+	def __call__(self, request: Request, reader: RequestReader) -> Any:
 		raise NotImplemented('{} must be implemented __call__'.format(self.__class__.__name__))
 
 

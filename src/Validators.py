@@ -176,35 +176,24 @@ class Body(object):
 	"""Body Validator"""
 	def __init__(
 		self,
-		type: str,
 		reader: ContentReader,
 		content: Pattern = None,
+		type: str = None,
 		format: Union[Value, Schema] = None,
 		example: Any = None,
 		required: bool = True,
-		error: Error = None,
-		typeError: Error = None,
 	):
-		self.type = type
 		self.reader = reader
 		self.va = Validator(content) if content else Validator()
+		self.type = type
 		self.format = format
 		self.example = example
 		self.required = required
-		self.typeError = typeError
-		self.error = error
 		return
 	def __call__(self, request: Request, reader: RequestReader) -> Any:
 		try:
-			type: ContentType = request.header('Content-Type')
-			if not type or type.format != self.type:
-				if self.typeError:
-					raise self.typeError
-				raise UnsupportedMediaTypeError('Content-Type not found')
-			return self.va(self.reader(reader, request.size))
+			return self.va(self.reader(request, reader))
+		except Error as e:
+			raise e
 		except Exception as e:
-			if isinstance(e, Error):
-				raise e
-			if self.error:
-				raise self.error
 			raise BadRequestError(str(e), error=e)
