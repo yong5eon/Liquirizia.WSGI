@@ -66,7 +66,6 @@ __all__ = (
 		},
 	),
 	body=Body(
-		type='application/json',
 		reader=JavaScriptObjectNotationContentReader(),
 		content=IsObject(
 			IsRequiredIn('a', 'b'),
@@ -81,10 +80,7 @@ __all__ = (
 				b=Number('본문 b', max=9),
 			)
 		),
-		example={
-			'a': 1,
-			'b': 2.0,
-		},
+		type='application/json',
 	),
 	response=Response(
 		status=200,

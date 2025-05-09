@@ -66,7 +66,6 @@ __all__ = (
 		},
 	),
 	body=Body(
-		type='application/json',
 		reader=JavaScriptObjectNotationContentReader(error=BadRequestError('올바르지 않은 application/json 형식입니다.')),
 		content=IsObject(
 			IsRequiredIn('a', 'b'),
@@ -81,6 +80,7 @@ __all__ = (
 				b=Number('본문 b', max=9),
 			)
 		),
+		type='application/json',
 	),
 	response=Response(
 		status=200,

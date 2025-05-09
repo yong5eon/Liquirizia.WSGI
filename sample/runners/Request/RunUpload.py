@@ -17,7 +17,7 @@ from ..Session import GetSession
 from ..Model import *
 
 __all__ = (
-	'RunPost'
+	'RunUpload'
 )
 
 
@@ -43,9 +43,9 @@ __all__ = (
 		},
 	),
 	body=Body(
-		type='*/*',
 		reader=ByteArrayContentReader(),
 		format=Binary(),
+		type='application/octet-stream',
 	),
 	response=Response(
 		status=200,
@@ -58,7 +58,7 @@ __all__ = (
 	summary='POST 파일 업로드를 처리하는 예제',
 	tags='RequestRunner',
 )
-class RunPost(RequestRunner):
+class RunUpload(RequestRunner):
 	def __init__(self, request: Request):
 		self.request = request
 		return

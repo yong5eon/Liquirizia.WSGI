@@ -19,8 +19,8 @@ __all__ = (
 	method='POST',
 	url='/api/content/bool',
 	body=Body(
-		type='application/json',
 		reader=JavaScriptObjectNotationContentReader(),
+		type='application/json',
 		content=IsBoolean(),
 		format=Boolean()
 	),

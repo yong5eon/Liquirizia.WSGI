@@ -20,9 +20,9 @@ __all__ = (
 	method='POST',
 	url='/api/content/integer',
 	body=Body(
-		type='application/json',
 		reader=JavaScriptObjectNotationContentReader(),
 		content=IsInteger(),
+		type='application/json',
 		format=Integer(),
 	),
 	response=Response(
