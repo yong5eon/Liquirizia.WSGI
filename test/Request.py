@@ -18,7 +18,7 @@ from json import loads
 
 @RequestProperties(
 	method='TEST',
-	url='/',
+	url='/:a/:b',
 	body=Body(
 		reader=JavaScriptObjectNotationContentReader(),
 		content=IsObject(),
@@ -30,6 +30,8 @@ class RunDelete(RequestRunner):
 		return
 	def run(self, **kwargs) -> Response:
 		return ResponseJSON({
+			'parameters': self.request.parameters,
+			'headers': self.request.headers(),
 			'qs': asdict(self.request.qs),
 			'body': kwargs,
 		})
@@ -47,23 +49,33 @@ class Request(Case):
 		ASSERT_TRUE('TEST' in response.header('Allow'))
 		response = _.request(
 			method='OPTIONS',
-			uri='/'
+			uri='/1/2'
 		)
 		ASSERT_TRUE(response.status in (200, 204))
 		ASSERT_TRUE('TEST' in response.header('Allow'))
 		ASSERT_TRUE('TEST' in response.header('Access-Control-Allow-Methods'))
 		return
 
+	@Order(1)	
+	def testNotFound(self):
+		_ = TestRequest(Application())
+		response = _.request(
+			method='TEST',
+			uri='/'
+		)
+		ASSERT_IS_EQUAL(response.status, 404)
+		return
+
 	@Parameterized(
 			{'qs': {'a': '1', 'b': '3'}, 'body': {'a': 1, 'b': 2, 'c': 3}},
 	)
-	@Order(1)
+	@Order(2)
 	def testRequest(self, qs, body):
 		_ = TestRequest(Application())
 		encode = JavaScriptObjectNotationEncoder('utf-8')
 		response = _.request(
 			method='TEST',
-			uri='/',
+			uri='/1/2',
 			qs=qs,
 			body=encode(body),
 			format='application/json',
