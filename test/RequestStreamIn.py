@@ -9,8 +9,6 @@ from Liquirizia.WSGI.Test import (
 
 from Liquirizia.WSGI import (
 	Application, 
-	Configuration,
-	CORS,
 	Handler,
 	Error,
 	Request,
@@ -29,7 +27,6 @@ from time import sleep
 @RequestStreamProperties(
 	method='PUT',
 	url='/stream',
-	cors=CORS(),
 )
 class RunPutStream(RequestStreamRunner):
 	def __init__(self, request: Request):
@@ -59,10 +56,10 @@ class RunPutStream(RequestStreamRunner):
 			sleep(0)
 		return
 
-class TestPutStream(Case):
+class RequestStreamIn(Case):
 	@Order(0)
 	def testOptions(self):
-		_ = TestRequest(Application(conf=Configuration()))
+		_ = TestRequest(Application())
 		response = _.request(
 			method='OPTIONS',
 			uri='*'
@@ -85,7 +82,7 @@ class TestPutStream(Case):
 					testRequestStream.write(str(i).encode('utf-8'))
 					sleep(0.1)
 				return
-		_ = TestRequestStream(Application(conf=Configuration()))
+		_ = TestRequestStream(Application())
 		response = _.send(
 			method='PUT',
 			uri='/stream',

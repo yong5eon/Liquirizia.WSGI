@@ -3,24 +3,25 @@
 from Liquirizia.Test import *
 from Liquirizia.WSGI.Test import TestRequest
 
-from Liquirizia.WSGI import (
-		Application, 
-		Configuration,
-		CORS,
-)
+from Liquirizia.WSGI import Application
 from Liquirizia.WSGI import Request, Response
 from Liquirizia.WSGI.Properties import RequestRunner, RequestProperties
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Encoders import JavaScriptObjectNotationEncoder
+from Liquirizia.WSGI.Validators import Body
+from Liquirizia.WSGI.ContentReaders import JavaScriptObjectNotationContentReader
+from Liquirizia.Validator.Patterns import *
 
 from dataclasses import asdict
+from json import loads
 
 
 @RequestProperties(
-	method='DELETE',
+	method='TEST',
 	url='/',
-	cors=CORS(
-		headers=['Content-Type', 'Content-Length']
+	body=Body(
+		reader=JavaScriptObjectNotationContentReader(),
+		content=IsObject(),
 	)
 )
 class RunDelete(RequestRunner):
@@ -34,26 +35,23 @@ class RunDelete(RequestRunner):
 		})
 
 
-class TestDelete(Case):
+class Request(Case):
 	@Order(0)
 	def testOptions(self):
-		_ = TestRequest(Application(conf=Configuration()))
+		_ = TestRequest(Application())
 		response = _.request(
 			method='OPTIONS',
 			uri='*'
 		)
 		ASSERT_TRUE(response.status in (200, 204))
-		ASSERT_TRUE('DELETE' in response.header('Allow'))
+		ASSERT_TRUE('TEST' in response.header('Allow'))
 		response = _.request(
 			method='OPTIONS',
 			uri='/'
 		)
 		ASSERT_TRUE(response.status in (200, 204))
-		ASSERT_TRUE('DELETE' in response.header('Allow'))
-		ASSERT_TRUE('DELETE' in response.header('Access-Control-Allow-Methods'))
-		headers = response.header('Access-Control-Allow-Headers')
-		others = ['Content-Type','Content-Length']
-		for other in others: ASSERT_TRUE(other in headers)
+		ASSERT_TRUE('TEST' in response.header('Allow'))
+		ASSERT_TRUE('TEST' in response.header('Access-Control-Allow-Methods'))
 		return
 
 	@Parameterized(
@@ -61,10 +59,10 @@ class TestDelete(Case):
 	)
 	@Order(1)
 	def testRequest(self, qs, body):
-		_ = TestRequest(Application(conf=Configuration()))
+		_ = TestRequest(Application())
 		encode = JavaScriptObjectNotationEncoder('utf-8')
 		response = _.request(
-			method='DELETE',
+			method='TEST',
 			uri='/',
 			qs=qs,
 			body=encode(body),
@@ -72,9 +70,7 @@ class TestDelete(Case):
 			charset='utf-8',
 		)
 		ASSERT_IS_EQUAL(response.status, 200)
-		headers = response.header('Access-Control-Allow-Headers')
-		others = ['Content-Type','Content-Length']
-		for other in others: ASSERT_TRUE(other in headers)
-		ASSERT_IS_EQUAL(response.body['qs'], qs)
-		ASSERT_IS_EQUAL(response.body['body'], body)
+		o = loads(response.body.decode(response.header('Content-Type').charset))
+		ASSERT_IS_EQUAL(o['qs'], qs)
+		ASSERT_IS_EQUAL(o['body'], body)
 		return

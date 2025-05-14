@@ -2,11 +2,12 @@
 
 from Liquirizia.Test import *
 from Liquirizia.WSGI.Utils import ParseHeader
+from Liquirizia.WSGI.Headers import *
 
 from datetime import datetime
 
 
-class TestParseHeader(Case):
+class ParseHeaders(Case):
 	# Common Headers
 	@Parameterized(
 		{
@@ -311,8 +312,8 @@ class TestParseHeader(Case):
 	)
 	@Order(211)
 	def testContentType(self, i, o):
-		_ = ParseHeader('Content-Type', i)
-		ASSERT_IS_EQUAL(_.type, o['type'])
+		_: ContentType = ParseHeader('Content-Type', i)
+		ASSERT_IS_EQUAL(_.format, o['type'])
 		ASSERT_IS_EQUAL(_.charset, o['charset'])
 		ASSERT_IS_EQUAL(_.boundary, o['boundary'])
 		return

@@ -9,8 +9,6 @@ from Liquirizia.WSGI.Test import (
 
 from Liquirizia.WSGI import (
 	Application, 
-	Configuration,
-	CORS,
 	Handler,
 	Error,
 	Request,
@@ -32,7 +30,6 @@ from typing import List
 @RequestWebSocketProperties(
 	method='GET',
 	url='/ws',
-	cors=CORS(),
 )
 class RunWebSocket(RequestWebSocketRunner):
 	def __init__(self, request: Request):
@@ -53,10 +50,10 @@ class RunWebSocket(RequestWebSocketRunner):
 		return
 
 
-class TestWebSocket(Case):
+class RequestWebSocket(Case):
 	@Order(0)
 	def testOptions(self):
-		_ = TestRequest(Application(conf=Configuration()))
+		_ = TestRequest(Application())
 		response = _.request(
 			method='OPTIONS',
 			uri='*'
@@ -93,7 +90,7 @@ class TestWebSocket(Case):
 				return
 
 		cb = Callback([b'123', b'456', b'789'])
-		_ = TestRequestWebSocket(Application(conf=Configuration()))
+		_ = TestRequestWebSocket(Application())
 		response = _.send(
 			method='GET',
 			uri='/ws',

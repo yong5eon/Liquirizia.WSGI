@@ -5,8 +5,6 @@ from Liquirizia.WSGI.Test import TestRequest, TestRequestStream, TestRequestStre
 
 from Liquirizia.WSGI import (
 	Application, 
-	Configuration,
-	CORS,
 	Handler,
 	Error,
 	Request,
@@ -48,10 +46,10 @@ class RunPutChunkedStream(RequestStreamRunner):
 		return
 	
 
-class TestPutChunkedStream(Case):
+class RequestChunkedStreamIn(Case):
 	@Order(0)
 	def testOptions(self):
-		_ = TestRequest(Application(conf=Configuration()))
+		_ = TestRequest(Application())
 		response = _.request(
 			method='OPTIONS',
 			uri='*'
@@ -75,7 +73,7 @@ class TestPutChunkedStream(Case):
 					sleep(0.1)
 				testRequestStream.end()
 				return
-		_ = TestRequestStream(Application(conf=Configuration()))
+		_ = TestRequestStream(Application())
 		response = _.send(
 			method='PUT',
 			uri='/stream/chunked',

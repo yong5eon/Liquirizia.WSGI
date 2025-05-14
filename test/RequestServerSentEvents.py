@@ -5,8 +5,6 @@ from Liquirizia.WSGI.Test import TestRequest, TestRequestServerSentEvents
 
 from Liquirizia.WSGI import (
 	Application, 
-	Configuration,
-	CORS,
 	Request,
 )
 from Liquirizia.WSGI.Properties import RequestServerSentEventsRunner, RequestServerSentEventsProperties
@@ -20,7 +18,6 @@ from random import randrange
 @RequestServerSentEventsProperties(
 	method='GET',
 	url='/sse',
-	cors=CORS()
 )
 class RunGetServerSentEvents(RequestServerSentEventsRunner):
 	def __init__(self, request: Request):
@@ -35,10 +32,10 @@ class RunGetServerSentEvents(RequestServerSentEventsRunner):
 		return
 
 
-class TestGetServerSentEvents(Case):
+class RequestServerSentEvents(Case):
 	@Order(0)
 	def testOptions(self):
-		_ = TestRequest(Application(conf=Configuration()))
+		_ = TestRequest(Application())
 		response = _.request(
 			method='OPTIONS',
 			uri='*'
@@ -55,13 +52,13 @@ class TestGetServerSentEvents(Case):
 
 	@Order(1)
 	def testRequest(self):
-		_ = TestRequestServerSentEvents(Application(conf=Configuration()))
+		_ = TestRequestServerSentEvents(Application())
 		response = _.request(
 			method='GET',
 			uri='/sse',
 		)
 		ASSERT_IS_EQUAL(response.status, 200)
-		ASSERT_IS_EQUAL(response.header('Content-Type').type, 'text/event-stream')
+		ASSERT_IS_EQUAL(response.header('Content-Type').format, 'text/event-stream')
 		for idx, event in enumerate(response.events()):
 			ASSERT_IS_EQUAL(event.data, str(idx))
 			ASSERT_IS_EQUAL(event.id, str(idx))
