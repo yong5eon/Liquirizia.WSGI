@@ -18,7 +18,7 @@ class ResponseText(Response):
 	"""Response HTML Class"""
 	def __init__(self, text: str, status=200, message='OK', headers: Dict[str, Any] = {}):
 		encode = TextEncoder('utf-8')
-		super(ResponseHTML, self).__init__(
+		super(ResponseText, self).__init__(
 			status=status,
 			message=message,
 			headers=headers,
