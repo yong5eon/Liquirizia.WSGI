@@ -111,10 +111,15 @@ class RunOptions(RequestFactory):
 		doc = descriptor.toDocument(
 			path, 
 			sortMethod=lambda o: {
-				'POST': 1,
-				'GET': 2,
-				'PUT': 3,
-				'DELETE': 4,
+				'OPTIONS': 0,
+				'CONNECT': 1,
+				'POST': 2,
+				'HEAD': 3,
+				'GET': 4,
+				'PUT': 5,
+				'PATCH': 6,
+				'TRACE': 7,
+				'DELETE': 8,
 			}.get(o.upper(), 9)
 		)
 		if doc:
