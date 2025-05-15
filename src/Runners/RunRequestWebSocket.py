@@ -64,7 +64,8 @@ class RunRequestWebSocket(Route, RequestFactory):
 		if self.header: self.header(request)
 
 		o = self.object(request)
-		if request.header('Sec-WebSocket-Protocol') and not o.switch(request.header('Sec-WebSocket-Protocol')):
+		if request.header('Sec-WebSocket-Protocol'):
+			if not o.switch(request.header('Sec-WebSocket-Protocol')):
 				raise NotAcceptableError(reason='{} is not acceptable protocol'.format(request.header('Sec-WebSocket-Protocol')))
 		ws = WebSocket(reader, writer)
 		ws.switch(request.header('Sec-WebSocket-Key'), protocol=request.header('Sec-WebSocket-Protocol'))

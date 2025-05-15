@@ -58,7 +58,10 @@ class HTTP(Auth):
 						]),
 					),
 				}
-			raise UnauthorizedError('Authorization not found', headers=headers)
+			raise UnauthorizedError(
+				headers=headers,
+				reason='Authorization not found',
+			)
 		if authorization.scheme != self.scheme:
 			if self.error:
 				raise self.error
@@ -72,7 +75,10 @@ class HTTP(Auth):
 						]),
 					),
 				}
-			raise UnauthorizedError('Authorization scheme not supported', headers=headers)
+			raise UnauthorizedError(
+				headers=headers,
+				reason='Authorization scheme not supported',
+			)
 		session = self.auth(authorization.credentials)
 		if not session:
 			if self.optional:
@@ -89,7 +95,10 @@ class HTTP(Auth):
 						]),
 					),
 				}
-			raise UnauthorizedError('Authorization failed', headers=headers)
+			raise UnauthorizedError(
+				headers=headers,
+				reason='Authorization failed',
+			)
 		request.session = session
 		return
 
@@ -112,7 +121,7 @@ class Cookie(Auth):
 				return
 			if self.error:
 				raise self.error
-			raise UnauthorizedError('Cookie is not found')
+			raise UnauthorizedError(reason='Cookie is not found')
 		_ = None
 		for cookie in cookies:
 			if cookie.name == self.name:
@@ -123,14 +132,14 @@ class Cookie(Auth):
 				return
 			if self.error:
 				raise self.error
-			raise UnauthorizedError('Cookie {} is not found'.format(self.name))
+			raise UnauthorizedError(reason='Cookie {} is not found'.format(self.name))
 		session = self.auth(_)
 		if not session:
 			if self.optional:
 				return
 			if self.error:
 				raise self.error
-			raise UnauthorizedError('Cookie {} is not valid'.format(self.name))
+			raise UnauthorizedError(reason='Cookie {} is not valid'.format(self.name))
 		request.session = session
 		return
 
@@ -153,14 +162,14 @@ class Header(Auth):
 				return
 			if self.error:
 				raise self.error
-			raise UnauthorizedError('Header {} is not found'.format(self.name))
+			raise UnauthorizedError(reason='Header {} is not found'.format(self.name))
 		session = self.auth(_)
 		if not session:
 			if self.optional:
 				return
 			if self.error:
 				raise self.error
-			raise UnauthorizedError('Cookie {} is not valid'.format(self.name))
+			raise UnauthorizedError(reason='Cookie {} is not valid'.format(self.name))
 		request.session = session
 		return
 
@@ -182,14 +191,14 @@ class Query(Auth):
 				return
 			if self.error:
 				raise self.error
-			raise UnauthorizedError('Query {} is not found'.format(self.name))
+			raise UnauthorizedError(reason='Query {} is not found'.format(self.name))
 		session = self.auth(getattr(request.qs, self.name))
 		if not session:
 			if self.optional:
 				return
 			if self.error:
 				raise self.error
-			raise UnauthorizedError('Query {} is not valid'.format(self.name))
+			raise UnauthorizedError(reason='Query {} is not valid'.format(self.name))
 		request.session = session
 		return
 
@@ -237,14 +246,17 @@ class OAuth2(Auth):
 				'error_description': 'Authorization not found',
 			}
 			kwargs.update(self.kwargs)
-			raise UnauthorizedError('Authorization not found', headers={
-				'WWW-Authorization': '{} {}'.format(
-					self.scheme,
-					', '.join([
-						'{}="{}"'.format(k, v) for k, v in kwargs.items()
-					]),
-				),
-			})
+			raise UnauthorizedError(
+				headers={
+					'WWW-Authorization': '{} {}'.format(
+						self.scheme,
+						', '.join([
+							'{}="{}"'.format(k, v) for k, v in kwargs.items()
+						]),
+					),
+				},
+				reason='Authorization not found',
+			)
 		if authorization.scheme != self.scheme:
 			if self.optional:
 				return
@@ -263,7 +275,10 @@ class OAuth2(Auth):
 					]),
 				),
 			}
-			raise UnauthorizedError('Authorization scheme not supported', headers=headers)
+			raise UnauthorizedError(
+				headers=headers,
+				reason='Authorization scheme not supported',
+			)
 		session = self.auth(authorization.credentials)
 		if not session:
 			if self.optional:
@@ -283,6 +298,9 @@ class OAuth2(Auth):
 					]),
 				),
 			}
-			raise UnauthorizedError('Authorization failed', headers=headers)
+			raise UnauthorizedError(
+				headers=headers,
+				reason='Authorization failed',
+			)
 		request.session = session
 		return

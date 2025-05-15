@@ -95,10 +95,10 @@ class Application(object):
 			else:
 				_, patterns = self.router.matches(env['PATH_INFO'])
 				if not _ or not patterns:
-					raise NotFoundError('{} is not found in router'.format(env['PATH_INFO']))
+					raise NotFoundError(reason='{} is not found in router'.format(env['PATH_INFO']))
 
 				if env['REQUEST_METHOD'] not in patterns.keys():
-					raise MethodNotAllowedError('{} is not allowed for {}'.format(
+					raise MethodNotAllowedError(reason='{} is not allowed for {}'.format(
 						env['REQUEST_METHOD'],
 						env['PATH_INFO']
 					))
@@ -140,7 +140,7 @@ class Application(object):
 				if self.requestHandler:
 					response = self.requestHandler.onRequestException(request, e)
 				else:
-					response = ResponseError(InternalServerError(str(e), error=e))
+					response = ResponseError(InternalServerError(reason=str(e), error=e))
 				write = send(str(response), response.headers())
 				write(response.body if response.body else b'')
 		except Error as e:
@@ -154,7 +154,7 @@ class Application(object):
 			if self.requestHandler: 
 				response = self.requestHandler.onException(env, e)
 			else:
-				response = ResponseError(ServiceUnavailableError(str(e), error=e))
+				response = ResponseError(ServiceUnavailableError(reason=str(e), error=e))
 			write = send(str(response), response.headers())
 			write(response.body if response.body else b'')
 		return b''

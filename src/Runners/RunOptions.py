@@ -31,12 +31,12 @@ class RunOptions(RequestFactory):
 			return
 		path, patterns = router.matches(request.uri)
 		if not patterns:
-			raise NotFoundError('{} is not found in router'.format(request.uri))
+			raise NotFoundError(reason='{} is not found in router'.format(request.uri))
 		methods = ['OPTIONS']
 		methods.extend(patterns.keys())
 		if request.header('Access-Control-Request-Method') and request.header('Access-Control-Request-Method') != 'OPTIONS':
 			if request.header('Access-Control-Request-Method') not in methods:
-				raise NotFoundError('{} is not found in router'.format(request.uri))
+				raise NotFoundError(reason='{} is not found in router'.format(request.uri))
 			origins = []
 			headers = []
 			match = patterns[request.header('Access-Control-Request-Method')]
@@ -60,12 +60,12 @@ class RunOptions(RequestFactory):
 			headers = list(set(headers))
 			if request.header('Origin'):
 				if '*' not in origins and request.header('Origin') not in origins:
-					raise ForbiddenError('Origin {} is not allowed'.format(request.header('Origin')))
+					raise ForbiddenError(reason='Origin {} is not allowed'.format(request.header('Origin')))
 			reqs = request.header('Access-Control-Request-Headers')
 			if reqs:
 				missings = [header for header in reqs if header not in headers]
 				if missings:
-					raise BadRequestError('Unsupported headers: {}'.format(', '.join(missings)))
+					raise BadRequestError(reason='Unsupported headers: {}'.format(', '.join(missings)))
 			doc = descriptor.toDocument(path, request.header('Access-Control-Request-Method'))
 			if doc:
 				response = ResponseJSON(doc, headers={
@@ -107,7 +107,7 @@ class RunOptions(RequestFactory):
 		if reqs:
 			missings = [header for header in reqs if header not in headers]
 			if missings:
-				raise BadRequestError('Unsupported headers: {}'.format(', '.join(missings)))
+				raise BadRequestError(reason='Unsupported headers: {}'.format(', '.join(missings)))
 		doc = descriptor.toDocument(
 			path, 
 			sortMethod=lambda o: {

@@ -66,7 +66,7 @@ class Origin(object):
 			return
 		if self.error:
 			raise self.error
-		raise ForbiddenError('Origin {} is not allowed'.format(origin))
+		raise ForbiddenError(reason='Origin {} is not allowed'.format(origin))
 
 
 class Authorization(metaclass=ABCMeta):
@@ -121,11 +121,11 @@ class QueryString(object):
 			if requires:
 				if not isinstance(requires, (list, tuple)):
 					requires = [requires]
-				requiresError = BadRequestError('Missing required query string {}'.format(
+				requiresError = BadRequestError(reason='Missing required query string {}'.format(
 					','.join(requires),
 				))
 			else:
-				requiresError = BadRequestError('Missing required query string')
+				requiresError = BadRequestError(reason='Missing required query string')
 		self.va = Validator(IsDataObject(
 			IsRequiredInDataObject(*requires if requires else [], error=requiresError),
 			IsMappingOfDataObject(qs),
@@ -150,11 +150,11 @@ class Header(object):
 			if requires:
 				if not isinstance(requires, (list, tuple)):
 					requires = [requires]
-				requiresError = BadRequestError('Missing required headers {}'.format(
+				requiresError = BadRequestError(reason='Missing required headers {}'.format(
 					','.join(requires),
 				))
 			else:
-				requiresError = BadRequestError('Missing required headers')
+				requiresError = BadRequestError(reason='Missing required headers')
 		self.va = Validator(IsObject(
 			IsRequiredInObject(*requires if requires else [], error=requiresError),
 			IsMappingOfObject(headers),
@@ -196,4 +196,4 @@ class Body(object):
 		except Error as e:
 			raise e
 		except Exception as e:
-			raise BadRequestError(str(e), error=e)
+			raise BadRequestError(reason=str(e), error=e)
