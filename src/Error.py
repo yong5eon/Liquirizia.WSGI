@@ -38,6 +38,11 @@ class Error(BaseException):
 			return '{}: {}'.format(self.__class__.__name__, self.reason)
 		return self.__class__.__name__
 	
+	def __str__(self):
+		if self.reason:
+			return '{}: {}'.format(self.__class__.__name__, self.reason)
+		return self.__class__.__name__
+
 	@property
 	def __traceback__(self):
 		if self.error:
