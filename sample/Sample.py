@@ -78,8 +78,16 @@ class SampleHandler(Handler):
 			request.remote,
 			str(request)
 		))
-		print(error.traceback)
-		return ResponseError(error)
+		tb = str(error)
+		tb += '\n'
+		tb += ''.join(format_tb(error.__traceback__)).strip().replace(' ' * 4, ' ' * 2)
+		print(tb)
+		return ResponseText(
+			text=tb,
+			status=error.status,
+			message=error.message,
+			headers=error.headers,
+		)
 	def onRequestException(self, request: Request, e: Exception):
 		print('{} - {} - REQUEST EXCEPTION - {} - {}'.format(
 			datetime.now().isoformat(),
@@ -87,7 +95,7 @@ class SampleHandler(Handler):
 			request.remote,
 			str(request)
 		))
-		tb =	str(e)
+		tb = str(e)
 		tb += '\n'
 		tb += ''.join(format_tb(e.__traceback__)).strip().replace(' ' * 4, ' ' * 2)
 		print(tb)
@@ -101,8 +109,16 @@ class SampleHandler(Handler):
 			env['PATH_INFO'],
 			str(error)
 		))
-		print(error.traceback)
-		return ResponseError(error)
+		tb = str(error)
+		tb += '\n'
+		tb += ''.join(format_tb(error.__traceback__)).strip().replace(' ' * 4, ' ' * 2)
+		print(tb)
+		return ResponseText(
+			text=tb,
+			status=error.status,
+			message=error.message,
+			headers=error.headers,
+		)
 	def onException(self, env, e: Exception):
 		print('{} - {} - EXCEPTION        - {} - {} {} - {}'.format(
 			datetime.now().isoformat(),
@@ -112,11 +128,11 @@ class SampleHandler(Handler):
 			env['PATH_INFO'],
 			str(e)
 		))
-		tb =	str(e)
+		tb = str(e)
 		tb += '\n'
 		tb += ''.join(format_tb(e.__traceback__)).strip().replace(' ' * 4, ' ' * 2)
 		print(tb)
-		return ResponseInternalServerError(body=tb.encode(), format='text/plain', charset='utf-8')
+		return ResponseServiceUnavailable(body=tb.encode(), format='text/plain', charset='utf-8')
 
 
 aps = Application(
