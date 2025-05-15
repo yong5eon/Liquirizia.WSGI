@@ -80,7 +80,7 @@ class RunRequest(Route, RequestFactory):
 
 		if self.onRequest:
 			for onRequest in self.onRequest:
-				request, response = self.onRequest(request)
+				request, response = onRequest(request)
 				if response:
 					writer.response(response)
 					return
