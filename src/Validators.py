@@ -71,7 +71,7 @@ class Origin(object):
 
 class Authorization(metaclass=ABCMeta):
 	@abstractmethod
-	def __call__(self, value: Any) -> Any:
+	def __call__(self, credentials: Any) -> Any:
 		raise NotImplementedError('{} must be implemented __call__'.format(
 			self.__class__.__name__,
 		))
@@ -82,11 +82,9 @@ class Auth(ABC):
 		self,
 		auth: Authorization,
 		optional: bool = False,
-		error: Error = None,
 	):
 		self.auth = auth
 		self.optional = optional
-		self.error = error
 		return
 	@abstractmethod
 	def __call__(self, request: Request):
