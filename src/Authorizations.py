@@ -17,13 +17,43 @@ from typing import Dict, Any
 from enum import Enum
 
 __all__ = (
-	'HTTP',
+	'Query',
 	'Cookie',
 	'Header',
-	'Query',
+	'HTTP',
 	'OAuth2Type',
 	'OAuth2',
 )
+
+
+class Query(Auth):
+	def __init__(
+		self,
+		name: str,
+		auth: Authorization,
+		optional: bool = False,
+		error: Error = None,
+	):
+		super().__init__(auth, optional)
+		self.name = name
+		self.error = error
+		return
+	def __call__(self, request: Request) -> Any:
+		if not hasattr(request.qs, self.name):
+			if self.optional:
+				return
+			if self.error:
+				raise self.error
+			raise UnauthorizedError(reason='Query {} is not found'.format(self.name))
+		session = self.auth(getattr(request.qs, self.name))
+		if not session:
+			if self.optional:
+				return
+			if self.error:
+				raise self.error
+			raise UnauthorizedError(reason='Query {} is not valid'.format(self.name))
+		request.session = session
+		return
 
 
 class HTTP(Auth):
@@ -170,35 +200,6 @@ class Header(Auth):
 			if self.error:
 				raise self.error
 			raise UnauthorizedError(reason='Cookie {} is not valid'.format(self.name))
-		request.session = session
-		return
-
-
-class Query(Auth):
-	def __init__(
-		self,
-		name: str,
-		auth: Authorization,
-		optional: bool = False,
-		error: Error = None,
-	):
-		super().__init__(auth, optional, error)
-		self.name = name
-		return
-	def __call__(self, request: Request) -> Any:
-		if not hasattr(request.qs, self.name):
-			if self.optional:
-				return
-			if self.error:
-				raise self.error
-			raise UnauthorizedError(reason='Query {} is not found'.format(self.name))
-		session = self.auth(getattr(request.qs, self.name))
-		if not session:
-			if self.optional:
-				return
-			if self.error:
-				raise self.error
-			raise UnauthorizedError(reason='Query {} is not valid'.format(self.name))
 		request.session = session
 		return
 
