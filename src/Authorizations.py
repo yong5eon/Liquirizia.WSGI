@@ -9,11 +9,11 @@ from .Request import Request
 from .Error import Error
 from .Errors import  UnauthorizedError
 from .Headers import (
-	Authorization as AuthorizationHeader,
-	Cookie,
+	Authorization as AuthorizationObject,
+	Cookie as CookieObject,
 )
 
-from typing import Dict, Any
+from typing import Dict, List, Any
 from enum import Enum
 
 __all__ = (
@@ -21,8 +21,10 @@ __all__ = (
 	'Cookie',
 	'Header',
 	'HTTP',
-	'OAuth2Type',
-	'OAuth2',
+	'OAuth2Implicit',
+	'OAuth2Password',
+	'OAuth2ClientCredentials',
+	'OAuth2AuthorizationCode',
 )
 
 
@@ -32,27 +34,71 @@ class Query(Auth):
 		name: str,
 		auth: Authorization,
 		optional: bool = False,
-		error: Error = None,
+		requiredError: Error = None,
 	):
 		super().__init__(auth, optional)
 		self.name = name
-		self.error = error
+		self.requiredError = requiredError
 		return
 	def __call__(self, request: Request) -> Any:
 		if not hasattr(request.qs, self.name):
-			if self.optional:
-				return
-			if self.error:
-				raise self.error
+			if self.optional: return
+			if self.requiredError: raise self.requiredError
 			raise UnauthorizedError(reason='Query {} is not found'.format(self.name))
-		session = self.auth(getattr(request.qs, self.name))
-		if not session:
-			if self.optional:
-				return
-			if self.error:
-				raise self.error
-			raise UnauthorizedError(reason='Query {} is not valid'.format(self.name))
-		request.session = session
+		request.session = self.auth(getattr(request.qs, self.name))
+		return
+
+
+class Cookie(Auth):
+	def __init__(
+		self,
+		name: str,
+		auth: Authorization,
+		optional: bool = False,
+		requiredError: Error = None,
+	):
+		super().__init__(auth, optional)
+		self.name = name
+		self.requiredError = requiredError
+		return
+	def __call__(self, request: Request) -> Any:
+		cookies: List[CookieObject] = request.header('Cookie')
+		if not cookies:
+			if self.optional: return
+			if self.requiredError: raise self.requiredError
+			raise UnauthorizedError(reason='Cookie is not found')
+		_ = None
+		for cookie in cookies:
+			if cookie.name == self.name:
+				_ = cookie
+				break
+		if not _:
+			if self.optional: return
+			if self.requiredError: raise self.requiredError
+			raise UnauthorizedError(reason='Cookie {} is not found'.format(self.name))
+		request.session = self.auth(_)
+		return
+
+
+class Header(Auth):
+	def __init__(
+		self,
+		name: str,
+		auth: Authorization,
+		optional: bool = False,
+		requiredError: Error = None,
+	):
+		super().__init__(auth, optional)
+		self.name = name
+		self.requiredError = requiredError
+		return
+	def __call__(self, request: Request) -> Any:
+		_ = request.header(self.name)
+		if not _:
+			if self.optional: return
+			if self.requiredError: raise self.requiredError
+			raise UnauthorizedError(reason='Header {} is not found'.format(self.name))
+		request.session = self.auth(_)
 		return
 
 
@@ -63,28 +109,31 @@ class HTTP(Auth):
 		auth: Authorization,
 		format: str = None,
 		optional: bool = False,
-		error: Error = None,
-		errorParameters: Dict[str, str] = None,	
+		requiredError: Error = None,
+		requiredErrorParameters: Dict[str, str] = None,
+		schemeError: Error = None,
+		schemeErrorParameters: Dict[str, str] = None,
 	):
-		super().__init__(auth, optional, error)
+		super().__init__(auth, optional)
 		self.scheme = scheme
 		self.format = format
-		self.errorParameters = errorParameters
+		self.requiredError = requiredError
+		self.requiredErrorParameters = requiredErrorParameters
+		self.schemeError = schemeError
+		self.schemeErrorParameters = schemeErrorParameters
 		return
 	def __call__(self, request: Request):
-		authorization: AuthorizationHeader = request.header('Authorization')
+		authorization: AuthorizationObject = request.header('Authorization')
 		if not authorization:
-			if self.optional:
-				return
-			if self.error:
-				raise self.error
+			if self.optional: return
+			if self.requiredError: raise self.requiredError
 			headers = None
-			if self.errorParameters:
+			if self.requiredErrorParameters:
 				headers = {
 					'WWW-Authorization': '{} {}'.format(
 						self.scheme,
 						', '.join([
-							'{}="{}"'.format(k, v) for k, v in self.errorParameters.items()
+							'{}="{}"'.format(k, v) for k, v in self.requiredErrorParameters.items()
 						]),
 					),
 				}
@@ -93,15 +142,14 @@ class HTTP(Auth):
 				reason='Authorization not found',
 			)
 		if authorization.scheme != self.scheme:
-			if self.error:
-				raise self.error
+			if self.schemeError: raise self.schemeError
 			headers = None
-			if self.errorParameters:
+			if self.schemeErrorParameters:
 				headers = {
 					'WWW-Authorization': '{} {}'.format(
 						self.scheme,
 						', '.join([
-							'{}="{}"'.format(k, v) for k, v in self.errorParameters.items()
+							'{}="{}"'.format(k, v) for k, v in self.schemeErrorParameters.items()
 						]),
 					),
 				}
@@ -109,98 +157,7 @@ class HTTP(Auth):
 				headers=headers,
 				reason='Authorization scheme not supported',
 			)
-		session = self.auth(authorization.credentials)
-		if not session:
-			if self.optional:
-				return
-			if self.error:
-				raise self.error
-			headers = None
-			if self.errorParameters:
-				headers = {
-					'WWW-Authorization': '{} {}'.format(
-						self.scheme,
-						', '.join([
-							'{}="{}"'.format(k, v) for k, v in self.errorParameters.items()
-						]),
-					),
-				}
-			raise UnauthorizedError(
-				headers=headers,
-				reason='Authorization failed',
-			)
-		request.session = session
-		return
-
-
-class Cookie(Auth):
-	def __init__(
-		self,
-		name: str,
-		auth: Authorization,
-		optional: bool = False,
-		error: Error = None,
-	):
-		super().__init__(auth, optional, error)
-		self.name = name
-		return
-	def __call__(self, request: Request) -> Any:
-		cookies = request.header('Cookie')
-		if not cookies:
-			if self.optional:
-				return
-			if self.error:
-				raise self.error
-			raise UnauthorizedError(reason='Cookie is not found')
-		_ = None
-		for cookie in cookies:
-			if cookie.name == self.name:
-				_ = cookie
-				break
-		if not _:
-			if self.optional:
-				return
-			if self.error:
-				raise self.error
-			raise UnauthorizedError(reason='Cookie {} is not found'.format(self.name))
-		session = self.auth(_)
-		if not session:
-			if self.optional:
-				return
-			if self.error:
-				raise self.error
-			raise UnauthorizedError(reason='Cookie {} is not valid'.format(self.name))
-		request.session = session
-		return
-
-
-class Header(Auth):
-	def __init__(
-		self,
-		name: str,
-		auth: Authorization,
-		optional: bool = False,
-		error: Error = None,
-	):
-		super().__init__(auth, optional, error)
-		self.name = name
-		return
-	def __call__(self, request: Request) -> Any:
-		_ = request.header(self.name)
-		if not _:
-			if self.optional:
-				return
-			if self.error:
-				raise self.error
-			raise UnauthorizedError(reason='Header {} is not found'.format(self.name))
-		session = self.auth(_)
-		if not session:
-			if self.optional:
-				return
-			if self.error:
-				raise self.error
-			raise UnauthorizedError(reason='Cookie {} is not valid'.format(self.name))
-		request.session = session
+		request.session = self.auth(authorization.credentials)
 		return
 
 
@@ -219,15 +176,18 @@ class OAuth2(Auth):
 		scheme: str,
 		auth: Authorization,
 		optional: bool = False,
-		error: Error = None,
+		requiredError: Error = None,
+		schemeError: Error = None,
 		authorizationUrl: str = None,
 		tokenUrl: str = None,
 		refreshUrl: str = None,
 		scope: Dict[str, str] = None,
 	):
-		super().__init__(auth, optional, error)
+		super().__init__(auth, optional)
 		self.type = type
 		self.scheme = scheme
+		self.requiredError = requiredError
+		self.schemeError = schemeError
 		self.kwargs = {}
 		if authorizationUrl: self.kwargs['authorizationUrl'] = authorizationUrl
 		if tokenUrl: self.kwargs['tokenUrl'] = tokenUrl
@@ -236,12 +196,10 @@ class OAuth2(Auth):
 		return
 
 	def __call__(self, request: Request) -> Any:
-		authorization: AuthorizationHeader = request.header('Authorization')
+		authorization: AuthorizationObject = request.header('Authorization')
 		if not authorization:
-			if self.optional:
-				return
-			if self.error:
-				raise self.error
+			if self.optional: return
+			if self.requiredError: raise self.requiredError
 			kwargs = {
 				'error': 'invalid_request',
 				'error_description': 'Authorization not found',
@@ -259,10 +217,8 @@ class OAuth2(Auth):
 				reason='Authorization not found',
 			)
 		if authorization.scheme != self.scheme:
-			if self.optional:
-				return
-			if self.error:
-				raise self.error
+			if self.optional: return
+			if self.schemeError: raise self.schemeError
 			kwargs = {
 				'error': 'invalid_scheme',
 				'error_description': 'Authorization scheme not supported',
@@ -280,28 +236,99 @@ class OAuth2(Auth):
 				headers=headers,
 				reason='Authorization scheme not supported',
 			)
-		session = self.auth(authorization.credentials)
-		if not session:
-			if self.optional:
-				return
-			if self.error:
-				raise self.error
-			kwargs = {
-				'error': 'invalid_token',
-				'error_description': 'Authorization failed',
-			}
-			kwargs.update(self.kwargs)
-			headers = {
-				'WWW-Authorization': '{} {}'.format(
-					self.scheme,
-					', '.join([
-						'{}="{}"'.format(k, v) for k, v in kwargs.items()
-					]),
-				),
-			}
-			raise UnauthorizedError(
-				headers=headers,
-				reason='Authorization failed',
-			)
-		request.session = session
+		request.session = self.auth(authorization.credentials)
+		return
+
+
+class OAuth2Implicit(OAuth2):
+	def __init__(
+		self,
+		scheme: str,
+		auth: Authorization,
+		optional: bool = False,
+		requiredError: Error = None,
+		schemeError: Error = None,
+		authorizationUrl: str = None,
+	):
+		super().__init__(
+			type=OAuth2Type.Implicit,
+			scheme=scheme,
+			auth=auth,
+			optional=optional,
+			requiredError=requiredError,
+			schemeError=schemeError,
+			authorizationUrl=authorizationUrl,
+		)
+		return
+
+
+class OAuth2Password(OAuth2):
+	def __init__(
+		self,
+		scheme: str,
+		auth: Authorization,
+		optional: bool = False,
+		requiredError: Error = None,
+		schemeError: Error = None,
+		tokenUrl: str = None,
+		refreshUrl: str = None,
+	):
+		super().__init__(
+			type=OAuth2Type.Password,
+			scheme=scheme,
+			auth=auth,
+			optional=optional,
+			requiredError=requiredError,
+			schemeError=schemeError,
+			tokenUrl=tokenUrl,
+			refreshUrl=refreshUrl,
+		)
+		return
+
+
+class OAuth2ClientCredentials(OAuth2):
+	def __init__(
+		self,
+		scheme: str,
+		auth: Authorization,
+		optional: bool = False,
+		requiredError: Error = None,
+		schemeError: Error = None,
+		tokenUrl: str = None,
+		refreshUrl: str = None,
+	):
+		super().__init__(
+			type=OAuth2Type.ClientCredentials,
+			scheme=scheme,
+			auth=auth,
+			optional=optional,
+			requiredError=requiredError,
+			schemeError=schemeError,
+			tokenUrl=tokenUrl,
+			refreshUrl=refreshUrl,
+		)
+		return
+
+
+class OAuth2AuthorizationCode(OAuth2):
+	def __init__(
+		self,
+		scheme: str,
+		auth: Authorization,
+		optional: bool = False,
+		requiredError: Error = None,
+		schemeError: Error = None,
+		authorizationUrl: str = None,
+		tokenUrl: str = None,
+	):
+		super().__init__(
+			type=OAuth2Type.AuthorizationCode,
+			scheme=scheme,
+			auth=auth,
+			optional=optional,
+			requiredError=requiredError,
+			schemeError=schemeError,
+			authorizationUrl=authorizationUrl,
+			tokenUrl=tokenUrl,
+		)
 		return
