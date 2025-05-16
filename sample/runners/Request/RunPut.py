@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Validators import *
-from Liquirizia.WSGI.Authorizations import HTTP
-from Liquirizia.WSGI.ContentReaders import *
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
@@ -24,13 +21,6 @@ __all__ = (
 @RequestProperties(
 	method='PUT',
 	url='/api/run/:a/:b',
-	origin=Origin(('http://localhost', 'http://localhost:8000', 'http://localhost:8080')),
-	auth=HTTP(
-		scheme='Bearer',
-		format='JWT',
-		optional=True,
-		auth=GetSession(),
-	),
 	parameter=Parameter(
 		{
 			'a': ToInteger(IsGreaterThan(100)), 
@@ -66,7 +56,7 @@ __all__ = (
 		},
 	),
 	body=Body(
-		reader=JavaScriptObjectNotationContentReader(error=BadRequestError('올바르지 않은 application/json 형식입니다.')),
+		reader=JavaScriptObjectNotationContentReader(),
 		content=IsObject(
 			IsRequiredIn('a', 'b'),
 			IsMappingOf({

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Authorizations import Header
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
@@ -21,7 +20,7 @@ __all__ = (
 @RequestProperties(
 	method='GET',
 	url='/api/auth/header',
-	auth=Header(
+	auth=AuthHeader(
 		name='Authorization',
 		auth=GetSession(),
 	),

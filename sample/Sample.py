@@ -97,7 +97,7 @@ class SampleHandler(Handler):
 		tb += '\n'
 		tb += ''.join(format_tb(e.__traceback__)).strip().replace(' ' * 4, ' ' * 2)
 		print(tb)
-		return ResponseInternalServerError(body=tb.encode(), format='text/plain', charset='utf-8')
+		return ResponseBadRequest(body=tb.encode(), format='text/plain', charset='utf-8')
 	def onError(self, env, error: Error):
 		print('{} - {} - ERROR   - {} - {} {} - {}'.format(
 			datetime.now().isoformat(),

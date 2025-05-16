@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Errors.ClientError import UnauthorizedError
-from Liquirizia.WSGI.Validators import Authorization
+from Liquirizia.WSGI.Properties import Authorization
 from dataclasses import dataclass
 
 __all__ = (

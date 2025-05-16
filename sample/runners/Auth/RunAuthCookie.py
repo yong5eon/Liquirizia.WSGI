@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Authorizations import Cookie
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
@@ -22,7 +21,7 @@ __all__ = (
 @RequestProperties(
 	method='GET',
 	url='/api/auth/cookie',
-	auth=Cookie(
+	auth=AuthCookie(
 		name='credentials',
 		auth=GetSession(),
 	),

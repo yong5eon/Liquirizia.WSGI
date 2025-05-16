@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Authorizations import Query
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
@@ -9,7 +8,6 @@ from Liquirizia.WSGI.Description import	Response, Content
 
 from Liquirizia.Validator.Patterns import *
 from Liquirizia.Description import *
-from typing_extensions import T
 
 from ..Session import GetSession
 from dataclasses import asdict
@@ -22,7 +20,7 @@ __all__ = (
 @RequestProperties(
 	method='GET',
 	url='/api/auth/query',
-	auth=Query(
+	auth=AuthQuery(
 		name='credentials',
 		auth=GetSession(),
 	),

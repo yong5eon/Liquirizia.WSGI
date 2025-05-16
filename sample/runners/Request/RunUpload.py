@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Validators import *
-from Liquirizia.WSGI.Authorizations import HTTP
-from Liquirizia.WSGI.ContentReaders import *
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
@@ -24,13 +21,6 @@ __all__ = (
 @RequestProperties(
 	method='POST',
 	url='/api/run/upload',
-	origin=Origin(all=True),
-	auth=HTTP(
-		scheme='Bearer',
-		format='JWT',
-		optional=True,
-		auth=GetSession(),
-	),
 	header=Header(
 		{
 			'Content-Format': IsString(),

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Authorizations import OAuth2Password
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
@@ -21,7 +20,7 @@ __all__ = (
 @RequestProperties(
 	method='GET',
 	url='/api/auth/oauth2/password',
-	auth=OAuth2Password(
+	auth=AuthOAuth2Password(
 		scheme='Bearer',
 		auth=GetSession(),
 		tokenUrl='/api/auth/oauth2/password/token',
