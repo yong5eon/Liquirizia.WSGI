@@ -117,7 +117,7 @@ class Request(object):
 		return self.args
 
 	@property
-	def parameters(self) -> Optional[Dict]:
+	def parameters(self) -> Optional[object]:
 		return self.params
 
 	@property
