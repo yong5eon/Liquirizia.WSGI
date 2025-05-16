@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Authorizations import HTTP
+from Liquirizia.WSGI.Authorizations import OAuth2AuthorizationCode
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
@@ -14,17 +14,17 @@ from ..Session import GetSession
 from dataclasses import asdict
 
 __all__ = (
-	'RunAuthHTTP'
+	'RunAuthOAuth2AuthorizationCode',
 )
 
 
 @RequestProperties(
 	method='GET',
-	url='/api/auth/http',
-	auth=HTTP(
+	url='/api/auth/oauth2/authorizationcode',
+	auth=OAuth2AuthorizationCode(
 		scheme='Bearer',
-		format='JWT',
 		auth=GetSession(),
+		authorizationUrl='/api/auth/oauth2/authorizationcode/token',
 	),
 	response=Response(
 		status=200,
@@ -39,10 +39,10 @@ __all__ = (
 			)
 		)
 	),
-	summary='HTTP 인증이 필요한 요청을 처리하는 예제',
+	summary='OAuth2AuthorizationCode 인증이 필요한 요청을 처리하는 예제',
 	tags='Auth',
 )
-class RunAuthHTTP(RequestRunner):
+class RunAuthOAuth2AuthorizationCode(RequestRunner):
 	def __init__(self, request: Request):
 		self.request = request
 		return

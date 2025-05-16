@@ -9,6 +9,7 @@ from Liquirizia.WSGI.Description import	Response, Content
 
 from Liquirizia.Validator.Patterns import *
 from Liquirizia.Description import *
+from typing_extensions import T
 
 from ..Session import GetSession
 from dataclasses import asdict

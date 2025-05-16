@@ -22,7 +22,7 @@ __all__ = (
 	method='GET',
 	url='/api/auth/header',
 	auth=Header(
-		name='Credentials',
+		name='Authorization',
 		auth=GetSession(),
 	),
 	response=Response(

@@ -37,23 +37,21 @@ FileSystemObjectHelper.Set(
 
 class SampleHandler(Handler):
 	def onRequest(self, request: Request):
-		print('{} - {} - REQUEST BEGIN     - {} - {} - {} - {}'.format(
+		print('{} - {} - REQUEST  - {} - {} - {} - {} - {} - {}'.format(
 			datetime.now().isoformat(),
 			request.id[:16],
 			request.remote,
 			str(request),
+			request.parameters,
+			request.qs,
 			request.header('Content-Type'),
 			request.size,
 		))
-		print('Protocol - {}'.format(request.protocol if request.protocol else None))
-		print('Platform - {}'.format(request.platform.upper() if request.platform else None))
-		print('Device - {}'.format(request.device.upper() if request.device else None))
-		print('Is-Mobile - {}'.format(request.isMobile))
 		for k, _ in request.headers():
 			print('{} - {}'.format(k, request.header(k)))
 		return request, None
 	def onRequestResponse(self, request: Request, response: Response):
-		print('{} - {} - REQUEST RESPONSE  - {} - {} - {}'.format(
+		print('{} - {} - RESPONSE - {} - {} - {}'.format(
 			datetime.now().isoformat(),
 			request.id[:16],
 			request.remote,
@@ -64,7 +62,7 @@ class SampleHandler(Handler):
 			print('{} - {}'.format(k, response.header(k)))
 		return response
 	def onRequestComplete(self, request: Request):
-		print('{} - {} - REQUEST DONE      - {} - {}'.format(
+		print('{} - {} - DONE     - {} - {}'.format(
 			datetime.now().isoformat(),
 			request.id[:16],
 			request.remote,
@@ -72,7 +70,7 @@ class SampleHandler(Handler):
 		))
 		return
 	def onRequestError(self, request: Request, error: Error):
-		print('{} - {} - REQUEST ERROR     - {} - {}'.format(
+		print('{} - {} - ERROR    - {} - {}'.format(
 			datetime.now().isoformat(),
 			request.id[:16],
 			request.remote,
@@ -89,7 +87,7 @@ class SampleHandler(Handler):
 			headers=error.headers,
 		)
 	def onRequestException(self, request: Request, e: Exception):
-		print('{} - {} - REQUEST EXCEPTION - {} - {}'.format(
+		print('{} - {} - EXCEPT   - {} - {}'.format(
 			datetime.now().isoformat(),
 			request.id[:16],
 			request.remote,
@@ -101,7 +99,7 @@ class SampleHandler(Handler):
 		print(tb)
 		return ResponseInternalServerError(body=tb.encode(), format='text/plain', charset='utf-8')
 	def onError(self, env, error: Error):
-		print('{} - {} - ERROR             - {} - {} {} - {}'.format(
+		print('{} - {} - ERROR   - {} - {} {} - {}'.format(
 			datetime.now().isoformat(),
 			env['REQUEST_ID'][:16],
 			env['REMOTE_ADDR'],
@@ -120,7 +118,7 @@ class SampleHandler(Handler):
 			headers=error.headers,
 		)
 	def onException(self, env, e: Exception):
-		print('{} - {} - EXCEPTION        - {} - {} {} - {}'.format(
+		print('{} - {} - EXCEPT  - {} - {} {} - {}'.format(
 			datetime.now().isoformat(),
 			env['REQUEST_ID'][:16],
 			env['REMOTE_ADDR'],
@@ -237,10 +235,18 @@ api_doc(
 			'/api/content/array': 5,
 			'/api/content/object': 6,
 			# auth
-			'/api/auth/http': 1,
-			'/api/auth/header': 2,
-			'/api/auth/cookie': 3,
-			'/api/auth/query': 4,
+			'/api/auth/query': 1,
+			'/api/auth/cookie': 2,
+			'/api/auth/header': 3,
+			'/api/auth/http': 4,
+			'/api/auth/oauth2/implicit': 5,
+			'/api/auth/oauth2/implicit/token': 6,
+			'/api/auth/oauth2/password': 7,
+			'/api/auth/oauth2/password/token': 8,
+			'/api/auth/oauth2/clientcredentials': 9,
+			'/api/auth/oauth2/clientcredentials/token': 10,
+			'/api/auth/oauth2/authorizationcode': 11,
+			'/api/auth/oauth2/authorizationcode/token': 12,
 		}.get(url, 99),
 		sortMethod=lambda o: {
 			'OPTIONS': 0,

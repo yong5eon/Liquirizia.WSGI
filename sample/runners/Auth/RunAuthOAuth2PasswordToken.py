@@ -13,13 +13,13 @@ from Liquirizia.Validator.Patterns.Object import *
 from Liquirizia.Description import *
 
 __all__ = (
-	'RunAuthToken',
+	'RunAuthOAuth2PasswordToken',
 )
 
 
 @RequestProperties(
 	method='POST',
-	url='/api/auth/token',
+	url='/api/auth/oauth2/password/token',
 	body=Body(
 		type='application/x-www-form-urlencoded',
 		reader=FormUrlEncodedContentReader(),
@@ -75,10 +75,10 @@ __all__ = (
 			)
 		)
 	),
-	summary='OAuth2 접큰키를 얻기위한 예제',
+	summary='OAuth2Password 접큰키를 얻기위한 예제',
 	tags='Auth',
 )
-class RunAuthToken(RequestRunner):
+class RunAuthOAuth2PasswordTOken(RequestRunner):
 	def __init__(self, request: Request):
 		self.request = request
 		return
@@ -98,6 +98,6 @@ class RunAuthToken(RequestRunner):
 			'client_id': client_id,
 			'client_secret': client_secret,
 			'grant_type': grant_type,
-			'access_token': str(randint(0, 1)),
-			'refresh_token': str(randint(0, 1)),
+			'access_token': str(1),
+			'refresh_token': str(1),
 		})

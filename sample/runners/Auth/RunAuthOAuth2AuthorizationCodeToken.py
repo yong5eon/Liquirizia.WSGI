@@ -1,30 +1,33 @@
 # -*- coding: utf-8 -*-
 
 from Liquirizia.WSGI.Properties import *
-from Liquirizia.WSGI.Authorizations import HTTP
+from Liquirizia.WSGI.Validators import *
+from Liquirizia.WSGI.ContentReaders import *
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Errors import *
 from Liquirizia.WSGI import	Request
 from Liquirizia.WSGI.Description import Response, Content
 
 from Liquirizia.Validator.Patterns import *
+from Liquirizia.Validator.Patterns.Object import *
 from Liquirizia.Description import *
 
-from ..Session import GetSession
-from dataclasses import asdict
-
 __all__ = (
-	'RunAuthHTTP'
+	'RunAuthOAuth2AuthorizationCodeToken',
 )
 
 
 @RequestProperties(
 	method='GET',
-	url='/api/auth/http',
-	auth=HTTP(
-		scheme='Bearer',
-		format='JWT',
-		auth=GetSession(),
+	url='/api/auth/oauth2/authorizationcode/token',
+	qs=QueryString(
+		{
+			'response_type': IsString(IsIn('code')),
+			'client_id': IsString(),
+			'redirect_uri': IsToNone(IsString()),
+			'state': IsToNone(IsString()),
+		},
+		requires=('response_type', 'client_id'),
 	),
 	response=Response(
 		status=200,
@@ -39,13 +42,17 @@ __all__ = (
 			)
 		)
 	),
-	summary='HTTP 인증이 필요한 요청을 처리하는 예제',
+	summary='OAuth2AuthorizationCode 접큰키를 얻기위한 예제',
 	tags='Auth',
 )
-class RunAuthHTTP(RequestRunner):
+class RunAuthOAuth2AuthorizationCodeTOken(RequestRunner):
 	def __init__(self, request: Request):
 		self.request = request
 		return
 
 	def run(self):
-		return ResponseJSON(asdict(self.request.session) if self.request.session else {})
+		from random import randint
+		return ResponseJSON({
+			'access_token': str(1),
+			'refresh_token': str(1),
+		})
