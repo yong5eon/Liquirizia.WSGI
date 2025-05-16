@@ -120,7 +120,7 @@ class QueryString(object):
 				if not isinstance(requires, (list, tuple)):
 					requires = [requires]
 				requiresError = BadRequestError(reason='Missing required query string {}'.format(
-					','.join(requires),
+					', '.join(requires),
 				))
 			else:
 				requiresError = BadRequestError(reason='Missing required query string')
