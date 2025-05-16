@@ -4,7 +4,7 @@ from .RequestRunner import RequestRunner, RequestFilter, ResponseFilter
 from .RequestStreamRunner import RequestStreamRunner
 from .RequestServerSentEventsRunner import RequestServerSentEventsRunner
 from .RequestWebSocketRunner import RequestWebSocketRunner
-from ..Validators import (
+from .Validators import (
 	Origin,
 	Auth,
 	Parameter,
@@ -13,7 +13,7 @@ from ..Validators import (
 	QueryString,
 	Body,
 )
-from ..Authorizations import (
+from .Authorizations import (
 	Query as QueryAuth,
 	Cookie as CookieAuth,
 	Header as HeaderAuth,

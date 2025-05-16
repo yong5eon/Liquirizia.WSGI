@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from .Request import Request
-from .RequestReader import RequestReader
+from ..Request import Request
+from ..RequestReader import RequestReader
+
 from abc import ABCMeta, abstractmethod
 from typing import Any
 
