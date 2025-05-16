@@ -5,11 +5,14 @@ from Liquirizia.WSGI.Test import TestRequest
 
 from Liquirizia.WSGI import Application
 from Liquirizia.WSGI import Request, Response
-from Liquirizia.WSGI.Properties import RequestRunner, RequestProperties
+from Liquirizia.WSGI.Properties import (
+	RequestRunner,
+	RequestProperties,
+	Body,
+	JavaScriptObjectNotationContentReader,
+)
 from Liquirizia.WSGI.Responses import *
 from Liquirizia.WSGI.Encoders import JavaScriptObjectNotationEncoder
-from Liquirizia.WSGI.Validators import Body
-from Liquirizia.WSGI.ContentReaders import JavaScriptObjectNotationContentReader
 from Liquirizia.Validator.Patterns import *
 
 from dataclasses import asdict
