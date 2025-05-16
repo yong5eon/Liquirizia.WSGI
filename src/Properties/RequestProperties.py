@@ -14,11 +14,14 @@ from ..Validators import (
 	Body,
 )
 from ..Authorizations import (
-	HTTP as HTTPAuth,
+	Query as QueryAuth,
 	Cookie as CookieAuth,
 	Header as HeaderAuth,
-	Query as QueryAuth,
-	OAuth2 as OAuth2Auth,
+	HTTP as HTTPAuth,
+	OAuth2Implicit as OAuth2ImplicitAuth,
+	OAuth2Password as OAuth2PasswordAuth,
+	OAuth2ClientCredentials as OAuth2ClientCredentialsAuth,
+	OAuth2AuthorizationCode as OAuth2AuthorizationCodeAuth,
 )
 from ..Router import Router
 from ..Description import (
@@ -132,9 +135,14 @@ class RequestProperties(object):
 					),
 					optional=self.auth.optional,
 				)
-			if isinstance(self.auth, OAuth2Auth):
+			if isinstance(self.auth, (
+				OAuth2ImplicitAuth,
+				OAuth2PasswordAuth,
+				OAuth2ClientCredentialsAuth,
+				OAuth2AuthorizationCodeAuth,
+			)):
 				auth = Authenticate(
-					name='{}{}'.format(self.auth.__class__.__name__, str(self.auth.type)),
+					name=self.auth.__class__.__name__,
 					format=OAuth2Authenticate(
 						type=str(self.auth.type),
 						**self.auth.kwargs,
