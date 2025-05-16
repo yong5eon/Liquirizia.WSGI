@@ -98,7 +98,7 @@ class FormUrlEncodedContentReader(ContentReader):
 			if type.format.lower() != 'application/x-www-form-urlencoded':
 				if self.typeerror: raise self.typeerror
 				raise UnsupportedMediaTypeError(reason='Invalid Content-Type header')
-			content = reader.read(request.size).decode(type.charset if type.charset else '')
+			content = reader.read(request.size).decode(type.charset if type.charset else 'utf-8')
 			qs = parse_qs(content, keep_blank_values=True)
 			q = {}
 			for (key, value) in qs.items():
@@ -158,7 +158,7 @@ class JavaScriptObjectNotationContentReader(ContentReader):
 				if self.typeerror: raise self.typeerror
 				raise UnsupportedMediaTypeError(reason='Invalid Content-Type header')
 			content = reader.read(request.size)
-			return loads(content.decode(type.charset if type.charset else ''), object_hook=JavaScriptObjectNotationTypeDecoder(typereader=self.typereader))
+			return loads(content.decode(type.charset if type.charset else 'utf-8'), object_hook=JavaScriptObjectNotationTypeDecoder(typereader=self.typereader))
 		except Exception as e:
 			if self.error:
 				raise self.error
