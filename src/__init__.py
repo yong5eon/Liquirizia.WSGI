@@ -8,7 +8,6 @@ from .ResponseWriter import ResponseWriter
 from .Router import Router
 from .Error import Error
 from .Cookie import Cookie
-from .ContentReader import ContentReader
 from .Encoder import Encoder
 from .Content import Content
 from .Handler import Handler
@@ -23,7 +22,6 @@ __all__ = (
 	'Router',
 	'Error',
 	'Cookie',
-	'ContentReader',
 	'Encoder',
 	'Content',
 	'Handler',

@@ -3,14 +3,13 @@
 from ..Route import Route
 from ..RequestFactory import RequestFactory
 from ..Request import Request
-from ..Properties import RequestWebSocketRunner
-from ..Validators import (
+from ..Properties import (
+	RequestWebSocketRunner,
 	Origin,
 	Auth,
 	Parameter,
 	QueryString,
 	Header,
-	Body,
 )
 from ..RequestReader import RequestReader
 from ..ResponseWriter import ResponseWriter
@@ -19,8 +18,6 @@ from ..Extends import WebSocket
 from ..Errors import (
 	NotAcceptableError,
 )
-
-from Liquirizia.Validator import Validator
 
 from typing import Type
 

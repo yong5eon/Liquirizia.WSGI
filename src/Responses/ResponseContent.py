@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from ..Response import Response
-from ..Encoders import *
 from ..Content import Content
 from ..Encoder import TypeEncoder
+from ..Encoders import *
 
 from typing import Dict, Any
 
