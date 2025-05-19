@@ -8,10 +8,12 @@ from ..Error import Error
 from ..Errors import BadRequestError, UnsupportedMediaTypeError
 from ..Headers import ContentType
 
+from Liquirizia.Validator import Validator, Pattern
+
 from urllib.parse import parse_qs, unquote_plus
 from json import loads
 from ast import literal_eval
-from typing import Any
+from typing import Any, Union
 
 __all__ = (
 	'ByteArrayContentReader',
@@ -23,12 +25,20 @@ __all__ = (
 
 
 class ByteArrayContentReader(ContentReader):
-	def __init__(self, error: Error = None):
+	def __init__(
+		self,
+		va: Union[Validator, Pattern] = None,
+		error: Error = None,
+	):
+		self.va = va
+		if isinstance(va, Pattern): self.va = Validator(va)
 		self.error = error
 		return
 	def __call__(self, request: Request, reader: RequestReader) -> Any:
 		try:
-			return reader.read(request.size)
+			content = reader.read(request.size)
+			if self.va: content = self.va(content)
+			return content
 		except Exception as e:
 			if self.error:
 				raise self.error
@@ -38,9 +48,12 @@ class ByteArrayContentReader(ContentReader):
 class TextContentReader(ContentReader):
 	def __init__(
 		self,
+		va: Union[Validator, Pattern] = None,
 		error: Error = None,
 		typeerror: Error = None,
 	):
+		self.va = va
+		if isinstance(va, Pattern): self.va = Validator(va)
 		self.error = error
 		self.typeerror = typeerror
 		return
@@ -53,7 +66,9 @@ class TextContentReader(ContentReader):
 			if not type.format.lower().startswith('text/'):
 				if self.typeerror: raise self.typeerror
 				raise UnsupportedMediaTypeError(reason='Invalid Content-Type header')
-			return reader.read(request.size).decode(type.charset if type.charset else '')
+			content = reader.read(request.size).decode(type.charset if type.charset else 'utf-8')
+			if self.va: content = self.va(content)
+			return content
 		except Exception as e:
 			if self.error:
 				raise self.error
@@ -63,9 +78,12 @@ class TextContentReader(ContentReader):
 class TextEvaluateContentReader(ContentReader):
 	def __init__(
 		self,
+		va: Union[Validator, Pattern] = None,
 		error: Error = None,
 		typeerror: Error = None,
 	):
+		self.va = va
+		if isinstance(va, Pattern): self.va = Validator(va)
 		self.error = error
 		self.typeerror = typeerror
 		return
@@ -78,7 +96,9 @@ class TextEvaluateContentReader(ContentReader):
 			if not type.format.lower().startswith('text/'):
 				if self.typeerror: raise self.typeerror
 				raise UnsupportedMediaTypeError(reason='Invalid Content-Type header')
-			return eval(reader.read(request.size).decode(type.charset if type.charset else ''))
+			content = eval(reader.read(request.size).decode(type.charset if type.charset else ''))
+			if self.va: content = self.va(content)
+			return content
 		except Exception as e:
 			if self.error:
 				raise self.error
@@ -86,7 +106,14 @@ class TextEvaluateContentReader(ContentReader):
 
 
 class FormUrlEncodedContentReader(ContentReader):
-	def __init__(self, error: Error = None, typeerror: Error = None):
+	def __init__(
+		self,
+		va: Union[Validator, Pattern] = None,
+		error: Error = None,
+		typeerror: Error = None,
+	):
+		self.va = va
+		if isinstance(va, Pattern): self.va = Validator(va)
 		self.error = error
 		self.typeerror = typeerror
 		return
@@ -114,6 +141,7 @@ class FormUrlEncodedContentReader(ContentReader):
 					continue
 				else:
 					q[key] = unquote_plus(value)
+			if self.va: q = self.va(q)
 			return q
 		except Exception as e:
 			if self.error:
@@ -144,7 +172,15 @@ class JavaScriptObjectNotationTypeDecoder:
 
 
 class JavaScriptObjectNotationContentReader(ContentReader):
-	def __init__(self, typereader: TypeReader = None, error: Error = None, typeerror: Error = None):
+	def __init__(
+		self,
+		va: Union[Validator, Pattern] = None,
+		typereader: TypeReader = None,
+		error: Error = None,
+		typeerror: Error = None,
+	):
+		self.va = va
+		if isinstance(va, Pattern): self.va = Validator(va)
 		self.typereader = typereader
 		self.error = error
 		self.typeerror = typeerror
@@ -159,7 +195,9 @@ class JavaScriptObjectNotationContentReader(ContentReader):
 				if self.typeerror: raise self.typeerror
 				raise UnsupportedMediaTypeError(reason='Invalid Content-Type header')
 			content = reader.read(request.size)
-			return loads(content.decode(type.charset if type.charset else 'utf-8'), object_hook=JavaScriptObjectNotationTypeDecoder(typereader=self.typereader))
+			content = loads(content.decode(type.charset if type.charset else 'utf-8'), object_hook=JavaScriptObjectNotationTypeDecoder(typereader=self.typereader))
+			if self.va: content = self.va(content)
+			return content
 		except Exception as e:
 			if self.error:
 				raise self.error

@@ -21,6 +21,7 @@ from ..Errors import (
 	ForbiddenError,
 	BadRequestError,
 )
+from ..Description import Content
 from .ContentReader import ContentReader
 
 from abc import ABC, ABCMeta, abstractmethod
@@ -170,22 +171,16 @@ class Body(object):
 	def __init__(
 		self,
 		reader: ContentReader,
-		content: Pattern = None,
-		type: str = None,
-		format: Union[Value, Schema] = None,
-		example: Any = None,
+		content: Content = None,
 		required: bool = True,
 	):
 		self.reader = reader
-		self.va = Validator(content) if content else Validator()
-		self.type = type
-		self.format = format
-		self.example = example
+		self.content = content
 		self.required = required
 		return
 	def __call__(self, request: Request, reader: RequestReader) -> Any:
 		try:
-			return self.va(self.reader(request, reader))
+			return self.reader(request, reader)
 		except Error as e:
 			raise e
 		except Exception as e:
