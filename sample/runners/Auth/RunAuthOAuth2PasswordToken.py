@@ -19,46 +19,37 @@ __all__ = (
 	method='POST',
 	url='/api/auth/oauth2/password/token',
 	body=Body(
-		type='application/x-www-form-urlencoded',
-		reader=FormUrlEncodedContentReader(),
-		content=IsObject(
-			IsRequiredIn('username', 'password'),
-			IsMappingOf({
-				'username': IsString(),
-				'password': IsString(),
-				'client_id': IsToNone(IsString()),
-				'client_secret': IsToNone(IsString()),
-				'grant_type': (
-					SetDefault('password'),
-					IsString(IsIn('password')),
-				),
-			}),
+		reader=FormUrlEncodedContentReader(
+			va=IsObject(
+				IsRequiredIn('username', 'password'),
+				IsMappingOf({
+					'username': IsString(),
+					'password': IsString(),
+					'client_id': IsToNone(IsString()),
+					'client_secret': IsToNone(IsString()),
+					'grant_type': (
+						SetDefault('password'),
+						IsString(IsIn('password')),
+					),
+				}),
+			),
 		),
-		format=Object(
-			properties=Properties(
-				username=String(
-					description='사용자 이름',
-					required=True,
-				),
-				password=String(
-					description='비밀번호',
-					required=True,
-				),
-				client_id=String(
-					description='클라이언트 아이디',
-					required=False,
-				),
-				client_secret=String(
-					description='클라이언트 비밀번호',
-					required=False,
-				),
-				grant_type=String(
-					description='인증 방식',
-					enum=['password'],
-					required=False,
+		content=Content(
+			format='application/x-www-form-urlencoded',
+			schema=Object(
+				properties=Properties(
+					username=String('사용자 이름', required=True),
+					password=String('비밀번호', required=True),
+					client_id=String('클라이언트 아이디', required=False),
+					client_secret=String('클라이언트 비밀번호', required=False),
+					grant_type=String(
+						description='인증 방식',
+						enum=['password'],
+						required=False,
+					),
 				),
 			),
-		)
+		),
 	),
 	response=Response(
 		status=200,

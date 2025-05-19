@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from ast import Is
 from Liquirizia.Test import *
 from Liquirizia.WSGI.Test import TestRequest
 
@@ -23,8 +24,7 @@ from json import loads
 	method='TEST',
 	url='/:a/:b',
 	body=Body(
-		reader=JavaScriptObjectNotationContentReader(),
-		content=IsObject(),
+		reader=JavaScriptObjectNotationContentReader(va=IsObject()),
 	)
 )
 class RunDelete(RequestRunner):

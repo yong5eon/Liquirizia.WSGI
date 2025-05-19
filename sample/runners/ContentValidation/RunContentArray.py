@@ -18,10 +18,13 @@ __all__ = (
 	method='POST',
 	url='/api/content/array',
 	body=Body(
-		reader=JavaScriptObjectNotationContentReader(),
-		content=IsArray(),
-		type='application/json',
-		format=Array()
+		reader=JavaScriptObjectNotationContentReader(
+			va=IsArray(),
+		),
+		content=Content(
+			format='application/json',
+			schema=Array(),
+		),
 	),
 	response=Response(
 		status=200,

@@ -17,10 +17,13 @@ __all__ = (
 	method='POST',
 	url='/api/content/bool',
 	body=Body(
-		reader=JavaScriptObjectNotationContentReader(),
-		type='application/json',
-		content=IsBoolean(),
-		format=Boolean()
+		reader=JavaScriptObjectNotationContentReader(
+			va=IsBoolean(),
+		),
+		content=Content(
+			format='application/json',
+			schema=Boolean()
+		)
 	),
 	response=Response(
 		status=200,

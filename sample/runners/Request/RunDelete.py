@@ -10,7 +10,6 @@ from Liquirizia.Validator.Patterns import *
 from Liquirizia.Validator.Patterns.Object import *
 from Liquirizia.Description import *
 
-from ..Session import GetSession
 from ..Model import *
 
 __all__ = (
@@ -47,30 +46,25 @@ __all__ = (
 			'c': String('질의 c', default='안녕', required=False),
 		}
 	),
-	header=Header(
-		{
-			'X-App-Id': IsToNone(IsString()),
-		},
-		format={
-			'X-App-Id': String(required=False),
-		},
-	),
 	body=Body(
-		reader=JavaScriptObjectNotationContentReader(),
-		content=IsObject(
-			IsRequiredIn('a', 'b'),
-			IsMappingOf({
-				'a': ToInteger(IsLessThan(5)),
-				'b': ToNumber(IsLessThan(9)),
-			}),
+		reader=JavaScriptObjectNotationContentReader(
+			va=IsObject(
+				IsRequiredIn('a', 'b'),
+				IsMappingOf({
+					'a': ToInteger(IsLessThan(5)),
+					'b': ToNumber(IsLessThan(9)),
+				}),
+			),
 		),
-		format=Object(
-			properties=Properties(
-				a=Integer('본문 a', max=5),
-				b=Number('본문 b', max=9),
-			)
+		content=Content(
+			format='application/json',
+			schema=Object(
+				properties=Properties(
+					a=Integer('본문 a', max=5),
+					b=Number('본문 b', max=9),
+				)
+			),
 		),
-		type='application/json',
 	),
 	response=Response(
 		status=200,

@@ -34,8 +34,10 @@ __all__ = (
 	),
 	body=Body(
 		reader=ByteArrayContentReader(),
-		format=Binary(),
-		type='application/octet-stream',
+		content=Content(
+			format='application/octet-stream',
+			schema=Binary(),
+		),
 	),
 	response=Response(
 		status=200,

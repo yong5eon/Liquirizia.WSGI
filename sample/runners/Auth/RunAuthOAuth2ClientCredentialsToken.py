@@ -19,17 +19,11 @@ __all__ = (
 	method='POST',
 	url='/api/auth/oauth2/clientcredentials/token',
 	body=Body(
-		type='application/x-www-form-urlencoded',
-		reader=FormUrlEncodedContentReader(),
-		content=IsObject(
-			IsRequiredIn(),
-			IsMappingOf({
-			}),
+		reader=FormUrlEncodedContentReader(va=IsObject()),
+		content=Content(
+			format='application/x-www-form-urlencoded',
+			schema=Object()
 		),
-		format=Object(
-			properties=Properties(
-			),
-		)
 	),
 	response=Response(
 		status=200,

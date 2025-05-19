@@ -9,7 +9,6 @@ from Liquirizia.WSGI.Description import	Response, Content
 from Liquirizia.Validator.Patterns import *
 from Liquirizia.Description import *
 
-from ..Session import GetSession
 from ..Model import *
 
 __all__ = (

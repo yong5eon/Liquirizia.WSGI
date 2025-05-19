@@ -216,12 +216,12 @@ api_doc(
 			Tag('Common'),
 		),
 		schemas=(
-			ToSchema(ParametersModel),
-			ToSchema(QueriesModel),
-			ToSchema(ContentModel),
-			ToSchema(ArgumentsModel),
-			ToSchema(DataModel),
-			ToSchema(ResponseModel),
+			ToSchema(ParametersModel, name='Parameter'),
+			ToSchema(QueriesModel, name='QueryString'),
+			ToSchema(ContentModel, name='Content'),
+			ToSchema(ArgumentsModel, name='Arguments'),
+			ToSchema(DataModel, name='Data'),
+			ToSchema(ResponseModel, name='Response'),
 		),
 		sortUrl=lambda url: {
 			# request runner
