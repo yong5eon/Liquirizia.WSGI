@@ -3,7 +3,7 @@
 from Liquirizia.Description import *
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Annotated, Optional
 
 __all__ = (
 	'ParametersModel',
@@ -17,39 +17,39 @@ __all__ = (
 
 @dataclass
 class ParametersModel:
-	a: int
-	b: int
+	a: Annotated[int, 'Parameter a']
+	b: Annotated[int, 'Parameter b']
 
 
 @dataclass
 class QueriesModel:
-	a: int
-	b: float
-	c: str = None
+	a: Annotated[int, 'Query a']
+	b: Annotated[float, 'Query b']
+	c: Annotated[Optional[str], 'Query c']
 
 
 @dataclass
 class ContentModel:
-	a: int
-	b: float
+	a: Annotated[int, 'Content a']
+	b: Annotated[float, 'Content b']
 
 
 @dataclass
 class ArgumentsModel:
-	parameters: ParametersModel
-	qs: QueriesModel
-	content: ContentModel = None
+	parameters: Annotated[ParametersModel, 'Parameters']
+	qs: Annotated[QueriesModel, 'QueryString']
+	content: Annotated[Optional[ContentModel], 'Content']
 
 
 @dataclass
 class DataModel:
-	message: str
-	args: ArgumentsModel
-	ret: float
+	message: Annotated[str, 'Message']
+	args: Annotated[ArgumentsModel, 'Arguments']
+	ret: Annotated[float, 'Return value']
 
 
 @dataclass
 class ResponseModel:
-	status: int
-	message: str
-	data: DataModel = None
+	status: Annotated[int, 'Status code']
+	message: Annotated[str, 'Message']
+	data: Annotated[Optional[DataModel], 'Data']
