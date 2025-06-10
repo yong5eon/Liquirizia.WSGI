@@ -9,12 +9,28 @@ from Liquirizia.WSGI.Description import	Response, Content
 from Liquirizia.Validator.Patterns import *
 from Liquirizia.Description import *
 
-from ..Session import GetSession
-from dataclasses import asdict
+from dataclasses import dataclass
 
 __all__ = (
 	'RunAuthQuery',
 )
+
+@dataclass
+class Session(object):
+	credentials: str
+	extra: dict = None
+
+
+class GetSession(Authorization):
+	def __call__(self, credentials: str):
+		if credentials != '1':
+			raise UnauthorizedError(reason='Invalid credentials')
+		return Session(
+			credentials=credentials,
+			extra={
+				'id': 0,
+			},
+		)
 
 
 @RequestProperties(
@@ -48,4 +64,4 @@ class RunAuthQuery(RequestRunner):
 		return
 
 	def run(self):
-		return ResponseJSON(asdict(self.request.session) if self.request.session else {})
+		return ResponseJSON(self.request.session if self.request.session else {})

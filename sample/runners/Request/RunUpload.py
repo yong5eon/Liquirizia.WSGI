@@ -10,7 +10,6 @@ from Liquirizia.Validator.Patterns import *
 from Liquirizia.Validator.Patterns.Object import *
 from Liquirizia.Description import *
 
-from ..Session import GetSession
 from ..Model import *
 
 __all__ = (

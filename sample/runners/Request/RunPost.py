@@ -33,7 +33,7 @@ __all__ = (
 	qs=QueryString(
 		{
 			'a': ToInteger(IsGreaterThan(5)),
-			'b': ToNumber(IsGreaterThan(9)),
+			'b': ToNumber(IsGreaterThan(9.0)),
 			'c': (
 				SetDefault('안녕'),
 				IsString(),
@@ -42,17 +42,9 @@ __all__ = (
 		requires=('a', 'b'),
 		format={
 			'a': Integer('질의 a', min=5),
-			'b': Number('질의 b', min=9),
+			'b': Number('질의 b', min=9.0),
 			'c': String('질의 c', default='안녕', required=False),
 		}
-	),
-	headers=Headers(
-		{
-			'X-App-Id': IsToNone(IsString()),
-		},
-		format={
-			'X-App-Id': String(required=False),
-		},
 	),
 	body=Body(
 		reader=JavaScriptObjectNotationContentReader(
@@ -60,7 +52,7 @@ __all__ = (
 				IsRequiredIn('a', 'b'),
 				IsMappingOf({
 					'a': ToInteger(IsLessThan(5)),
-					'b': ToNumber(IsLessThan(9)),
+					'b': ToNumber(IsLessThan(9.0)),
 				}),
 			),
 		),
