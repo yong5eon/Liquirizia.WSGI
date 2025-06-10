@@ -20,9 +20,11 @@ __all__ = (
 @RequestProperties(
 	method='GET',
 	url='/api/auth/header',
-	auth=AuthHeader(
-		name='Authorization',
+	auth=Auth(
 		auth=GetSession(),
+		credentials=Header(
+			name='Authorization',
+		),
 	),
 	response=Response(
 		status=200,

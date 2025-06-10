@@ -21,7 +21,7 @@ __all__ = (
 @RequestStreamProperties(
 	method='PUT',
 	url='/api/run/stream/chunked',
-	header=Header(
+	headers=Headers(
 		{
 			'Content-Type': IsString(),
 			'Transfer-Encoding': IsString(IsEqualTo('chunked')),

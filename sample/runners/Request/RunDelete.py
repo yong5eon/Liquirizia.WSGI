@@ -20,7 +20,7 @@ __all__ = (
 @RequestProperties(
 	method='DELETE',
 	url='/api/run/:a/:b',
-	parameter=Parameter(
+	parameters=Parameters(
 		{
 			'a': ToInteger(IsGreaterThan(100)), 
 			'b': ToInteger(IsGreaterThan(100)),

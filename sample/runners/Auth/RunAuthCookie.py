@@ -21,9 +21,11 @@ __all__ = (
 @RequestProperties(
 	method='GET',
 	url='/api/auth/cookie',
-	auth=AuthCookie(
-		name='credentials',
+	auth=Auth(
 		auth=GetSession(),
+		credentials=Cookie(
+			name='credentials',
+		),
 	),
 	response=Response(
 		status=200,

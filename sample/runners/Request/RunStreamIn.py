@@ -20,7 +20,7 @@ __all__ = (
 @RequestStreamProperties(
 	method='PUT',
 	url='/api/run/stream',
-	header=Header(
+	headers=Headers(
 		{
 			'Content-Type': IsString(),
 			'Content-Length': IsString(ToInteger()),

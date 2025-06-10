@@ -20,10 +20,12 @@ __all__ = (
 @RequestProperties(
 	method='GET',
 	url='/api/auth/http',
-	auth=AuthHTTP(
-		scheme='Bearer',
-		format='JWT',
+	auth=Auth(
 		auth=GetSession(),
+		credentials=HTTP(
+			scheme='Bearer',
+			format='JWT',
+		),
 	),
 	response=Response(
 		status=200,

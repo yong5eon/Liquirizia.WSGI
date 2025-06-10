@@ -20,7 +20,7 @@ __all__ = (
 @RequestProperties(
 	method='POST',
 	url='/api/run/:a/:b',
-	parameter=Parameter(
+	parameters=Parameters(
 		{
 			'a': ToInteger(IsGreaterThan(100)), 
 			'b': ToInteger(IsGreaterThan(100)),
@@ -46,7 +46,7 @@ __all__ = (
 			'c': String('질의 c', default='안녕', required=False),
 		}
 	),
-	header=Header(
+	headers=Headers(
 		{
 			'X-App-Id': IsToNone(IsString()),
 		},

@@ -20,10 +20,11 @@ __all__ = (
 @RequestProperties(
 	method='GET',
 	url='/api/auth/oauth2/authorizationcode',
-	auth=AuthOAuth2AuthorizationCode(
-		scheme='Bearer',
+	auth=Auth(
 		auth=GetSession(),
-		authorizationUrl='/api/auth/oauth2/authorizationcode/token',
+		credentials=OAuth2AuthorizationCode(
+			authorizationUrl='/api/auth/oauth2/authorizationcode/token',
+		),
 	),
 	response=Response(
 		status=200,

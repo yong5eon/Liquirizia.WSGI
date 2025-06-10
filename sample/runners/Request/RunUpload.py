@@ -21,7 +21,7 @@ __all__ = (
 @RequestProperties(
 	method='POST',
 	url='/api/run/upload',
-	header=Header(
+	headers=Headers(
 		{
 			'Content-Format': IsString(),
 			'Content-Charset': IsToNone(IsString()),
