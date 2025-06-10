@@ -7,9 +7,9 @@ from ..Properties import (
 	RequestServerSentEventsRunner,
 	Origin,
 	Auth,
-	Parameter,
+	Parameters,
 	QueryString,
-	Header,
+	Headers,
 )
 from ..RequestReader import RequestReader
 from ..ResponseWriter import ResponseWriter
@@ -33,17 +33,17 @@ class RunRequestServerSentEvents(Route, RequestFactory):
 		url: str,
 		origin: Origin = None,
 		auth: Auth = None,
-		parameter: Parameter = None,
+		parameters: Parameters = None,
 		qs: QueryString = None,
-		header: Header = None,
+		headers: Headers = None,
 	):
 		super().__init__(method, url)
 		self.object = obj
 		self.origin = origin
 		self.auth = auth
-		self.parameter = parameter
+		self.parameters = parameters
 		self.qs = qs
-		self.header = header
+		self.headers = headers
 		return
 
 	def run(
@@ -54,9 +54,9 @@ class RunRequestServerSentEvents(Route, RequestFactory):
 	):
 		if self.origin: self.origin(request)
 		if self.auth: self.auth(request)
-		if self.parameter: self.parameter(request)
+		if self.parameters: self.parameters(request)
 		if self.qs: self.qs(request)
-		if self.header: self.header(request)
+		if self.headers: self.headers(request)
 		o = self.object(request)
 		o.run(ServerSentEvents(writer))
 		return

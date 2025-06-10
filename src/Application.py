@@ -20,9 +20,9 @@ from .Properties import (
 	RequestServerSentEventsRunner,
 	Origin,
 	Auth,
-	Parameter,
+	Parameters,
 	QueryString,
-	Header,
+	Headers,
 	Body,
 )
 from Liquirizia.FileSystemObject import Connection
@@ -230,9 +230,9 @@ class Application(object):
 		url: str,
 		origin: Origin = None,
 		auth: Auth = None,
-		parameter: Parameter = None,
+		parameters: Parameters = None,
 		qs: QueryString = None,
-		header: Header = None,
+		headers: Headers = None,
 		body: Body = None,
 		response: Union[Response, Sequence[Response]] = None,
 		onRequest: Union[RequestFilter, Sequence[RequestFilter]] = None,
@@ -244,9 +244,9 @@ class Application(object):
 			url=url,
 			origin=origin,
 			auth=auth,
-			parameter=parameter,
+			parameters=parameters,
 			qs=qs,
-			header=header,
+			headers=headers,
 			body=body,
 			response=response,
 			onRequest=onRequest,
@@ -261,9 +261,9 @@ class Application(object):
 		url: str,
 		origin: Origin = None,
 		auth: Auth = None,
-		parameter: Parameter = None,
+		parameters: Parameters = None,
 		qs: QueryString = None,
-		header: Header = None,
+		headers: Headers = None,
 	):
 		self.router.add(RunRequestStream(
 			obj=object,
@@ -271,9 +271,9 @@ class Application(object):
 			url=url,
 			origin=origin,
 			auth=auth,
-			parameter=parameter,
+			parameters=parameters,
 			qs=qs,
-			header=header,
+			headers=headers,
 		))
 		return
 
@@ -283,18 +283,18 @@ class Application(object):
 		url: str,
 		origin: Origin = None,
 		auth: Auth = None,
-		parameter: Parameter = None,
+		parameters: Parameters = None,
 		qs: QueryString = None,
-		header: Header = None,
+		headers: Headers = None,
 	):
 		self.router.add(RunRequestWebSocket(
 			obj=object,
 			url=url,
 			origin=origin,
 			auth=auth,
-			parameter=parameter,
+			parameters=parameters,
 			qs=qs,
-			header=header,
+			headers=headers,
 		))
 		return
 
@@ -304,18 +304,18 @@ class Application(object):
 		url: str,
 		origin: Origin = None,
 		auth: Auth = None,
-		parameter: Parameter = None,
+		parameters: Parameters = None,
 		qs: QueryString = None,
-		header: Header = None,
+		headers: Headers = None,
 	):
 		self.router.add(RunRequestServerSentEvents(
 			obj=object,
 			url=url,
 			origin=origin,
 			auth=auth,
-			parameter=parameter,
+			parameters=parameters,
 			qs=qs,
-			header=header,
+			headers=headers,
 		))
 		return
 

@@ -8,18 +8,11 @@ from .RequestWebSocketRunner import RequestWebSocketRunner
 from .Validators import (
 	Origin,
 	Auth,
-	Parameter,
+	Parameters,
 	QueryString,
-	Header,
+	Headers,
 	QueryString,
 	Body,
-)
-from .Authorizations import (
-	Query as AuthQuery,
-	Cookie as AuthCookie,
-	Header as AuthHeader,
-	HTTP as AuthHTTP,
-	OAuth2 as AuthOAuth2,
 )
 from ..Router import Router
 from ..Description import (
@@ -29,13 +22,6 @@ from ..Description import (
 	Body as BodyDescription,
 	Content as ContentDescription,
 	Auth as Authenticate,
-)
-from ..Description.Auth import (
-	HTTP as HTTPAuthenticate,
-	Cookie as CookieAuthenticate,
-	Header as HeaderAuthenticate,
-	Query as QueryAuthenticate,
-	OAuth2 as OAuth2Authenticate,
 )
 from typing import Type, Sequence, Union
 
@@ -55,9 +41,9 @@ class RequestProperties(object):
 		url: str,
 		origin: Union[Origin, Sequence[Origin]] = None,
 		auth: Auth = None,
-		parameter: Parameter = None,
+		parameters: Parameters = None,
 		qs: QueryString = None,
-		header: Header = None,
+		headers: Headers = None,
 		body: Body = None,
 		response: Union[Response, Sequence[Response]] = None,
 		summary: str = None,
@@ -70,9 +56,9 @@ class RequestProperties(object):
 		self.url = url
 		self.origin = origin
 		self.auth = auth
-		self.parameter = parameter
+		self.parameters = parameters
 		self.qs = qs
-		self.header = header
+		self.headers = headers
 		self.body = body 
 		self.response = response
 		self.onRequest = onRequest
@@ -90,9 +76,9 @@ class RequestProperties(object):
 			url=self.url,
 			origin=self.origin,
 			auth=self.auth,
-			parameter=self.parameter,
+			parameters=self.parameters,
 			qs=self.qs,
-			header=self.header,
+			headers=self.headers,
 			body=self.body,
 			onRequest=self.onRequest,
 			onResponse=self.onResponse,
@@ -100,48 +86,11 @@ class RequestProperties(object):
 		descriptor = Descriptor()
 		auth = None
 		if self.auth:
-			if isinstance(self.auth, AuthHTTP):
-				auth = Authenticate(
-					name=self.auth.__class__.__name__,
-					format=HTTPAuthenticate(
-						format=self.auth.scheme,
-						bearerFormat=self.auth.format,
-					),
-					optional=self.auth.optional,
-				)
-			if isinstance(self.auth, AuthCookie):
-				auth = Authenticate(
-					name=self.auth.__class__.__name__,
-					format=CookieAuthenticate(
-						name=self.auth.name,
-					),
-					optional=self.auth.optional,
-				)
-			if isinstance(self.auth, AuthHeader):
-				auth = Authenticate(
-					name=self.auth.__class__.__name__,
-					format=HeaderAuthenticate(
-						name=self.auth.name,
-					),
-					optional=self.auth.optional,
-				)
-			if isinstance(self.auth, AuthQuery):
-				auth = Authenticate(
-					name=self.auth.__class__.__name__,
-					format=QueryAuthenticate(
-						name=self.auth.name,
-					),
-					optional=self.auth.optional,
-				)
-			if isinstance(self.auth, AuthOAuth2):
-				auth = Authenticate(
-					name=self.auth.__class__.__name__,
-					format=OAuth2Authenticate(
-						type=str(self.auth.type),
-						**self.auth.kwargs,
-					),
-					optional=self.auth.optional,
-				)
+			auth = Authenticate(
+				name=self.auth.credentials.name,
+				format=self.auth.credentials.format,
+				optional=self.auth.optional,
+			)
 		contents = []
 		if self.body and self.body.content:
 			for content in self.body.content:
@@ -154,9 +103,9 @@ class RequestProperties(object):
 			method=self.method,
 			url=self.url,
 			auth=auth,
-			parameters=self.parameter.format if self.parameter else None,
+			parameters=self.parameters.format if self.parameters else None,
 			qs=self.qs.format if self.qs else None,
-			headers=self.header.format if self.header else None,
+			headers=self.headers.format if self.headers else None,
 			body=BodyDescription(
 				content=contents,
 				required=self.body.required,
@@ -177,9 +126,9 @@ class RequestStreamProperties(object):
 		url: str,
 		origin: Union[Origin, Sequence[Origin]] = None,
 		auth: Auth = None,
-		parameter: Parameter = None,
+		parameters: Parameters = None,
 		qs: QueryString = None,
-		header: Header = None,
+		headers: Headers = None,
 		response: Union[Response, Sequence[Response]] = None,
 		summary: str = None,
 		description: str = None,
@@ -189,9 +138,9 @@ class RequestStreamProperties(object):
 		self.url = url
 		self.origin = origin
 		self.auth = auth
-		self.parameter = parameter
+		self.parameters = parameters
 		self.qs = qs
-		self.header = header
+		self.headers = headers
 		self.response = response
 		self.summary = summary
 		self.description = description
@@ -206,62 +155,25 @@ class RequestStreamProperties(object):
 			url=self.url,
 			origin=self.origin,
 			auth=self.auth,
-			parameter=self.parameter,
+			parameters=self.parameters,
 			qs=self.qs,
-			header=self.header,
+			headers=self.headers,
 		))
 		descriptor = Descriptor()
 		auth = None
 		if self.auth:
-			if isinstance(self.auth, AuthHTTP):
-				auth = Authenticate(
-					name=self.auth.__class__.__name__,
-					format=HTTPAuthenticate(
-						format=self.auth.scheme,
-						bearerFormat=self.auth.format,
-					),
-					optional=self.auth.optional,
-				)
-			if isinstance(self.auth, AuthCookie):
-				auth = Authenticate(
-					name=self.auth.__class__.__name__,
-					format=CookieAuthenticate(
-						name=self.auth.name,
-					),
-					optional=self.auth.optional,
-				)
-			if isinstance(self.auth, AuthHeader):
-				auth = Authenticate(
-					name=self.auth.__class__.__name__,
-					format=HeaderAuthenticate(
-						name=self.auth.name,
-					),
-					optional=self.auth.optional,
-				)
-			if isinstance(self.auth, AuthQuery):
-				auth = Authenticate(
-					name=self.auth.__class__.__name__,
-					format=QueryAuthenticate(
-						name=self.auth.name,
-					),
-					optional=self.auth.optional,
-				)
-			if isinstance(self.auth, AuthOAuth2):
-				auth = Authenticate(
-					name='{}{}'.format(self.auth.__class__.__name__, str(self.auth.type)),
-					format=OAuth2Authenticate(
-						type=str(self.auth.type),
-						**self.auth.kwargs,
-					),
-					optional=self.auth.optional,
-				)
+			auth = Authenticate(
+				name=self.auth.credentials.name,
+				format=self.auth.credentials.format,
+				optional=self.auth.optional,
+			)
 		descriptor.add(Description(
 			method=self.method,
 			url=self.url,
 			auth=auth,
-			parameters=self.parameter.format if self.parameter else None,
+			parameters=self.parameters.format if self.parameters else None,
 			qs=self.qs.format if self.qs else None,
-			headers=self.header.format if self.header else None,
+			headers=self.headers.format if self.headers else None,
 			responses=self.response,
 			summary=self.summary,
 			description=self.description,
@@ -278,9 +190,9 @@ class RequestServerSentEventsProperties(object):
 		url: str,
 		origin: Union[Origin, Sequence[Origin]] = None,
 		auth: Auth = None,
-		parameter: Parameter = None,
+		parameters: Parameters = None,
 		qs: QueryString = None,
-		header: Header = None,
+		headers: Headers = None,
 		response: Union[Response, Sequence[Response]] = None,
 		summary: str = None,
 		description: str = None,
@@ -290,9 +202,9 @@ class RequestServerSentEventsProperties(object):
 		self.url = url
 		self.origin = origin
 		self.auth = auth
-		self.parameter = parameter
+		self.parameters = parameters
 		self.qs = qs
-		self.header = header
+		self.headers = headers
 		self.response = response
 		self.summary = summary
 		self.description = description
@@ -307,62 +219,25 @@ class RequestServerSentEventsProperties(object):
 			url=self.url,
 			origin=self.origin,
 			auth=self.auth,
-			parameter=self.parameter,
+			parameters=self.parameters,
 			qs=self.qs,
-			header=self.header,
+			headers=self.headers,
 		))
 		descriptor = Descriptor()
 		auth = None
 		if self.auth:
-			if isinstance(self.auth, AuthHTTP):
-				auth = Authenticate(
-					name=self.auth.__class__.__name__,
-					format=HTTPAuthenticate(
-						format=self.auth.scheme,
-						bearerFormat=self.auth.format,
-					),
-					optional=self.auth.optional,
-				)
-			if isinstance(self.auth, AuthCookie):
-				auth = Authenticate(
-					name=self.auth.__class__.__name__,
-					format=CookieAuthenticate(
-						name=self.auth.name,
-					),
-					optional=self.auth.optional,
-				)
-			if isinstance(self.auth, AuthHeader):
-				auth = Authenticate(
-					name=self.auth.__class__.__name__,
-					format=HeaderAuthenticate(
-						name=self.auth.name,
-					),
-					optional=self.auth.optional,
-				)
-			if isinstance(self.auth, AuthQuery):
-				auth = Authenticate(
-					name=self.auth.__class__.__name__,
-					format=QueryAuthenticate(
-						name=self.auth.name,
-					),
-					optional=self.auth.optional,
-				)
-			if isinstance(self.auth, AuthOAuth2):
-				auth = Authenticate(
-					name='{}{}'.format(self.auth.__class__.__name__, str(self.auth.type)),
-					format=OAuth2Authenticate(
-						type=str(self.auth.type),
-						**self.auth.kwargs,
-					),
-					optional=self.auth.optional,
-				)
+			auth = Authenticate(
+				name=self.auth.credentials.name,
+				format=self.auth.credentials.format,
+				optional=self.auth.optional,
+			)
 		descriptor.add(Description(
 			method=self.method,
 			url=self.url,
 			auth=auth,
-			parameters=self.parameter.format if self.parameter else None,
+			parameters=self.parameters.format if self.parameters else None,
 			qs=self.qs.format if self.qs else None,
-			headers=self.header.format if self.header else None,
+			headers=self.headers.format if self.headers else None,
 			responses=self.response,
 			summary=self.summary,
 			description=self.description,
@@ -379,9 +254,9 @@ class RequestWebSocketProperties(object):
 		url: str,
 		origin: Union[Origin, Sequence[Origin]] = None,
 		auth: Auth = None,
-		parameter: Parameter = None,
+		parameters: Parameters = None,
 		qs: QueryString = None,
-		header: Header = None,
+		headers: Headers = None,
 		response: Union[Response, Sequence[Response]] = None,
 		summary: str = None,
 		description: str = None,
@@ -391,9 +266,9 @@ class RequestWebSocketProperties(object):
 		self.url = url
 		self.origin = origin
 		self.auth = auth
-		self.parameter = parameter
+		self.parameters = parameters
 		self.qs = qs
-		self.header = header
+		self.headers = headers
 		self.response = response
 		self.summary = summary
 		self.description = description
@@ -407,62 +282,25 @@ class RequestWebSocketProperties(object):
 			url=self.url,
 			origin=self.origin,
 			auth=self.auth,
-			parameter=self.parameter,
+			parameters=self.parameters,
 			qs=self.qs,
-			header=self.header,
+			headers=self.headers,
 		))
 		descriptor = Descriptor()
 		auth = None
 		if self.auth:
-			if isinstance(self.auth, AuthHTTP):
-				auth = Authenticate(
-					name=self.auth.__class__.__name__,
-					format=HTTPAuthenticate(
-						format=self.auth.scheme,
-						bearerFormat=self.auth.format,
-					),
-					optional=self.auth.optional,
-				)
-			if isinstance(self.auth, AuthCookie):
-				auth = Authenticate(
-					name=self.auth.__class__.__name__,
-					format=CookieAuthenticate(
-						name=self.auth.name,
-					),
-					optional=self.auth.optional,
-				)
-			if isinstance(self.auth, AuthHeader):
-				auth = Authenticate(
-					name=self.auth.__class__.__name__,
-					format=HeaderAuthenticate(
-						name=self.auth.name,
-					),
-					optional=self.auth.optional,
-				)
-			if isinstance(self.auth, AuthQuery):
-				auth = Authenticate(
-					name=self.auth.__class__.__name__,
-					format=QueryAuthenticate(
-						name=self.auth.name,
-					),
-					optional=self.auth.optional,
-				)
-			if isinstance(self.auth, AuthOAuth2):
-				auth = Authenticate(
-					name='{}{}'.format(self.auth.__class__.__name__, str(self.auth.type)),
-					format=OAuth2Authenticate(
-						type=str(self.auth.type),
-						**self.auth.kwargs,
-					),
-					optional=self.auth.optional,
-				)
+			auth = Authenticate(
+				name=self.auth.credentials.name,
+				format=self.auth.credentials.format,
+				optional=self.auth.optional,
+			)
 		descriptor.add(Description(
 			method=self.method,
 			url=self.url,
 			auth=auth,
-			parameters=self.parameter.format if self.parameter else None,
+			parameters=self.parameters.format if self.parameters else None,
 			qs=self.qs.format if self.qs else None,
-			headers=self.header.format if self.header else None,
+			headers=self.headers.format if self.headers else None,
 			responses=self.response,
 			summary=self.summary,
 			description=self.description,

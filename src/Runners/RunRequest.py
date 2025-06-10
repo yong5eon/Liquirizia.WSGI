@@ -9,9 +9,9 @@ from ..Properties import (
 	ResponseFilter,
 	Origin,
 	Auth,
-	Parameter,
+	Parameters,
 	QueryString,
-	Header,
+	Headers,
 	Body,
 )
 from ..RequestReader import RequestReader
@@ -36,9 +36,9 @@ class RunRequest(Route, RequestFactory):
 		url: str,
 		origin: Origin = None,
 		auth: Auth = None,
-		parameter: Parameter = None,
+		parameters: Parameters = None,
 		qs: QueryString = None,
-		header: Header = None,
+		headers: Headers = None,
 		body: Body = None,
 		response: Union[Response, Sequence[Response]] = None,
 		onRequest: Union[RequestFilter, Sequence[RequestFilter]] = None,
@@ -48,9 +48,9 @@ class RunRequest(Route, RequestFactory):
 		self.object = obj
 		self.origin = origin
 		self.auth = auth
-		self.parameter = parameter
+		self.parameters = parameters
 		self.qs = qs
-		self.header = header
+		self.headers = headers
 		self.body = body
 		self.response = response
 		self.onRequest = onRequest
@@ -71,9 +71,9 @@ class RunRequest(Route, RequestFactory):
 	):
 		if self.origin: self.origin(request)
 		if self.auth: self.auth(request)
-		if self.parameter: self.parameter(request)
+		if self.parameters: self.parameters(request)
 		if self.qs: self.qs(request)
-		if self.header: self.header(request)
+		if self.headers: self.headers(request)
 
 		content = None
 		if self.body: content = self.body(request, reader)

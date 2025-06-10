@@ -13,22 +13,23 @@ from .RequestProperties import (
 )
 from .Validators import (
 	Origin,
+	Credentials,
 	Authorization,
 	Auth,
-	Parameter,
+	Parameters,
 	QueryString,
-	Header,
+	Headers,
 	Body,
 )
-from .Authorizations import (
-	Query as AuthQuery,
-	Cookie as AuthCookie,
-	Header as AuthHeader,
-	HTTP as AuthHTTP,
-	OAuth2Implicit as AuthOAuth2Implicit,
-	OAuth2Password as AuthOAuth2Password,
-	OAuth2ClientCredentials as AuthOAuth2ClientCredentials,
-	OAuth2AuthorizationCode as AuthOAuth2AuthorizationCode,
+from .Credentials import (
+	Query,
+	Cookie,
+	Header,
+	HTTP,
+	OAuth2Implicit,
+	OAuth2Password,
+	OAuth2ClientCredentials,
+	OAuth2AuthorizationCode,
 )
 from .ContentReader import ContentReader
 from .ContentReaders import (
@@ -54,21 +55,22 @@ __all__ = (
 	'RequestWebSocketProperties',
 	# Validators
 	'Origin',
+	'Credentials',
 	'Authorization',
 	'Auth',
-	'Parameter',
+	'Parameters',
 	'QueryString',
-	'Header',
+	'Headers',
 	'Body',
 	# Authorizations
-	'AuthQuery',
-	'AuthCookie',
-	'AuthHeader',
-	'AuthHTTP',
-	'AuthOAuth2Implicit',
-	'AuthOAuth2Password',
-	'AuthOAuth2ClientCredentials',
-	'AuthOAuth2AuthorizationCode',
+	'Query',
+	'Cookie',
+	'Header',
+	'HTTP',
+	'OAuth2Implicit',
+	'OAuth2Password',
+	'OAuth2ClientCredentials',
+	'OAuth2AuthorizationCode',
 	# ContentReader
 	'ContentReader',
 	# ContentReaders

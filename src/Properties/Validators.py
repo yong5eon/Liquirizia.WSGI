@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from curses import meta
+from Liquirizia.DataAccessObject.Implements.Sqlite.Executors import Get
 from Liquirizia.Validator import Validator, Pattern
 from Liquirizia.Validator.Patterns import IsDataObject, IsObject
 from Liquirizia.Validator.Patterns.DataObject import (
@@ -14,6 +16,7 @@ from Liquirizia.Description import (
 	Value,
 	Schema,
 )
+from Liquirizia.WSGI.Errors.ClientError import UnauthorizedError
 from ..Request import Request
 from ..RequestReader import RequestReader
 from ..Error import Error
@@ -29,11 +32,12 @@ from typing import Dict, Sequence, Union, Any
 
 __all__ = (
 	'Origin',
+	'Credentials',
 	'Authorization',
 	'Auth',
-	'Parameter',
+	'Parameters',
 	'QueryString',
-	'Header',
+	'Headers',
 	'Body',
 )
 
@@ -65,6 +69,28 @@ class Origin(object):
 		raise ForbiddenError(reason='Origin {} is not allowed'.format(origin))
 
 
+class Credentials(metaclass=ABCMeta):
+	@abstractmethod
+	def __call__(self, request: Request) -> Any:
+		raise NotImplementedError('{} must be implemented __call__'.format(
+			self.__class__.__name__,
+		))
+	@property
+	@abstractmethod
+	def name(self) -> str:
+		"""Return the name of the credentials"""
+		raise NotImplementedError('{} must be implemented name'.format(
+			self.__class__.__name__,
+		))
+	@property
+	@abstractmethod
+	def format(self) -> Dict[str, str]:
+		"""Return the format of the credentials"""
+		raise NotImplementedError('{} must be implemented format'.format(
+			self.__class__.__name__,
+		))
+
+
 class Authorization(metaclass=ABCMeta):
 	@abstractmethod
 	def __call__(self, credentials: Any) -> Any:
@@ -73,22 +99,33 @@ class Authorization(metaclass=ABCMeta):
 		))
 
 
-class Auth(ABC):
+class Auth(object):
 	def __init__(
 		self,
 		auth: Authorization,
+		credentials: Credentials,
 		optional: bool = False,
+		error: Error = None,
 	):
 		self.auth = auth
+		self.credentials = credentials
 		self.optional = optional
+		self.error = error
 		return
-	@abstractmethod
 	def __call__(self, request: Request):
-		raise NotImplementedError('{} must be implemented __call__'.format(self.__class__.__name__))
+		credentials = self.credentials(request)
+		if not credentials:
+			if self.optional:
+				return
+			if self.error:
+				raise self.error
+			raise UnauthorizedError(reason='Credentials is not found')
+		request.session = self.auth(credentials)
+		return
 
 
-class Parameter(object):
-	"""Paramter Validator"""
+class Parameters(object):
+	"""Parameters Validator"""
 	def __init__(
 		self,
 		parameters : Dict[str, Union[Pattern, Sequence[Pattern]]],
@@ -131,8 +168,8 @@ class QueryString(object):
 		return
 
 
-class Header(object):
-	"""Header Validator"""
+class Headers(object):
+	"""Headers Validator"""
 	def __init__(
 		self,
 		headers: Dict[str, Union[Pattern, Sequence[Pattern]]],
