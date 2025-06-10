@@ -144,11 +144,12 @@ class RequestProperties(object):
 				)
 		contents = []
 		if self.body and self.body.content:
-			contents.append(ContentDescription(
-				format=self.body.content.format,
-				schema=self.body.content.schema,
-				example=self.body.content.example,
-			))
+			for content in self.body.content:
+				contents.append(ContentDescription(
+					format=content.format,
+					schema=content.schema,
+					example=content.example,
+				))
 		descriptor.add(Description(
 			method=self.method,
 			url=self.url,

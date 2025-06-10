@@ -171,11 +171,14 @@ class Body(object):
 	def __init__(
 		self,
 		reader: ContentReader,
-		content: Content = None,
+		content: Union[Content, Sequence[Content]] = None,
 		required: bool = True,
 	):
 		self.reader = reader
 		self.content = content
+		if self.content:
+			if not isinstance(self.content, (list, tuple)):
+				self.content = [self.content]
 		self.required = required
 		return
 	def __call__(self, request: Request, reader: RequestReader) -> Any:
