@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from curses import meta
-from Liquirizia.DataAccessObject.Implements.Sqlite.Executors import Get
 from Liquirizia.Validator import Validator, Pattern
 from Liquirizia.Validator.Patterns import IsDataObject, IsObject
 from Liquirizia.Validator.Patterns.DataObject import (

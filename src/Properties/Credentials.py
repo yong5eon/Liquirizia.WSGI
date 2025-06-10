@@ -81,7 +81,7 @@ class Header(Credentials):
 		self.key = name
 		return
 	def __call__(self, request: Request) -> Any:
-		return request.header(self.name)
+		return request.header(self.key)
 	@property
 	def name(self) -> str: return 'Header'
 	@property
