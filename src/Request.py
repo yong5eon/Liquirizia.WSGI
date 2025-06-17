@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from .Utils import ParseHeader
+from .Utils.DataObject import ObjectToDataObject
 from .Headers import (
 	ContentType,
 )
-from Liquirizia.Utils.Dictionary import CreateDataClass, ToDataClass
 
 from urllib.parse import parse_qs, unquote, urlencode
 from uuid import uuid4
@@ -34,8 +34,7 @@ class Request(object):
 		self.method = method
 		self.path, *querystring = uri.split('?', 1)
 		if parameters:
-			Parameters = CreateDataClass('Parameters', parameters)
-			self.params = ToDataClass(parameters, Parameters)
+			self.params = ObjectToDataObject('Parameters', parameters)
 		else:
 			self.params = None
 		self.qs_ = querystring[0] if len(querystring) else None
@@ -49,8 +48,7 @@ class Request(object):
 				for i, o in enumerate(v):
 					v[i] = unquote(o) if len(o) else None
 				args[k] = v
-		Querystring = CreateDataClass('Querystring', args)
-		self.args = ToDataClass(args, Querystring)
+		self.args = ObjectToDataObject('Querystring', args)
 		self.props = {}
 		for k, v in headers.items() if headers else []:
 			self.header(k, v)
