@@ -21,7 +21,7 @@ class ContentRange(object):
 @dataclass
 class ContentType(object):
 	"""Content Type Class for Content-Type Header"""
-	type: str = None
+	format: str = None
 	charset: str = None
 	boundary: str = None
 

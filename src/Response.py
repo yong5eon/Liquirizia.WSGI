@@ -30,7 +30,7 @@ class Response(object):
 					'; charset={}'.format(charset) if charset else ''
 				)
 			)
-		self.header('Content-Length', len(body) if body else 0)
+			self.header('Content-Length', len(body) if body else 0)
 		self.header('Date', formatdate(time(), usegmt=True))
 		self.obj = body
 		return

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from traceback import format_tb
-
 from typing import Dict, Any
 
 __all__ = (
@@ -13,34 +11,38 @@ class Error(BaseException):
 	"""Error Class of WSGI"""
 	def __init__(
 		self,
-		reason: str,
 		status: int,
 		message: str,
 		headers: Dict[str, Any] = None,
 		body: bytes = None,
 		format: str = None,
 		charset: str = None,
-		error: BaseException = None
+		reason: str = None,
+		error: BaseException = None,
+		extra: Any = None,
 	):
-		super(Error, self).__init__(reason)
+		super(Error, self).__init__()
 		self.status = status
 		self.message = message
 		self.headers = headers
 		self.body = body
 		self.format = format
 		self.charset = charset
+		self.reason = reason
 		self.error = error
+		self.extra = extra
 		return
-
-	@property 
-	def traceback(self):
-		reason = '{}\n'.format(str(self.error) if self.error else str(self))
-		if self.error:
-			reason += ''.join(format_tb(self.error.__traceback__)).strip().replace(' ' * 4, ' ' * 2)
-		else:
-			reason += ''.join(format_tb(self.__traceback__)).strip().replace(' ' * 4, ' ' * 2)
-		return reason
 	
+	def __repr__(self):
+		if self.reason:
+			return '{}: {}'.format(self.__class__.__name__, self.reason)
+		return self.__class__.__name__
+	
+	def __str__(self):
+		if self.reason:
+			return '{}: {}'.format(self.__class__.__name__, self.reason)
+		return self.__class__.__name__
+
 	@property
 	def __traceback__(self):
 		if self.error:

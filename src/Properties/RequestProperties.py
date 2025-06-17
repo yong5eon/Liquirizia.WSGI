@@ -1,32 +1,29 @@
 # -*- coding: utf-8 -*-
 
-from .RequestRunner import RequestRunner
+from re import A
+from .RequestRunner import RequestRunner, RequestFilter, ResponseFilter
 from .RequestStreamRunner import RequestStreamRunner
 from .RequestServerSentEventsRunner import RequestServerSentEventsRunner
 from .RequestWebSocketRunner import RequestWebSocketRunner
-from .Properties import Properties
-from .Validator import (
-	Parameter,
-	Header,
+from .Validators import (
+	Origin,
+	Auth,
+	Parameters,
 	QueryString,
-	Content,
+	Headers,
+	QueryString,
+	Body,
 )
-
 from ..Router import Router
-from ..Routes import *
-from ..Filters import (
-	RequestFilter,
-	ResponseFilter,
+from ..Description import (
+	Descriptor,
+	Description,
+	Response,
+	Body as BodyDescription,
+	Content as ContentDescription,
+	Auth as Authenticate,
 )
-from ..Decoder import Decoder
-from ..Decoders import (
-	TextDecoder,
-	FormUrlEncodedDecoder,
-	JavaScriptObjectNotationDecoder
-)
-from ..CORS import CORS
-
-from typing import Type, Sequence
+from typing import Type, Sequence, Union
 
 __all__ = (
 	'RequestProperties',
@@ -37,54 +34,86 @@ __all__ = (
 
 
 class RequestProperties(object):
-	"""Request Properties Decorator Class for RequestRunner"""
+	"""Request Decorator Class for RequestRunner"""
 	def __init__(
 		self,
 		method: str,
 		url: str,
-		cors: CORS = CORS(),
-		parameter: Parameter = None,
-		header: Header = None,
+		origin: Union[Origin, Sequence[Origin]] = None,
+		auth: Auth = None,
+		parameters: Parameters = None,
 		qs: QueryString = None,
-		content: Content = None,
-		contentParsers: Sequence[Decoder] = (
-			TextDecoder('utf-8'),
-			FormUrlEncodedDecoder('utf-8'),
-			JavaScriptObjectNotationDecoder('utf-8'),
-		),
-		onRequest: RequestFilter = None,
-		onResponse : ResponseFilter = None,
+		headers: Headers = None,
+		body: Body = None,
+		response: Union[Response, Sequence[Response]] = None,
+		summary: str = None,
+		description: str = None,
+		tags: Union[str, Sequence[str]] = None,
+		onRequest: Union[RequestFilter, Sequence[RequestFilter]] = None,
+		onResponse : Union[ResponseFilter, Sequence[ResponseFilter]] = None,
 	):
 		self.method = method
 		self.url = url
-		self.cors = cors
-		self.parameter = parameter
-		self.header = header
+		self.origin = origin
+		self.auth = auth
+		self.parameters = parameters
 		self.qs = qs
-		self.content = content
-		self.contentParsers = contentParsers
+		self.headers = headers
+		self.body = body 
+		self.response = response
 		self.onRequest = onRequest
 		self.onResponse = onResponse
+		self.summary = summary
+		self.description = description
+		self.tags = tags
 		return
-	
 	def __call__(self, obj: Type[RequestRunner]):
-		obj.__properties__ = Properties(
-			method=self.method,
-			url=self.url,
-		)
+		from ..Runners import RunRequest
 		router = Router()
-		router.add(RouteRequest(
+		router.add(RunRequest(
 			obj=obj,
 			method=self.method,
 			url=self.url,
-			cors=self.cors,
-			parameter=self.parameter,
-			header=self.header,
+			origin=self.origin,
+			auth=self.auth,
+			parameters=self.parameters,
 			qs=self.qs,
-			content=self.content,
-			contentParsers=self.contentParsers,
+			headers=self.headers,
+			body=self.body,
 			onRequest=self.onRequest,
 			onResponse=self.onResponse,
+		))
+		descriptor = Descriptor()
+		auth = None
+		if self.auth:
+			auth = Authenticate(
+				name=self.auth.credentials.name,
+				format=self.auth.credentials.format,
+				optional=self.auth.optional,
+			)
+		contents = []
+		if self.body and self.body.content:
+			for content in self.body.content:
+				contents.append(ContentDescription(
+					format=content.format,
+					schema=content.schema,
+					example=content.example,
+				))
+		descriptor.add(Description(
+			method=self.method,
+			url=self.url,
+			auth=auth,
+			parameters=self.parameters.format if self.parameters else None,
+			qs=self.qs.format if self.qs else None,
+			headers=self.headers.format if self.headers else None,
+			body=BodyDescription(
+				content=contents,
+				required=self.body.required,
+			) if self.body else None,
+			responses=self.response,
+			summary=self.summary,
+			description=self.description,
+			tags=self.tags,
 		))
 		return obj
 
@@ -95,38 +124,63 @@ class RequestStreamProperties(object):
 		self,
 		method: str,
 		url: str,
-		cors: CORS = CORS(),
-		parameter: Parameter = None,
-		header: Header = None,
+		origin: Union[Origin, Sequence[Origin]] = None,
+		auth: Auth = None,
+		parameters: Parameters = None,
 		qs: QueryString = None,
-		onRequest: RequestFilter = None,
+		headers: Headers = None,
+		response: Union[Response, Sequence[Response]] = None,
+		summary: str = None,
+		description: str = None,
+		tags: Union[str, Sequence[str]] = None,
 	):
 		self.method = method
 		self.url = url
-		self.cors = cors
-		self.parameter = parameter
-		self.header = header
+		self.origin = origin
+		self.auth = auth
+		self.parameters = parameters
 		self.qs = qs
-		self.onRequest = onRequest
+		self.headers = headers
+		self.response = response
+		self.summary = summary
+		self.description = description
+		self.tags = tags
 		return
-	
 	def __call__(self, obj: Type[RequestStreamRunner]):
-		obj.__properties__ = Properties(
-			method=self.method,
-			url=self.url,
-		)
+		from ..Runners import RunRequestStream
 		router = Router()
-		router.add(RouteRequestStream(
+		router.add(RunRequestStream(
 			obj=obj,
 			method=self.method,
 			url=self.url,
-			cors=self.cors,
-			parameter=self.parameter,
-			header=self.header,
+			origin=self.origin,
+			auth=self.auth,
+			parameters=self.parameters,
 			qs=self.qs,
-			onRequest=self.onRequest,
+			headers=self.headers,
+		))
+		descriptor = Descriptor()
+		auth = None
+		if self.auth:
+			auth = Authenticate(
+				name=self.auth.credentials.name,
+				format=self.auth.credentials.format,
+				optional=self.auth.optional,
+			)
+		descriptor.add(Description(
+			method=self.method,
+			url=self.url,
+			auth=auth,
+			parameters=self.parameters.format if self.parameters else None,
+			qs=self.qs.format if self.qs else None,
+			headers=self.headers.format if self.headers else None,
+			responses=self.response,
+			summary=self.summary,
+			description=self.description,
+			tags=self.tags,
 		))
 		return obj
+
 
 class RequestServerSentEventsProperties(object):
 	"""Request Properties Decorator Class for RequestServerSentEventsRunner"""
@@ -134,36 +188,60 @@ class RequestServerSentEventsProperties(object):
 		self,
 		method: str,
 		url: str,
-		cors: CORS = CORS(),
-		parameter: Parameter = None,
-		header: Header = None,
+		origin: Union[Origin, Sequence[Origin]] = None,
+		auth: Auth = None,
+		parameters: Parameters = None,
 		qs: QueryString = None,
-		onRequest: RequestFilter = None,
+		headers: Headers = None,
+		response: Union[Response, Sequence[Response]] = None,
+		summary: str = None,
+		description: str = None,
+		tags: Union[str, Sequence[str]] = None,
 	):
 		self.method = method
 		self.url = url
-		self.cors = cors
-		self.parameter = parameter
-		self.header = header
+		self.origin = origin
+		self.auth = auth
+		self.parameters = parameters
 		self.qs = qs
-		self.onRequest = onRequest
+		self.headers = headers
+		self.response = response
+		self.summary = summary
+		self.description = description
+		self.tags = tags
 		return
-	
 	def __call__(self, obj: Type[RequestServerSentEventsRunner]):
-		obj.__properties__ = Properties(
-			method=self.method,
-			url=self.url,
-		)
+		from ..Runners import RunRequestServerSentEvents
 		router = Router()
-		router.add(RouteRequestServerSentEvents(
+		router.add(RunRequestServerSentEvents(
 			obj=obj,
 			method=self.method,
 			url=self.url,
-			cors=self.cors,
-			parameter=self.parameter,
-			header=self.header,
+			origin=self.origin,
+			auth=self.auth,
+			parameters=self.parameters,
 			qs=self.qs,
-			onRequest=self.onRequest,
+			headers=self.headers,
+		))
+		descriptor = Descriptor()
+		auth = None
+		if self.auth:
+			auth = Authenticate(
+				name=self.auth.credentials.name,
+				format=self.auth.credentials.format,
+				optional=self.auth.optional,
+			)
+		descriptor.add(Description(
+			method=self.method,
+			url=self.url,
+			auth=auth,
+			parameters=self.parameters.format if self.parameters else None,
+			qs=self.qs.format if self.qs else None,
+			headers=self.headers.format if self.headers else None,
+			responses=self.response,
+			summary=self.summary,
+			description=self.description,
+			tags=self.tags,
 		))
 		return obj
 
@@ -174,35 +252,59 @@ class RequestWebSocketProperties(object):
 		self,
 		method: str,
 		url: str,
-		cors: CORS = CORS(),
-		parameter: Parameter = None,
-		header: Header = None,
+		origin: Union[Origin, Sequence[Origin]] = None,
+		auth: Auth = None,
+		parameters: Parameters = None,
 		qs: QueryString = None,
-		onRequest: RequestFilter = None,
+		headers: Headers = None,
+		response: Union[Response, Sequence[Response]] = None,
+		summary: str = None,
+		description: str = None,
+		tags: Union[str, Sequence[str]] = None,
 	):
 		self.method = method
 		self.url = url
-		self.cors = cors
-		self.parameter = parameter
-		self.header = header
+		self.origin = origin
+		self.auth = auth
+		self.parameters = parameters
 		self.qs = qs
-		self.onRequest = onRequest
+		self.headers = headers
+		self.response = response
+		self.summary = summary
+		self.description = description
+		self.tags = tags
 		return
-	
 	def __call__(self, obj: Type[RequestWebSocketRunner]):
-		obj.__properties__ = Properties(
-			method=self.method,
-			url=self.url,
-		)
+		from ..Runners import RunRequestWebSocket
 		router = Router()
-		router.add(RouteRequestWebSocket(
+		router.add(RunRequestWebSocket(
 			obj=obj,
 			url=self.url,
-			cors=self.cors,
-			parameter=self.parameter,
-			header=self.header,
+			origin=self.origin,
+			auth=self.auth,
+			parameters=self.parameters,
 			qs=self.qs,
-			onRequest=self.onRequest,
+			headers=self.headers,
+		))
+		descriptor = Descriptor()
+		auth = None
+		if self.auth:
+			auth = Authenticate(
+				name=self.auth.credentials.name,
+				format=self.auth.credentials.format,
+				optional=self.auth.optional,
+			)
+		descriptor.add(Description(
+			method=self.method,
+			url=self.url,
+			auth=auth,
+			parameters=self.parameters.format if self.parameters else None,
+			qs=self.qs.format if self.qs else None,
+			headers=self.headers.format if self.headers else None,
+			responses=self.response,
+			summary=self.summary,
+			description=self.description,
+			tags=self.tags,
 		))
 		return obj
 

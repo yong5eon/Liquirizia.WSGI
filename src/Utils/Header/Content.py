@@ -35,7 +35,7 @@ class ParseContentType(Parse):
 	def __call__(self, value: str) -> ContentType:
 		o = ContentType()
 		type, params = ParseStringWithParameters()(value)
-		o.type = self.strip(type)
+		o.format = self.strip(type)
 		o.charset = self.strip(params['charset']) if 'charset' in params else None
 		o.boundary= self.strip(params['boundary']) if 'boundary' in params else None
 		return o

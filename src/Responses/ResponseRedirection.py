@@ -20,9 +20,8 @@ __all__ = (
 class ResponseMovePermanently(Response):
 	"""Response 301 Move Permanently Class"""
 	def __init__(self, url, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
-		headers.update({
-			'Location': url,
-		})
+		headers['Location'] = url
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseMovePermanently, self).__init__(
 			status=301,
 			message='Move Permanently',
@@ -37,9 +36,8 @@ class ResponseMovePermanently(Response):
 class ResponseFound(Response):
 	"""Response 302 Found Class"""
 	def __init__(self, url, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
-		headers.update({
-			'Location': url,
-		})
+		headers['Location'] = url
+		if body is None: headers['Content-Length'] = 0
 		super().__init__(
 			status=302,
 			message='Found',
@@ -54,6 +52,7 @@ class ResponseFound(Response):
 class ResponseNotModified(Response):
 	"""Reponse 304 Not Modified Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotModified, self).__init__(
 			status=304,
 			message='Not Modified',

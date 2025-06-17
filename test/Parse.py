@@ -15,7 +15,7 @@ from Liquirizia.WSGI.Utils.Header.Parse import (
 )
 
 
-class TestParse(Case):
+class Parse(Case):
 	@Parameterized(
 		{'i': '1', 'o': True},
 		{'i': '0', 'o': None},

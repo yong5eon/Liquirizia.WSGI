@@ -22,6 +22,7 @@ __all__ = (
 class ResponseInternalServerError(Response):
 	"""Response 500 Internal Server Error"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super().__init__(
 			status=500,
 			message='Internal Server Error',
@@ -36,6 +37,7 @@ class ResponseInternalServerError(Response):
 class ResponseNotImplemented(Response):
 	"""Response 501 Not Implemented"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super().__init__(
 			status=501,
 			message='Not Implemented',
@@ -50,6 +52,7 @@ class ResponseNotImplemented(Response):
 class ResponseServiceUnavailable(Response):
 	"""Response 503 Service Unavailable"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super().__init__(
 			status=503,
 			message='Service Unavailable',

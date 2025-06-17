@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from .Utils import ParseHeader
+from .Headers import (
+	ContentType,
+)
 from Liquirizia.Utils.Dictionary import CreateDataClass, ToDataClass
 
 from urllib.parse import parse_qs, unquote, urlencode
@@ -41,11 +44,11 @@ class Request(object):
 			if len(v) == 0:
 				args[k] = None
 			elif len(v) == 1:
-				args[k] = unquote(v[0]) if len(v[0]) else None
+				args[k] = unquote(v[0])
 			else:
 				for i, o in enumerate(v):
-					v[i] = o if len(o) else None
-				args[k] = unquote(v)
+					v[i] = unquote(o) if len(o) else None
+				args[k] = v
 		Querystring = CreateDataClass('Querystring', args)
 		self.args = ToDataClass(args, Querystring)
 		self.props = {}
@@ -99,13 +102,13 @@ class Request(object):
 
 	@property
 	def format(self) -> Optional[str]:
-		_ = self.header('Content-Type')
+		_: ContentType = self.header('Content-Type')
 		if not _: return None
-		return _.type
+		return _.format
 
 	@property
 	def charset(self) -> Optional[str]:
-		_ = self.header('Content-Type')
+		_: ContentType = self.header('Content-Type')
 		if not _: return None
 		return _.charset
 
@@ -114,7 +117,7 @@ class Request(object):
 		return self.args
 
 	@property
-	def parameters(self) -> Optional[Dict]:
+	def parameters(self) -> Optional[object]:
 		return self.params
 
 	@property

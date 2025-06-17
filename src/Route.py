@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from .Request import Request
-from .CORS import CORS
-
 from re import compile, escape
 
 __all__ = (
@@ -13,12 +10,11 @@ __all__ = (
 class Route(object):
 	RegexVar = compile(r':\w+')
 
-	def __init__(self, method: str, url: str, parameter: str = ':%s', cors: CORS = None):
+	def __init__(self, method: str, url: str, parameter: str = ':%s'):
 		self.method = method
 		self.url = url
 		self.parameter = parameter
 		self.re, self.fmt = self.parse(url)
-		self.cors = cors
 		return
 
 	def match(self, url: str):
@@ -45,25 +41,3 @@ class Route(object):
 		fmt.append(url[pos:])
 
 		return compile('^%s$' % "".join(regex)), "".join(fmt)
-
-	def headers(self, request: Request):
-		if not self.cors:
-			return {}
-
-		headers = self.cors.toHeaders()
-		headers['Access-Control-Allow-Methods'] = self.method
-
-		if not request.header('Origin'):
-			headers['Access-Control-Allow-Credentials'] = 'false'
-			return headers
-
-		if '*' in self.cors.origin:
-			headers['Access-Control-Allow-Credentials'] = 'true'
-			return headers
-
-		if request.header('Origin') not in self.cors.origin:
-			headers['Access-Control-Allow-Credentials'] = 'false'
-		else:
-			headers['Access-Control-Allow-Credentials'] = 'true'
-
-		return headers

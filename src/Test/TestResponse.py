@@ -3,11 +3,6 @@
 from ..Utils import ToHeader, ParseHeader
 
 from .Sender import Sender
-from ..Decoder import Decoder
-from ..Decoders import (
-	TextDecoder,
-	JavaScriptObjectNotationDecoder,
-)
 
 from io import BytesIO, BufferedReader
 
@@ -25,25 +20,14 @@ class TestResponse(object):
 	def __init__(
 		self,
 		sender: Sender,
-		decoders: Sequence[Decoder] = (
-			TextDecoder('utf-8'),
-			JavaScriptObjectNotationDecoder('utf-8'),
-		)
 	):
 		self.status = int(sender.status)
 		self.message = sender.message
 		self.headers = {}
 		for k, v in sender.headers:
 			self.headers[k] = str(v) 
-		decode = None
-		for decoder in decoders:
-			if decoder.format == self.format:
-				decode = decoder
-				break
-		if sender.buffer and not decode:
-			raise ValueError('Decoder not found')
 		if self.header('Transfer-Encoding') == 'chunked':
-			buffer = bytes()
+			buffer = b''
 			buf = BytesIO(sender.buffer)
 			while True:
 				line = buf.readline()
@@ -52,9 +36,9 @@ class TestResponse(object):
 					break
 				buffer += buf.read(size)
 				line = buf.readline()
-			self.body = decode(buffer) if sender.buffer else None
+			self.body = buffer
 		else:
-			self.body = decode(sender.buffer) if sender.buffer else None
+			self.body = sender.buffer if sender.buffer else None
 		return
 
 	def header(self, key: str):

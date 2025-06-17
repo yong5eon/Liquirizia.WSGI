@@ -1,22 +1,24 @@
 # -*- coding: utf-8 -*-
 
-from ..Encoder import Encoder
+from ..Encoder import Encoder, TypeEncoder
 
 
 from collections.abc import MutableSequence, Sequence, Mapping, Set
 from datetime import datetime, date, time
 from decimal import Decimal
-from json import dumps, JSONEncoder
+from json import dumps
+from dataclasses import is_dataclass, asdict
 
 __all__ = (
-	'Encoder'
+	'JavaScriptObjectNotationTypeEncoder',
+	'JavaScriptObjectNotationEncoder',
 )
 
 
-class TypeEncoder(JSONEncoder):
-	"""Type Encoder for JSON"""
+class JavaScriptObjectNotationTypeEncoder(TypeEncoder):
+	"""Type Encoder for JavaScriptObjectNotation"""
 
-	def default(self, obj):
+	def __call__(self, obj):
 		if isinstance(obj, Decimal):
 			return float(obj)
 		if isinstance(obj, MutableSequence):
@@ -29,22 +31,21 @@ class TypeEncoder(JSONEncoder):
 			return dict(obj)
 		if isinstance(obj, (datetime, date, time)):
 			return obj.isoformat()
-		return None
+		if is_dataclass(obj):
+			return asdict(obj)
+		raise RuntimeError('{} {} is not a supported type in {}'.format(type(obj), obj, self.__class__.__name__))
 
 
 class JavaScriptObjectNotationEncoder(Encoder):
 	"""Encoder Class for JSON"""
-	def __init__(self, charset: str = 'utf-8', ensure_ascii: bool = False):
-		self.chs = charset
+	def __init__(self, charset: str = 'utf-8', typeenc: TypeEncoder = JavaScriptObjectNotationTypeEncoder(), ensure_ascii: bool = False):
+		self.charset = charset
+		self.typeencoder = typeenc
 		self.ea = ensure_ascii
 		return
-	@property
-	def format(self): return 'application/json'
-	@property
-	def charset(self): return self.chs
 	def __call__(self, obj):
 		return dumps(
 			obj, 
-			cls=TypeEncoder,
+			default=self.typeencoder,
 			ensure_ascii=self.ea, 
 		).encode(self.charset)

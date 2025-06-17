@@ -44,9 +44,6 @@ class ServerHandler(BaseHandler):
 		result = self.stdout.write(data)
 		if result is None or result == len(data):
 			return
-		from warnings import warn
-		warn("SimpleHandler.stdout.write() should not do partial writes",
-			DeprecationWarning)
 		while True:
 			data = data[result:]
 			if not data:
@@ -133,7 +130,7 @@ class ServerRequestHandler(WSGIRequestHandler):
 		handler.request_handler = self	  # backpointer for logging
 		handler.run(self.server.get_app())
 		return
-	
+
 
 def serve(host, port, app):
 	"""Create a new WSGI server listening on `host` and `port` for `app`"""

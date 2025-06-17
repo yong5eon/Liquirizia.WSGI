@@ -41,6 +41,7 @@ __all__ = (
 class ResponseBadRequest(Response):
 	"""Response 400 Bad Request Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseBadRequest, self).__init__(
 			status=400,
 			message='Bad Request',
@@ -55,6 +56,7 @@ class ResponseBadRequest(Response):
 class ResponseUnauthorized(Response):
 	"""Response 401 Unauthorized Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseBadRequest, self).__init__(
 			status=401,
 			message='Unauthorized',
@@ -69,6 +71,7 @@ class ResponseUnauthorized(Response):
 class ResponsePaymentRequired(Response):
 	"""Response 402 Payment Required Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseBadRequest, self).__init__(
 			status=402,
 			message='Payment Required',
@@ -83,6 +86,7 @@ class ResponsePaymentRequired(Response):
 class ResponseForbidden(Response):
 	"""Response 403 Forbidden Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseBadRequest, self).__init__(
 			status=403,
 			message='Forbidden',
@@ -97,6 +101,7 @@ class ResponseForbidden(Response):
 class ResponseNotFound(Response):
 	"""Response 404 Not Found Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=404,
 			message='Not Found',
@@ -111,6 +116,7 @@ class ResponseNotFound(Response):
 class ResponseMethodNotAllowed(Response):
 	"""Response 405 Method Not Allowed Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=405,
 			message='Method Not Allowed',
@@ -125,6 +131,7 @@ class ResponseMethodNotAllowed(Response):
 class ResponseNotAcceptable(Response):
 	"""Response 406 Not Acceptable Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=406,
 			message='Not Acceptable',
@@ -139,6 +146,7 @@ class ResponseNotAcceptable(Response):
 class ResponseProxyAuthenticationRequired(Response):
 	"""Response 407 Proxy Authentication Required Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=407,
 			message='Proxy Authentication Required',
@@ -153,6 +161,7 @@ class ResponseProxyAuthenticationRequired(Response):
 class ResponseRequestTimeout(Response):
 	"""Response 408 Request Timeout Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=408,
 			message='Request Timeout',
@@ -167,6 +176,7 @@ class ResponseRequestTimeout(Response):
 class ResponseConflict(Response):
 	"""Response 409 Conflict Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=409,
 			message='Conflict',
@@ -181,6 +191,7 @@ class ResponseConflict(Response):
 class ResponseGone(Response):
 	"""Response 410 Gone Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=410,
 			message='Gone',
@@ -195,6 +206,7 @@ class ResponseGone(Response):
 class ResponseLengthRequired(Response):
 	"""Response 411 Length Required Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=411,
 			message='Length Required',
@@ -209,6 +221,7 @@ class ResponseLengthRequired(Response):
 class ResponsePreconditionFailed(Response):
 	"""Response 412 Precondition Failed Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=412,
 			message='Precondition Failed',
@@ -223,6 +236,7 @@ class ResponsePreconditionFailed(Response):
 class ResponsePayloadTooLarge(Response):
 	"""Response 413 Payload Too Large Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=413,
 			message='Payload Too Large',
@@ -237,6 +251,7 @@ class ResponsePayloadTooLarge(Response):
 class ResponseURITooLong(Response):
 	"""Response 414 URI Too Long Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=414,
 			message='URI Too Long',
@@ -251,6 +266,7 @@ class ResponseURITooLong(Response):
 class ResponseUnsupportedMediaType(Response):
 	"""Response 415 Unsupported Media Type Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=415,
 			message='Unsupported Media Type',
@@ -265,6 +281,7 @@ class ResponseUnsupportedMediaType(Response):
 class ResponseRangeNotSatisfiable(Response):
 	"""Response 416 Range Not Satisfiable Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=416,
 			message='Range Not Satisfiable',
@@ -279,6 +296,7 @@ class ResponseRangeNotSatisfiable(Response):
 class ResponseExpectationFailed(Response):
 	"""Response 417 Expectation Failed Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=417,
 			message='Expectation Failed',
@@ -294,6 +312,7 @@ class ResponseExpectationFailed(Response):
 class ResponseMisdirectedRequest(Response):
 	"""Response 421 Misdirected Request Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=421,
 			message='Misdirected Request',
@@ -308,6 +327,7 @@ class ResponseMisdirectedRequest(Response):
 class ResponseUnprocessableEntity(Response):
 	"""Response 422 Unprocessable Entity Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=422,
 			message='Unprocessable Entity',
@@ -322,6 +342,7 @@ class ResponseUnprocessableEntity(Response):
 class ResponseLocked(Response):
 	"""Response 423 Locked Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=423,
 			message='Locked',
@@ -336,6 +357,7 @@ class ResponseLocked(Response):
 class ResponseFailedDependency(Response):
 	"""Response 424 Failed Dependency Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=424,
 			message='Failed Dependency',
@@ -350,6 +372,7 @@ class ResponseFailedDependency(Response):
 class ResponseTooEarly(Response):
 	"""Response 425 Too Early Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=425,
 			message='Too Early',
@@ -364,6 +387,7 @@ class ResponseTooEarly(Response):
 class ResponseUpgradeRequired(Response):
 	"""Response 426 Upgrade Required Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=426,
 			message='Upgrade Required',
@@ -378,6 +402,7 @@ class ResponseUpgradeRequired(Response):
 class ResponseUnassigned(Response):
 	"""Response 427 Unassigned Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=427,
 			message='Unassigned',
@@ -392,6 +417,7 @@ class ResponseUnassigned(Response):
 class ResponsePreconditionRequired(Response):
 	"""Response 428 Precondition Required Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=428,
 			message='Precondition Required',
@@ -406,6 +432,7 @@ class ResponsePreconditionRequired(Response):
 class ResponseTooManyRequests(Response):
 	"""Response 429 Too Many Requests Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=429,
 			message='Too Many Requests',
@@ -420,6 +447,7 @@ class ResponseTooManyRequests(Response):
 class ResponseRequestHeaderFieldsTooLarge(Response):
 	"""Response 431 Request Header Fields Too Large Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=431,
 			message='Request Header Fields Too Large',
@@ -434,6 +462,7 @@ class ResponseRequestHeaderFieldsTooLarge(Response):
 class ResponseUnavailableForLegalReasons(Response):
 	"""Response 451 Unavailable For Legal Reasons Class"""
 	def __init__(self, body=None, format=None, charset=None, headers: Dict[str, Any] = {}):
+		if body is None: headers['Content-Length'] = 0
 		super(ResponseNotFound, self).__init__(
 			status=451,
 			message='Unavailable For Legal Reasons',

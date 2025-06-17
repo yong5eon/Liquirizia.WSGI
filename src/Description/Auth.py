@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
 
 from typing import Any, Iterator, KeysView, ItemsView, ValuesView, Mapping
+from typing import Dict, Union
 
 __all__ = (
-	'OAuth2Password',
-	'OAuth2Implict',
-	'OAuth2Credentials',
-	'OAuth2Code',
+	'Authenticate',
+	'OAuth2',
 	'HTTP',
-	'KeyHeader',
-	'KeyQuery',
-	'KeyCookie',
+	'Header',
+	'Query',
+	'Cookie',
 	'TLS',
 	'OpenIdConnect',
 )
 
-class Authorization(Mapping):
+class Authenticate(Mapping):
 	def __init__(self, **kwargs):
 		self.__properties__ = kwargs
 		return
@@ -56,93 +55,32 @@ class Authorization(Mapping):
 	def get(self, key: object) -> Any:
 		return self.__properties__.get(key)
 
-class OAuth2Password(Authorization):
+
+class OAuth2(Authenticate):
 	def __init__(
 		self,
-		url: str,
+		type: str,
+		authorizationUrl: str = None,
+		tokenUrl: str = None,
 		refreshUrl: str = None,
+		scopes: Dict[str, str] = None,
 		description: str = None,
-		scopes: Mapping[str, str] = {},
 	):
 		super().__init__(
 			type='oauth2',
 			flows={
-				'password': {
-					'tokenUrl': url,
-					'refreshUrl': refreshUrl,
-					'scopes': scopes
-				}
+				type: {}
 			},
-			description=description,
 		)
-		return
-	
-class OAuth2Implict(Authorization):
-	def __init__(
-		self,
-		url: str,
-		refreshUrl: str = None,
-		description: str = None,
-		scopes: Mapping[str, str] = {},
-	):
-		super().__init__(
-			type='oauth2',
-			flows={
-				'implicit': {
-					'authorizationUrl': url,
-					'refreshUrl': refreshUrl,
-					'scopes': scopes
-				}
-			},
-			description=description,
-		)
+		if authorizationUrl: self['flows'][type]['authorizationUrl'] = authorizationUrl
+		if tokenUrl: self['flows'][type]['tokenUrl'] = tokenUrl
+		if refreshUrl: self['flows'][type]['refreshUrl'] = refreshUrl
+		if scopes: self['flows'][type]['scopes'] = scopes
+		if description: self['description'] = description
 		return
 
-class OAuth2Credentials(Authorization):
-	def __init__(
-		self,
-		url: str,
-		refreshUrl: str = None,
-		description: str = None,
-		scopes: Mapping[str, str] = {},
-	):
-		super().__init__(
-			type='oauth2',
-			flows={
-				'clientCredentials': {
-					'tokenUrl': url,
-					'refreshUrl': refreshUrl,
-					'scopes': scopes
-				}
-			},
-			description=description,
-		)
-		return
-
-class OAuth2Code(Authorization):
-	def __init__(
-		self,
-		url: str,
-		authUrl: str,
-		refreshUrl: str = None,
-		description: str = None,
-		scopes: Mapping[str, str] = {},
-	):
-		super().__init__(
-			type='oauth2',
-			flows={
-				'clientCredentials': {
-					'tokenUrl': url,
-					'authrizationUrl': authUrl,
-					'refreshUrl': refreshUrl,
-					'scopes': scopes
-				}
-			},
-			description=description,
-		)
-		return
 	
-class HTTP(Authorization):
+class HTTP(Authenticate):
 	def __init__(
 		self,
 		format: str,
@@ -153,11 +91,12 @@ class HTTP(Authorization):
 			type='http',
 			scheme=format,
 			bearerFormat=bearerFormat,
-			description=description,
 		)
+		if description: self['description'] = description
 		return
 
-class KeyHeader(Authorization):
+
+class Header(Authenticate):
 	def __init__(
 		self,
 		name: str,
@@ -166,12 +105,12 @@ class KeyHeader(Authorization):
 		super().__init__(
 			type='apiKey',
 			name=name,
-			description=description,
 		)
+		if description: self['description'] = description
 		self['in'] = 'header'
 		return
 
-class KeyQuery(Authorization):
+class Query(Authenticate):
 	def __init__(
 		self,
 		name: str,
@@ -180,12 +119,13 @@ class KeyQuery(Authorization):
 		super().__init__(
 			type='apiKey',
 			name=name,
-			description=description,
 		)
+		if description: self['description'] = description
 		self['in'] = 'query'
 		return
 
-class KeyCookie(Authorization):
+
+class Cookie(Authenticate):
 	def __init__(
 		self,
 		name: str,
@@ -194,23 +134,25 @@ class KeyCookie(Authorization):
 		super().__init__(
 			type='apiKey',
 			name=name,
-			description=description,
 		)
+		if description: self['description'] = description
 		self['in'] = 'cookie'
 		return
 
-class TLS(Authorization):
+
+class TLS(Authenticate):
 	def __init__(
 		self,
 		description: str = None,
 	):
 		super().__init__(
 			type='mutualTLS',
-			description=description,
 		)
+		if description: self['description'] = description
 		return
-	
-class OpenIdConnect(Authorization):
+
+
+class OpenIdConnect(Authenticate):
 	def __init__(
 		self,
 		url: str,
@@ -219,7 +161,7 @@ class OpenIdConnect(Authorization):
 		super().__init__(
 			type='openIdConnect',
 			openIdConnectUrl=url,
-			description=description,
 		)
+		if description: self['description'] = description
 		return
 	

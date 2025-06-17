@@ -2,7 +2,6 @@
 
 from Liquirizia.WSGI import (
 		Application, 
-		Configuration,
 		Handler,
 		Request,
 		Response,
@@ -10,7 +9,7 @@ from Liquirizia.WSGI import (
 		serve,
 )
 from Liquirizia.WSGI.Responses import *
-from Liquirizia.WSGI.Filters import RequestFilters
+from Liquirizia.WSGI.Properties import RequestFilter
 from Liquirizia.WSGI.Description import Descriptor, Information, Contact, Tag
 from Liquirizia.WSGI.Utils import Load
 
@@ -20,9 +19,9 @@ from Liquirizia.FileSystemObject.Implements.FileSystem import (
 		Connection as FileSystemObject,
 )
 
-from api.Format import *
 
-from filters import ToJPEG
+from Filters import ToJPEG
+
 from os.path import dirname, realpath
 from sys import stderr
 from traceback import format_tb
@@ -33,28 +32,26 @@ PATH = dirname(realpath(__file__))
 FileSystemObjectHelper.Set(
 	'Sample',
 	FileSystemObject,
-	FileSystemObjectConfiguration('sample/res/images')
+	FileSystemObjectConfiguration('res/images')
 )
 
 class SampleHandler(Handler):
 	def onRequest(self, request: Request):
-		print('{} - {} - REQUEST BEGIN     - {} - {} - {} - {}'.format(
+		print('{} - {} - REQUEST  - {} - {} - {} - {} - {} - {}'.format(
 			datetime.now().isoformat(),
 			request.id[:16],
 			request.remote,
 			str(request),
+			request.parameters,
+			request.qs,
 			request.header('Content-Type'),
 			request.size,
 		))
-		print('Protocol - {}'.format(request.protocol if request.protocol else None))
-		print('Platform - {}'.format(request.platform.upper() if request.platform else None))
-		print('Device - {}'.format(request.device.upper() if request.device else None))
-		print('Is-Mobile - {}'.format(request.isMobile))
 		for k, _ in request.headers():
 			print('{} - {}'.format(k, request.header(k)))
 		return request, None
 	def onRequestResponse(self, request: Request, response: Response):
-		print('{} - {} - REQUEST RESPONSE  - {} - {} - {}'.format(
+		print('{} - {} - RESPONSE - {} - {} - {}'.format(
 			datetime.now().isoformat(),
 			request.id[:16],
 			request.remote,
@@ -65,7 +62,7 @@ class SampleHandler(Handler):
 			print('{} - {}'.format(k, response.header(k)))
 		return response
 	def onRequestComplete(self, request: Request):
-		print('{} - {} - REQUEST DONE      - {} - {}'.format(
+		print('{} - {} - DONE     - {} - {}'.format(
 			datetime.now().isoformat(),
 			request.id[:16],
 			request.remote,
@@ -73,62 +70,86 @@ class SampleHandler(Handler):
 		))
 		return
 	def onRequestError(self, request: Request, error: Error):
-		print('{} - {} - REQUEST ERROR     - {} - {}'.format(
+		print('{} - {} - ERROR    - {} - {}'.format(
 			datetime.now().isoformat(),
 			request.id[:16],
 			request.remote,
 			str(request)
 		))
-		print(error.traceback)
-		return ResponseError(error)
+		tb = str(error)
+		tb += '\n'
+		tb += ''.join(format_tb(error.__traceback__)).strip().replace(' ' * 4, ' ' * 2)
+		print(tb)
+		return ResponseText(
+			text=tb,
+			status=error.status,
+			message=error.message,
+			headers=error.headers,
+		)
 	def onRequestException(self, request: Request, e: Exception):
-		print('{} - {} - REQUEST EXCEPTION - {} - {}'.format(
+		print('{} - {} - EXCEPT   - {} - {}'.format(
 			datetime.now().isoformat(),
 			request.id[:16],
 			request.remote,
 			str(request)
 		))
-		tb =	str(e)
+		tb = str(e)
 		tb += '\n'
 		tb += ''.join(format_tb(e.__traceback__)).strip().replace(' ' * 4, ' ' * 2)
 		print(tb)
-		return ResponseInternalServerError(body=tb, format='text/plain', charset='utf-8')
+		return ResponseBadRequest(body=tb.encode(), format='text/plain', charset='utf-8')
 	def onError(self, env, error: Error):
-		print('{} - {} - ERROR            - {} - {}'.format(
+		print('{} - {} - ERROR   - {} - {} {} - {}'.format(
 			datetime.now().isoformat(),
 			env['REQUEST_ID'][:16],
+			env['REMOTE_ADDR'],
+			env['REQUEST_METHOD'],
 			env['PATH_INFO'],
 			str(error)
 		))
-		print(error.traceback)
-		return ResponseError(error)
+		tb = str(error)
+		tb += '\n'
+		tb += ''.join(format_tb(error.__traceback__)).strip().replace(' ' * 4, ' ' * 2)
+		print(tb)
+		return ResponseText(
+			text=tb,
+			status=error.status,
+			message=error.message,
+			headers=error.headers,
+		)
 	def onException(self, env, e: Exception):
-		print('{} - {} - EXCEPTION        - {} - {}'.format(
+		print('{} - {} - EXCEPT  - {} - {} {} - {}'.format(
 			datetime.now().isoformat(),
 			env['REQUEST_ID'][:16],
+			env['REMOTE_ADDR'],
+			env['REQUEST_METHOD'],
 			env['PATH_INFO'],
 			str(e)
 		))
-		tb =	str(e)
+		tb = str(e)
 		tb += '\n'
 		tb += ''.join(format_tb(e.__traceback__)).strip().replace(' ' * 4, ' ' * 2)
 		print(tb)
-		return ResponseServiceUnavailable(body=tb, format='text/plain', charset='utf-8')
+		return ResponseServiceUnavailable(body=tb.encode(), format='text/plain', charset='utf-8')
 
 
 aps = Application(
 	handler=SampleHandler(),
-	conf=Configuration(
-		headers={
-			'X_TOKEN': 'X-Token',
-		},
-	)
+	headers={
+		'X_APP_ID': 'X-App-Id',
+		'CREDENTIALS': 'Credentials',
+		'CONTENT_FORMAT': 'Content-Format',
+		'CONTENT_CHARSET': 'Content-Charset',
+	},
 )
+
+from Liquirizia.WSGI.Description import *
+from Liquirizia.Description import *
 
 descriptor = Descriptor(
 	info=Information(
 		title='Liquirizia.WSGI Sample API',
-		version=open('VERSION', 'rt').read().strip(),
+		version=open('../VERSION', 'rt').read().strip(),
 		summary='Sample API Document',
 		description='Sample API',
 		contact=Contact(
@@ -137,60 +158,100 @@ descriptor = Descriptor(
 			email='contact@email.com'
 		)
 	),
-	# version='3.0.0'
+	errorResponses=(
+		Response(
+			status=400,
+			description='잘못된 요청',
+			content=Content(
+				format='text/plain',
+				schema=String('원인')
+			)
+		),
+	),
+	authErrorResponses=(
+		Response(
+			status=401,
+			description='인증 실패',
+			content=Content(
+				format='text/plain',
+				schema=String('원인')
+			)
+		),
+		Response(
+			status=403,
+			description='권한 없음',
+			content=Content(
+				format='text/plain',
+				schema=String('원인')
+			)
+		),
+	),
 )
 
-Load(path='sample/api')
+Load(mod='runners')
 
+# import model
+from Liquirizia.Description import ToSchema
+from runners.Model import *
 # apply swagger-ui
 import sys
 import DocumentHandler
 
-from swagger_ui import supported_list
+from swagger_ui import supported_list, api_doc
 
 sys.modules['swagger_ui.handlers.Liquirizia'] = DocumentHandler
 supported_list.append('Liquirizia')
-
-from Liquirizia.WSGI import Application, Configuration
-from Liquirizia.WSGI.Description import (
-	Descriptor,
-	Information,
-	Contact,
-)
-from swagger_ui import api_doc
 
 api_doc(
 	aps,
 	config=Descriptor().toDocument(
 		tags=(
 			Tag('RequestRunner', description='일반적인 요청 처리 예제'),
-			Tag('RequestRunner - Content Validation', description='일반적인 요청 처리 시 본문으로 전달되는 컨텐츠의 유효성 검사 예제'),
 			Tag('RequestStreamRunner', description='스트림 요청 처리 예제'),
 			Tag('RequestStreamRunner - Chunked', description='청크 스트림 요청 처리 예제'),
 			Tag('RequestServerSentEventsRunner', description='Server-Sent Events 요청 처리 예제'),
 			Tag('RequestWebSocketRunner', description='WebSocket 요청 처리 예제'),
+			Tag('Content Validation', description='일반적인 요청 처리 시 본문으로 전달되는 컨텐츠의 유효성 검사 예제'),
+			Tag('Auth', description='인증 처리 예제'),
+			Tag('Common'),
 		),
 		schemas=(
-			FormatError,
-			FormatRequest,
-			FormatResponse,	
-			FormatData,
-			FormatParameters,
-			FormatQueryString,
-			FormatContent,
-			FormatExtra,
+			ToSchema(ParametersModel, description='Parameter'),
+			ToSchema(QueriesModel, description='QueryString'),
+			ToSchema(ContentModel, description='Content'),
+			ToSchema(ArgumentsModel, description='Arguments'),
+			ToSchema(DataModel, description='Data'),
+			ToSchema(ResponseModel, description='Response'),
 		),
-		url=lambda url: {
-			'/api/content/bool': '11',
-			'/api/content/integer': '12',
-			'/api/content/number': '13',
-			'/api/content/string': '14',
-			'/api/content/array': '14',
-			'/api/content/object': '14',
-		}.get(url, '99'),
-		method=lambda o: {
-			'GET': 1,
-			'POST': 2,
+		sortUrl=lambda url: {
+			# request runner
+			'/api/run/:a/:b': 1,
+			'/api/run/upload': 2,
+			# content validation
+			'/api/content/bool': 1,
+			'/api/content/integer': 2,
+			'/api/content/number': 3,
+			'/api/content/string': 4,
+			'/api/content/array': 5,
+			'/api/content/object': 6,
+			# auth
+			'/api/auth/query': 1,
+			'/api/auth/cookie': 2,
+			'/api/auth/header': 3,
+			'/api/auth/http': 4,
+			'/api/auth/oauth2/implicit': 5,
+			'/api/auth/oauth2/implicit/token': 6,
+			'/api/auth/oauth2/password': 7,
+			'/api/auth/oauth2/password/token': 8,
+			'/api/auth/oauth2/clientcredentials': 9,
+			'/api/auth/oauth2/clientcredentials/token': 10,
+			'/api/auth/oauth2/authorizationcode': 11,
+			'/api/auth/oauth2/authorizationcode/token': 12,
+		}.get(url, 99),
+		sortMethod=lambda o: {
+			'OPTIONS': 0,
+			'POST': 1,
+			'GET': 2,
 			'PUT': 3,
 			'DELETE': 4,
 		}.get(o.upper(), 9),
@@ -200,16 +261,16 @@ api_doc(
 )
 
 # add resources to router
-aps.addFile('sample/res/html/welcome.html', '/')
-aps.addFile('sample/res/favicon.ico', '/favicon.ico')
-aps.addFiles('sample/res/css', '/css')
+aps.addFile('res/html/welcome.html', '/')
+aps.addFile('res/favicon.ico', '/favicon.ico')
+aps.addFiles('res/css', '/css')
 aps.addFileSystemObject(
 	FileSystemObjectHelper.Get('Sample'),
 	prefix='/thumbs',
-	onRequest=RequestFilters(ToJPEG()),
+	onRequest=ToJPEG(),
 )
-aps.addFile('sample/res/html/swagger.html', '/doc/swagger')
-aps.addFile('sample/res/html/redoc.html', '/doc/redoc')
+aps.addFile('res/html/swagger.html', '/doc/swagger')
+aps.addFile('res/html/redoc.html', '/doc/redoc')
 
 
 if __name__ == '__main__':
