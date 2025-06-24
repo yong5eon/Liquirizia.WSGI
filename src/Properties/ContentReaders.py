@@ -16,7 +16,7 @@ from ast import literal_eval
 from typing import Any, Union
 
 __all__ = (
-	'ByteArrayContentReader',
+	'ByteStringContentReader',
 	'TextContentReader',
 	'TextEvaluateContentReader',
 	'FormUrlEncodedContentReader',
@@ -24,7 +24,7 @@ __all__ = (
 )
 
 
-class ByteArrayContentReader(ContentReader):
+class ByteStringContentReader(ContentReader):
 	def __init__(
 		self,
 		va: Union[Validator, Pattern] = None,
