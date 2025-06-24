@@ -33,7 +33,7 @@ setup(
 		'Application Framework :: Liquirizia',
 	],
 	install_requires=[
-		'Liquirizia@git+https://github.com/yong5eon/Liquirizia.git',
+		'Liquirizia@git+https://github.com/yong5eon/Liquirizia.git@feature/211',
 	],
 	python_requires='>=3.9'
 )
