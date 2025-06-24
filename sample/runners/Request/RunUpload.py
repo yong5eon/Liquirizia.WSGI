@@ -32,7 +32,7 @@ __all__ = (
 		},
 	),
 	body=Body(
-		reader=ByteArrayContentReader(),
+		reader=ByteStringContentReader(),
 		content=Content(
 			format='application/octet-stream',
 			schema=Binary(),
