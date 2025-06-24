@@ -18,7 +18,7 @@ __all__ = (
 	url='/api/content/bool',
 	body=Body(
 		reader=JavaScriptObjectNotationContentReader(
-			va=IsBoolean(),
+			va=IsBool(),
 		),
 		content=Content(
 			format='application/json',

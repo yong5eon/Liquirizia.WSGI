@@ -32,7 +32,7 @@ __all__ = (
 	qs=QueryString(
 		{
 			'a': ToInteger(IsGreaterThan(5)),
-			'b': ToNumber(IsGreaterThan(9.0)),
+			'b': ToFloat(IsGreaterThan(9.0)),
 			'c': (
 				SetDefault('안녕'),
 				IsString(),

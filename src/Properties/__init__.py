@@ -33,7 +33,7 @@ from .Credentials import (
 )
 from .ContentReader import ContentReader
 from .ContentReaders import (
-	ByteArrayContentReader,
+	ByteStringContentReader,
 	TextContentReader,
 	TextEvaluateContentReader,
 	FormUrlEncodedContentReader,
@@ -74,7 +74,7 @@ __all__ = (
 	# ContentReader
 	'ContentReader',
 	# ContentReaders
-	'ByteArrayContentReader',
+	'ByteStringContentReader',
 	'TextContentReader',
 	'TextEvaluateContentReader',
 	'FormUrlEncodedContentReader',
