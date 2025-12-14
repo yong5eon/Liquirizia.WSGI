@@ -66,9 +66,9 @@ class RunOptions(RequestFactory):
 				rps = [_.upper().replace('-', '_') for _ in reqs]
 				sps = [_.upper().replace('-', '_') for _ in headers]
 				missings = []
-				for _ in rps:
+				for i, _ in enumerate(rps):
 					if _ not in sps:
-						missings.append(_)
+						missings.append(reqs[i])
 				if missings:
 					raise BadRequestError(reason='Unsupported headers: {}'.format(', '.join(missings)))
 			doc = descriptor.toDocument(path, request.header('Access-Control-Request-Method'))
@@ -114,9 +114,9 @@ class RunOptions(RequestFactory):
 			rps = [_.upper().replace('-', '_') for _ in reqs]
 			sps = [_.upper().replace('-', '_') for _ in headers]
 			missings = []
-			for _ in rps:
+			for i, _ in enumerate(rps):
 				if _ not in sps:
-					missings.append(_)
+					missings.append(reqs[i])
 			if missings:
 				raise BadRequestError(reason='Unsupported headers: {}'.format(', '.join(missings)))
 		doc = descriptor.toDocument(
