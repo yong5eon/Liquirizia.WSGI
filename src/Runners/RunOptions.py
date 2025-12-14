@@ -63,7 +63,12 @@ class RunOptions(RequestFactory):
 					raise ForbiddenError(reason='Origin {} is not allowed'.format(request.header('Origin')))
 			reqs = request.header('Access-Control-Request-Headers')
 			if reqs:
-				missings = [header for header in reqs if header not in headers]
+				rps = [_.upper().replace('-', '_') for _ in reqs]
+				sps = [_.upper().replace('-', '_') for _ in headers]
+				missings = []
+				for _ in rps:
+					if _ not in sps:
+						missings.append(_)
 				if missings:
 					raise BadRequestError(reason='Unsupported headers: {}'.format(', '.join(missings)))
 			doc = descriptor.toDocument(path, request.header('Access-Control-Request-Method'))
@@ -81,7 +86,8 @@ class RunOptions(RequestFactory):
 				response.header('Access-Control-Allow-Origin', ', '.join(origins))
 			if headers:
 				response.header('Access-Control-Allow-Headers', ', '.join(headers))
-			return response
+			writer.response(response)
+			return
 		origins = []
 		headers = []
 		for _, match in patterns.items():
@@ -105,7 +111,12 @@ class RunOptions(RequestFactory):
 		headers = list(set(headers))
 		reqs = request.header('Access-Control-Request-Headers')
 		if reqs:
-			missings = [header for header in reqs if header not in headers]
+			rps = [_.upper().replace('-', '_') for _ in reqs]
+			sps = [_.upper().replace('-', '_') for _ in headers]
+			missings = []
+			for _ in rps:
+				if _ not in sps:
+					missings.append(_)
 			if missings:
 				raise BadRequestError(reason='Unsupported headers: {}'.format(', '.join(missings)))
 		doc = descriptor.toDocument(
