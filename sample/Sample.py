@@ -32,7 +32,7 @@ PATH = dirname(realpath(__file__))
 FileSystemObjectHelper.Set(
 	'Sample',
 	FileSystemObject,
-	FileSystemObjectConfiguration('res/images')
+	FileSystemObjectConfiguration('sample/res/images')
 )
 
 class SampleHandler(Handler):
@@ -149,7 +149,7 @@ from Liquirizia.Description import *
 descriptor = Descriptor(
 	info=Information(
 		title='Liquirizia.WSGI Sample API',
-		version=open('../VERSION', 'rt').read().strip(),
+		version=open('VERSION', 'rt').read().strip(),
 		summary='Sample API Document',
 		description='Sample API',
 		contact=Contact(
@@ -261,16 +261,16 @@ api_doc(
 )
 
 # add resources to router
-aps.addFile('res/html/welcome.html', '/')
-aps.addFile('res/favicon.ico', '/favicon.ico')
-aps.addFiles('res/css', '/css')
+aps.addFile('sample/res/html/welcome.html', '/')
+aps.addFile('sample/res/favicon.ico', '/favicon.ico')
+aps.addFiles('sample/res/css', '/css')
 aps.addFileSystemObject(
 	FileSystemObjectHelper.Get('Sample'),
 	prefix='/thumbs',
 	onRequest=ToJPEG(),
 )
-aps.addFile('res/html/swagger.html', '/doc/swagger')
-aps.addFile('res/html/redoc.html', '/doc/redoc')
+aps.addFile('sample/res/html/swagger.html', '/doc/swagger')
+aps.addFile('sample/res/html/redoc.html', '/doc/redoc')
 
 
 if __name__ == '__main__':
