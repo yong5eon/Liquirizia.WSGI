@@ -163,3 +163,5 @@ cython_debug/
 
 # MISC
 tmp
+.github/instructions
+.vscode
