@@ -33,9 +33,9 @@ class SplitHeaders(Pattern):
 	qs=QueryString(
 		{
 			'p': IsString(),
-			'method': IsToNone(IsString()),
-			'headers': IsToNone(IsString(SplitHeaders(','))),
-			'origin': IsToNone(IsString()),
+			'method': Optional(IsString()),
+			'headers': Optional(IsString(SplitHeaders(','))),
+			'origin': Optional(IsString()),
 		},
 		requires=('p',),
 		format={

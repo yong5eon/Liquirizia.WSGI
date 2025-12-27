@@ -23,7 +23,7 @@ __all__ = (
 	headers=Headers(
 		{
 			'Content-Format': IsString(),
-			'Content-Charset': IsToNone(IsString()),
+			'Content-Charset': Optional(IsString()),
 		},
 		requires=['Content-Format'],
 		format={

@@ -25,8 +25,8 @@ __all__ = (
 				IsMappingOf({
 					'username': IsString(),
 					'password': IsString(),
-					'client_id': IsToNone(IsString()),
-					'client_secret': IsToNone(IsString()),
+					'client_id': Optional(IsString()),
+					'client_secret': Optional(IsString()),
 					'grant_type': (
 						SetDefault('password'),
 						IsString(IsIn('password')),

@@ -22,8 +22,8 @@ __all__ = (
 		{
 			'response_type': IsString(IsIn('code')),
 			'client_id': IsString(),
-			'redirect_uri': IsToNone(IsString()),
-			'state': IsToNone(IsString()),
+			'redirect_uri': Optional(IsString()),
+			'state': Optional(IsString()),
 		},
 		requires=('response_type', 'client_id'),
 	),
