@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 
 from wsgiref.simple_server import (
-	make_server,
 	WSGIServer,
 	WSGIRequestHandler,
 )
+from socketserver import ThreadingMixIn
 from wsgiref.handlers import SimpleHandler, BaseHandler
 
 __all__ = (
 	'serve'
 )
 
-class Server(WSGIServer): pass
+class Server(ThreadingMixIn, WSGIServer): pass
 
 class ServerHandler(BaseHandler):
 	server_software = 'Liquirizia(WSGI)'
