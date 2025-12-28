@@ -20,11 +20,9 @@ class ResponseBuffer(Response):
 		charset=None,
 		status=200,
 		message='OK',
-		headers: Dict[str, Any] ={} 
+		headers: Dict[str, Any] = {} 
 	):
-		headers = {
-			'Content-Length': size,
-		}
+		headers['Content-Length'] = size
 		super(ResponseBuffer, self).__init__(
 			status=status,
 			message=message,
