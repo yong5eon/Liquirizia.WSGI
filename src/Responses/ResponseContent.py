@@ -69,12 +69,11 @@ class ResponseJSON(Response):
 class ResponseContent(Response):
 	"""Response Content Class"""
 	def __init__(self, content: Content, status=200, message='OK', headers: Dict[str, Any] = {}):
-		_ = content.headers()
-		_.update(headers)
+		headers.update(content.headers())
 		super().__init__(
 			status=status,
 			message=message,
-			headers=_,
+			headers=headers,
 			body=content.body,
 			format=content.format,
 			charset=content.charset,
